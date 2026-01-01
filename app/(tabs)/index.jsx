@@ -4,11 +4,13 @@ import { ThemedView } from '@/components/themed-view';
 import { Image } from 'expo-image';
 import React, { useState } from 'react';
 import { Button, StyleSheet, TextInput } from 'react-native';
+import "../../global.css";
 import { Business } from '../components/business.js';
 
 export default function HomeScreen() {
   const [businessName, setBusinessName] = useState('');
-  const [businesses, setBusinesses] = useState<Business[]>([]);
+//   const [businesses, setBusinesses] = useState<Business[]>([]);
+  const [businesses, setBusinesses] = useState([]);
 
   const SubmitBusiness = () => {
 
