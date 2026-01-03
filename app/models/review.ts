@@ -1,5 +1,7 @@
-class Review {
-    constructor(private rating: number, private comment: string) {}
+export class Review {
+    private id: string = "1";
+
+    constructor(private rating: number, private comment: string, private date: Date, private customer: string) {}
 
     editComment(newComment: string) {
         this.comment = newComment;
@@ -10,6 +12,6 @@ class Review {
     }
 
     getReview() {
-        return { rating: this.rating, comment: this.comment };
+        return { id: this.id, rating: this.rating, comment: this.comment, date: this.date, customer: this.customer };
     }
 }

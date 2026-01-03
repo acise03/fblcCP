@@ -1,15 +1,13 @@
-class Business {
-    private ratings: number[] = [];
-    private reviews: string[] = [];
+import { Review } from "./review";
+
+export class Business {
+    private reviews: Review[] = [];
     private bookmark = false;
 
     constructor(private name: string, private category: string, private description: string) {}
 
     // Mutator methods
-    addRating(newRating: number) {
-        this.ratings.push(newRating);
-    }
-    addReview(newReview: string) {
+    addReview(newReview: Review) {
         this.reviews.push(newReview);
     }
     addBookmark() {
@@ -34,6 +32,3 @@ class Business {
     }
 
 }
-
-export { Business };
-
