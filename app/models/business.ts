@@ -1,6 +1,7 @@
 import { Review } from "./review";
 
 export class Business {
+    private id: string = "1";
     private reviews: Review[] = [];
     private bookmark = false;
 
