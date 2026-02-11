@@ -1,40 +1,45 @@
+import { useModalSettingsStore } from "@/store/useModalSettingsStore";
 import Feather from "@expo/vector-icons/Feather";
+import { useFocusEffect } from "expo-router";
 import { useState } from "react";
-import {
-    FlatList,
-    Image,
-    Pressable,
-    Text,
-    TextInput,
-    View,
-} from "react-native";
+import { FlatList, Pressable, Text, TextInput, View } from "react-native";
 import "../../global.css";
+import { Announcement } from "../../models/announcement";
+import { Poll } from "../../models/poll";
 import AnnouncementItem from "../components/announcementItem";
 import PollItem from "../components/pollItem";
-import { Announcement } from "../models/announcement";
-import { Poll } from "../models/poll";
+import ProfilePicture from "../components/profilePicture";
 
 type SocialItem = Announcement | Poll;
 
 const dummyData: SocialItem[] = [
-    new Announcement("Grand Opening! Here is a very long text asdiojfiodfjgiojeriogjioj", new Date(), "martin's grill"),
-    new Announcement("Holiday Hours", new Date(), "martin's grill"),
-    new Poll(
-        "The new chocolate cake was a hit at our North York location! What did you think of it?",
-        new Date(),
-        "Business1",
-        ["🍁", "🥀", "💀"]
-    ),
-    new Poll(
-        "Which day works best for you?",
-        new Date(),
-        "Business1",
-        ["Monday", "Wednesday", "Friday"]
-    ),
-]
+	new Announcement(
+		"Grand Opening! Here is a very long text asdiojfiodfjgiojeriogjioj",
+		new Date(),
+		"martin's grill",
+	),
+	new Announcement("Holiday Hours", new Date(), "martin's grill"),
+	new Poll(
+		"The new chocolate cake was a hit at our North York location! What did you think of it?",
+		new Date(),
+		"Business1",
+		["🍁", "🥀", "💀"],
+	),
+	new Poll("Which day works best for you?", new Date(), "Business1", [
+		"Monday",
+		"Wednesday",
+		"Friday",
+	]),
+];
 
 export default function BusinessSocial() {
 	const [message, setMessage] = useState("");
+	const setMode = useModalSettingsStore((state) => state.setMode);
+
+	useFocusEffect(() => {
+		setMode("business");
+		return () => {};
+	});
 
 	return (
 		<View className="h-full w-full bg-white">
@@ -43,10 +48,7 @@ export default function BusinessSocial() {
 					<Text className="font-bold text-2xl text-black dark:text-white">
 						Social
 					</Text>
-					<Image
-						resizeMode="contain"
-						className="rounded-full w-14 h-14 bg-gray-500"
-					/>
+					<ProfilePicture />
 				</View>
 				<View className="flex flex-col mt-6">
 					{/* <Text className="dark:text-gray-300 text-zinc-700 font-semibold text-xl">
@@ -59,8 +61,8 @@ export default function BusinessSocial() {
 							onChangeText={setMessage}
 							className="text-black h-44"
 							multiline={true}
-                            scrollEnabled={true}
-                            textAlignVertical="top"
+							scrollEnabled={true}
+							textAlignVertical="top"
 						/>
 						<View className="flex flex-row mx-1 justify-between">
 							<View className="flex flex-row">
@@ -92,22 +94,34 @@ export default function BusinessSocial() {
 						data={dummyData}
 						renderItem={({ item }) => {
 							if (item instanceof Announcement) {
-                                const announcementObject = item.getAnnouncement();
-                                return (
-                                    <AnnouncementItem text={announcementObject.text} date={announcementObject.date} />
-                                )
-                            } else {
-                                const pollObject = item.getPoll();
-                                return (
-                                    <PollItem text={pollObject.text} date={pollObject.date} votes={pollObject.votes} comments={pollObject.comments} />
-                                )
-                            }
+								const announcementObject = item.getAnnouncement();
+								return (
+									<AnnouncementItem
+										text={announcementObject.text}
+										date={announcementObject.date}
+									/>
+								);
+							} else {
+								const pollObject = item.getPoll();
+								return (
+									<PollItem
+										text={pollObject.text}
+										date={pollObject.date}
+										votes={pollObject.votes}
+										comments={pollObject.comments}
+									/>
+								);
+							}
 						}}
-						keyExtractor={(item) => item instanceof Announcement ? item.getAnnouncement().id : item.getPoll().id}
+						keyExtractor={(item) =>
+							item instanceof Announcement
+								? item.getAnnouncement().id
+								: item.getPoll().id
+						}
 						ItemSeparatorComponent={() => <View className="h-2" />}
-                        scrollEnabled={true}
-                        contentContainerStyle={{ paddingBottom: 8 }}
-                        showsVerticalScrollIndicator={false}
+						scrollEnabled={true}
+						contentContainerStyle={{ paddingBottom: 8 }}
+						showsVerticalScrollIndicator={false}
 					/>
 				</View>
 			</View>

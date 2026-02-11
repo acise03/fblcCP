@@ -9,29 +9,34 @@ import "react-native-reanimated";
 import "../global.css";
 
 import { useColorScheme } from "@/hooks/use-color-scheme";
+import { useModalSettingsStore } from "@/store/useModalSettingsStore";
 import { Platform, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import ModalSettings from "./components/modalSettings";
 
 export const unstable_settings = {
-	anchor: "(business)",
+	// anchor: "(business)",
 };
 
 export default function RootLayout() {
 	const colorScheme = useColorScheme();
-    const Container = Platform.OS === "web" ? View : SafeAreaView;
+	const Container = Platform.OS === "web" ? View : SafeAreaView;
+	const modalSettings = useModalSettingsStore((state) => state.visible);
 
 	return (
 		<ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-            <Container style={{ flex: 1 }}>
-                <Stack>
+			<Container className="flex-1">
+				<Stack>
 					<Stack.Screen name="(business)" options={{ headerShown: false }} />
+					<Stack.Screen name="(customer)" options={{ headerShown: false }} />
 					<Stack.Screen
 						name="modal"
 						options={{ presentation: "modal", title: "Modal" }}
 					/>
 				</Stack>
-                <StatusBar style="auto" />
-            </Container>
+				<ModalSettings />
+				<StatusBar style="auto" />
+			</Container>
 		</ThemeProvider>
 	);
 }

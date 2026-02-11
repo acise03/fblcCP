@@ -1,5 +1,7 @@
+import { useModalSettingsStore } from "@/store/useModalSettingsStore";
 import Entypo from "@expo/vector-icons/Entypo";
 import Feather from "@expo/vector-icons/Feather";
+import { useFocusEffect } from "expo-router";
 import {
     FlatList,
     Image,
@@ -10,6 +12,7 @@ import {
 } from "react-native";
 import "../../global.css";
 import ImageUploadItem from "../components/imageUploadItem";
+import ProfilePicture from "../components/profilePicture";
 
 let dummyImages = [
 	{ id: "1", uri: "https://reactnative.dev/img/tiny_logo.png" },
@@ -18,6 +21,13 @@ let dummyImages = [
 ];
 
 export default function BusinessAbout() {
+	const setMode = useModalSettingsStore((state) => state.setMode);
+
+	useFocusEffect(() => {
+		setMode("business");
+		return () => {};
+	});
+
 	if (dummyImages.length % 2 !== 0) {
 		dummyImages = [...dummyImages, { id: "empty", uri: "" }];
 	}
@@ -29,10 +39,7 @@ export default function BusinessAbout() {
 					<Text className="font-bold text-2xl text-black dark:text-white">
 						Business
 					</Text>
-					<Image
-						resizeMode="contain"
-						className="rounded-full w-14 h-14 bg-gray-500"
-					/>
+					<ProfilePicture />
 				</View>
 				<View className="relative w-full h-48 mt-8">
 					<Image className="bg-gray-500 w-full h-full rounded-3xl" />

@@ -1,8 +1,11 @@
+import { useModalSettingsStore } from "@/store/useModalSettingsStore";
 import Entypo from "@expo/vector-icons/Entypo";
+import { useFocusEffect } from "expo-router";
 import { FlatList, Image, Pressable, Text, View } from "react-native";
 import "../../global.css";
+import { Review } from "../../models/review";
 import ActivityItem from "../components/activityItem";
-import { Review } from "../models/review";
+import ProfilePicture from "../components/profilePicture";
 
 const dummyData: Review[] = [
 	new Review(5, "Great service!", new Date("2024-01-01"), "asdfjioj23of"),
@@ -11,18 +14,22 @@ const dummyData: Review[] = [
 ];
 
 export default function BusinessHome() {
+	const setMode = useModalSettingsStore((state) => state.setMode);
+
+	useFocusEffect(() => {
+		setMode("business");
+		return () => {};
+	});
+
 	return (
-		// Make this scrollable maybe
+		// TODO Make this scrollable maybe
 		<View className="h-full w-full bg-white">
 			<View className="mx-8 mt-8 flex flex-1 flex-col bg-white">
 				<View className="flex flex-row items-center justify-between">
 					<Text className="font-bold text-2xl text-black dark:text-white">
 						Dashboard
 					</Text>
-					<Image
-						resizeMode="contain"
-						className="rounded-full w-14 h-14 bg-gray-500"
-					/>
+					<ProfilePicture />
 				</View>
 				<View className="relative w-full h-48 mt-8">
 					<Image className="bg-gray-500 w-full h-full rounded-3xl" />
