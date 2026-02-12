@@ -1,13 +1,11 @@
-import { Announcement } from "@/models/announcement";
 import { Business } from "@/models/business";
 import { Review } from "@/models/review";
-
+import { Event } from "@/models/event";
 import { Image } from "react-native";
-import { Poll } from "@/models/poll";
 import { useModalSettingsStore } from "@/store/useModalSettingsStore";
-import Feather from "@expo/vector-icons/Feather";
 import { useFocusEffect } from "expo-router";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { REACT_APP_API_KEY } from "@env";
 
 import {
     FlatList,
@@ -19,8 +17,6 @@ import {
     View,
 } from "react-native";
 import "../../global.css";
-import AnnouncementItemCustomer from "../components/announcementItemCustomer";
-import BusinessItem from "../components/businessItem";
 import ProfilePicture from "../components/profilePicture";
 type Category = "food" | "retail" | "services" | "favourite" | "local";
 type SortBy = "recent" | "popular" | "ratings" | "distance" | "alphabetical";
@@ -58,6 +54,24 @@ testBusiness.addReview(testreview1);
 testBusiness.addReview(testreview2);
 testBusiness.addReview(testreview3);
 
+const testevent1 = new Event(
+    "Family Day Sale",
+    "Purchase our Happy Meal and Big Mac Combo for just $15.99",
+    new Date(),
+    new Date()
+
+)
+
+const testevent2 = new Event(
+    "Sunday Morning Sale",
+    "All menu items 5% off.",
+    new Date(),
+    new Date()
+)
+testBusiness.addEvent(testevent1);
+testBusiness.addEvent(testevent2);
+
+
 
 export default function CustomerHome() {
 	const [searchQuery, setSearchQuery] = useState("");
@@ -68,9 +82,40 @@ export default function CustomerHome() {
 	const inputRef = useRef<TextInput>(null);
 	const setMode = useModalSettingsStore((state) => state.setMode);
    
-   
-   
+    const [AISummary, setAISummary] = useState("... loading ...");
+
+    const generateAISummary = async () => {
+        const reviews = testBusiness.getReviews().map((rev) => {
+            const review = rev.getReview();
+            return `A rating of ${review.rating} was given with the comment: ${review.comment}`
+        })
+        
+        const prompt = `You are tasked with creating a brief 3-4 sentence a summary of the business ${testBusiness.getName()} using the following reviews: ${reviews.join("\n")}`;
+
+        const summary = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${REACT_APP_API_KEY}`,
+            },
+            body: JSON.stringify({
+                model: "openai/gpt-oss-120b",
+                messages: [{ role: "user", content: prompt }],
+                temperature: 1,
+                max_tokens: 512,
+                top_p: 1,
+            })
+        });
+
+        const results = await summary.json();
+        setAISummary(results.choices[0].message.content);    
     
+      
+    }
+    useEffect(() => {
+        generateAISummary();
+    }, []);
+
 
 	useFocusEffect(() => {
 		setMode("customer");
@@ -125,15 +170,42 @@ export default function CustomerHome() {
                         </Text>
 
                         <Text className="text-base text-black dark:text-white w-full">
-                        // add to class
+                        
+
+                        {testBusiness.getEvents().map((event) => {
+
+                        return (
+                            <View
+                             className="w-full bg-gray-100 dark:bg-gray-800 rounded-xl p-3 mb-2"
+                            >
+                            <View className="flex-row justify-between mb-1">
+                                <Text className="font-semibold text-black dark:text-white">
+                                {event.getName()}
+                                </Text>
+
+                            </View>
+
+                            <Text className="text-sm text-gray-700 dark:text-gray-300 mb-1">
+                                {event.getDescription()}
+                            </Text>
+
+                            <Text className="text-xs text-gray-500">
+                                {event.getStart().toDateString()} to {event.getEnd().toDateString()}
+                            </Text>
+                            </View>
+                        );
+                        })}
+
+
                         </Text>
+
                     </View>
                     <View className="flex flex-col items-start mb-2 px-4 gap-2">
                         <Text className="text-xl font-semibold text-black dark:text-white">
                         AI Summary of Reviews:
                         </Text>
-                        <Text className="text-base text-black dark:text-white w-full">
-                        // import ai
+                        <Text className="italic text-base text-black dark:text-white w-full">
+                        {AISummary} 
                         </Text>
                     </View>
 
@@ -143,12 +215,11 @@ export default function CustomerHome() {
                         </Text>
                         <Text className="text-base text-black dark:text-white w-full">
 
-                        {testBusiness.getReviews().map((review, index) => {
+                        {testBusiness.getReviews().map((review) => {
                         const r = review.getReview();
 
                         return (
                             <View
-                            key={index}
                             className="w-full bg-gray-100 dark:bg-gray-800 rounded-xl p-3 mb-2"
                             >
                             <View className="flex-row justify-between mb-1">

@@ -1,8 +1,10 @@
 import { Review } from "./review";
+import { Event } from "./event";
 
 export class Business {
     private id: string = "1";
     private reviews: Review[] = [];
+    private events: Event[] = [];
     private bookmark = false;
 
     constructor(private name: string, private category: string, private description: string, private banner: string) {}
@@ -10,6 +12,9 @@ export class Business {
     // Mutator methods
     addReview(newReview: Review) {
         this.reviews.push(newReview);
+    }
+    addEvent(newEvent: Event) {
+        this.events.push(newEvent);
     }
     addBookmark() {
         this.bookmark = true;
@@ -36,5 +41,8 @@ export class Business {
     }
     getReviews(){
         return this.reviews;
+    }
+    getEvents(){
+        return this.events;
     }
 }
