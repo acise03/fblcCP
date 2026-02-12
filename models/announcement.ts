@@ -6,4 +6,7 @@ export class Announcement {
     getAnnouncement() {
         return { id: this.id, text: this.text, date: this.date, business: this.business }
     }
+    getID() {
+        return this.id;
+    }
 }

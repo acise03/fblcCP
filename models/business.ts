@@ -5,7 +5,7 @@ export class Business {
     private reviews: Review[] = [];
     private bookmark = false;
 
-    constructor(private name: string, private category: string, private description: string) {}
+    constructor(private name: string, private category: string, private description: string, private banner: string) {}
 
     // Mutator methods
     addReview(newReview: Review) {
@@ -30,6 +30,11 @@ export class Business {
     }
     ifBookmarked() {
         return this.bookmark;
+    }  
+    getBanner() {
+        return this.banner;
     }
-
+    getReviews(){
+        return this.reviews;
+    }
 }
