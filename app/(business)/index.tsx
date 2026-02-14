@@ -23,9 +23,14 @@ export default function BusinessHome() {
 	});
 
 	useEffect(() => {
+		let mounted = true;
 		fetchReviews(ownedBusiness!!.id).then(() => {
+			if (!mounted) return;
 			setReviews(fetchedReviews);
 		});
+		return () => {
+			mounted = false;
+		};
 	}, [ownedBusiness]);
 
 	return (

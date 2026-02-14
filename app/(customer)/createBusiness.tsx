@@ -24,7 +24,9 @@ export default function CreateBusiness() {
 	const updateBusinessAddress = useBusinessStore(
 		(state) => state.updateBusinessAddress,
 	);
-	const userId = useAuthStore((state) => state.user!!.id);
+	const loading = useAuthStore((state) => state.loading);
+	if (loading) return null;
+	const userId = useAuthStore((state) => state.profile!!.id);
 	const isValidEmail = (value: string) =>
 		/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 	const isValidPhone = (value: string) => /^\+?[0-9().\-\s]{7,20}$/.test(value);

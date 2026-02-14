@@ -1,3 +1,5 @@
+import { usersApi } from "@/db/api/users";
+import { useEffect, useState } from "react";
 import { Image, Text, View } from "react-native";
 import "../../global.css";
 
@@ -16,8 +18,18 @@ export default function ActivityItem({
 	date,
 	customer,
 }: ActivityItemProps) {
-	// TODO need to add way to access other users in database to get full name
-	// const username = useAuthStore((state) => state)
+	const [username, setUsername] = useState(customer);
+
+	useEffect(() => {
+		let mounted = true;
+		usersApi.getById(id).then((user) => {
+			if (!mounted || !user) return;
+			setUsername(`${user.firstname} ${user.lastname}`.trim());
+		});
+		return () => {
+			mounted = false;
+		};
+	}, [id]);
 
 	return (
 		<View className="px-4 flex flex-row items-center rounded-2xl bg-orange-50 w-full h-20">

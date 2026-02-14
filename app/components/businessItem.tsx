@@ -16,9 +16,14 @@ export default function BusinessItem({ businessId }: BusinessItemProps) {
 	const [business, setBusiness] = useState<BusinessWithInfo | null>();
 
 	useEffect(() => {
+		let mounted = true;
 		fetchBusiness(businessId).then((res) => {
+			if (!mounted) return;
 			setBusiness(selectedBusiness);
 		});
+		return () => {
+			mounted = false;
+		};
 	}, [businessId]);
 
 	if (!business)

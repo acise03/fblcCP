@@ -51,9 +51,11 @@ export default function ModalSettings() {
 							onPress={() => {
 								setVisible(false);
 								toggleMode();
-								modalMode === "business"
-									? router.navigate("/(customer)")
-									: router.navigate("/(business)");
+								isBusiness
+									? modalMode === "business"
+										? router.navigate("/(customer)")
+										: router.navigate("/(business)")
+									: router.navigate("/(customer)/createBusiness");
 							}}
 							className="flex-1 w-full bg-purple-100 justify-center items-center rounded-xl"
 						>

@@ -17,7 +17,7 @@ export default function Login() {
 	const [firstName, setFirstName] = useState("");
 	const [lastName, setLastName] = useState("");
 	const [login, setLogin] = useState(true);
-	const isAuth = useAuthStore((state) => state.isAuthenticated);
+	const isAuth = useAuthStore((state) => state.session !== null);
 	const error = useAuthStore((state) => state.error);
 	const signIn = useAuthStore((state) => state.signIn);
 	const signUp = useAuthStore((state) => state.signUp);
@@ -94,6 +94,7 @@ export default function Login() {
 						onPress={() => {
 							console.log("pressed");
 							if (login) {
+								console.log(`${isAuth} working`);
 								signIn(email, password);
 							} else {
 								if (
@@ -109,7 +110,11 @@ export default function Login() {
 							}
 						}}
 					>
-						<Text>{login ? "Log in" : "Sign up"}</Text>
+						<Text>
+							{login
+								? "Log in"
+								: "Sign up\nAfter signing up check your email and log in again"}
+						</Text>
 					</Pressable>
 					<Pressable
 						className="mt-10"

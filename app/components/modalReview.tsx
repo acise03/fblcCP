@@ -18,7 +18,7 @@ export default function ModalReviews() {
 	const createReview = useReviewStore((state) => state.createReview);
 	const fetchPrev = useReviewStore((state) => state.fetchUserReviewForBusiness);
 	const userReview = useReviewStore((state) => state.userReview);
-	const userId = useAuthStore((state) => state.user!!.id);
+	const userId = useAuthStore((state) => state.profile!!.id);
 	const [review, setReview] = useState("");
 	const [rating, setRating] = useState(0);
 	const [error, setError] = useState("");

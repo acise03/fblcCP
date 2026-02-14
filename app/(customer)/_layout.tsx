@@ -9,7 +9,7 @@ import React from "react";
 
 export default function TabLayout() {
 	const colorScheme = useColorScheme();
-	const isAuth = useAuthStore((state) => state.isAuthenticated);
+	const isAuth = useAuthStore((state) => state.session !== null);
 	if (!isAuth) return <Redirect href="/login" />;
 
 	return (
