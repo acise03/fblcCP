@@ -1,6 +1,6 @@
 import { Redirect } from "expo-router";
 
-// Default entry point redirects into the business tab stack
+// Default entry point redirects into login
 export default function Index() {
-	return <Redirect href="/(business)" />;
+	return <Redirect href="/login" />;
 }

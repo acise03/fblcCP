@@ -1,3 +1,4 @@
+import { useAuthStore } from "@/store/useAuthStore";
 import { useModalSettingsStore } from "@/store/useModalSettingsStore";
 import Feather from "@expo/vector-icons/Feather";
 import { Link, useRouter } from "expo-router";
@@ -10,6 +11,7 @@ export default function ModalSettings() {
 	const setVisible = useModalSettingsStore((state) => state.setVisible);
 	const toggleMode = useModalSettingsStore((state) => state.toggleMode);
 	const router = useRouter();
+	const isBusiness = useAuthStore((state) => state.isBusinessOwner);
 
 	return (
 		<Modal transparent visible={modalVisible} animationType="slide">
@@ -29,7 +31,11 @@ export default function ModalSettings() {
 								className="rounded-full w-10 h-10 bg-gray-500"
 							/>
 						</View>
-						<Link href="/" className="my-4">
+						<Link
+							href="/accountSettings"
+							className="my-4"
+							onPress={() => setVisible(false)}
+						>
 							Account Settings
 						</Link>
 						<Link href="/" className="my-4">
@@ -52,9 +58,11 @@ export default function ModalSettings() {
 							className="flex-1 w-full bg-purple-100 justify-center items-center rounded-xl"
 						>
 							<Text>
-								{modalMode === "business"
-									? "Switch to Customer"
-									: "Switch to Business"}
+								{isBusiness
+									? modalMode === "business"
+										? "Switch to Customer"
+										: "Switch to Business"
+									: "Create a Business"}
 							</Text>
 						</Pressable>
 					</View>

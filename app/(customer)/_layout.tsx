@@ -1,13 +1,16 @@
-import { HapticTab } from '@/components/haptic-tab';
-import { Colors } from '@/constants/theme';
-import { useColorScheme } from '@/hooks/use-color-scheme';
-import Feather from '@expo/vector-icons/Feather';
-import { Tabs } from 'expo-router';
+import { HapticTab } from "@/components/haptic-tab";
+import { Colors } from "@/constants/theme";
+import { useColorScheme } from "@/hooks/use-color-scheme";
+import { useAuthStore } from "@/store/useAuthStore";
+import Feather from "@expo/vector-icons/Feather";
+import { Redirect, Tabs } from "expo-router";
 
-import React from 'react';
+import React from "react";
 
 export default function TabLayout() {
 	const colorScheme = useColorScheme();
+	const isAuth = useAuthStore((state) => state.isAuthenticated);
+	if (!isAuth) return <Redirect href="/login" />;
 
 	return (
 		<Tabs

@@ -15,7 +15,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import ModalSettings from "./components/modalSettings";
 
 export const unstable_settings = {
-	// anchor: "(business)",
+	initialRouteName: "login",
 };
 
 export default function RootLayout() {
@@ -27,12 +27,9 @@ export default function RootLayout() {
 		<ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
 			<Container className="flex-1">
 				<Stack>
-					<Stack.Screen name="(business)" options={{ headerShown: false }} />
 					<Stack.Screen name="(customer)" options={{ headerShown: false }} />
-					<Stack.Screen
-						name="modal"
-						options={{ presentation: "modal", title: "Modal" }}
-					/>
+					<Stack.Screen name="login" options={{ headerShown: false }} />
+					<Stack.Screen name="(business)" options={{ headerShown: false }} />
 				</Stack>
 				<ModalSettings />
 				<StatusBar style="auto" />

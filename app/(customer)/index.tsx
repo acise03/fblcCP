@@ -1,5 +1,6 @@
 import { Announcement } from "@/models/announcement";
 import { Poll } from "@/models/poll";
+import { useBusinessStore } from "@/store/useBusinessStore";
 import { useModalSettingsStore } from "@/store/useModalSettingsStore";
 import Feather from "@expo/vector-icons/Feather";
 import { useFocusEffect } from "expo-router";
@@ -42,39 +43,6 @@ const mockAnnouncements = [
 	]),
 ];
 
-const mockBusinesses = [
-	{
-		id: "1",
-		name: "McDonalds",
-		description:
-			"Famous for hamburgers, fries, and breakfast items like the Big Mac and Egg McMuffin",
-		category: "food",
-		rating: 4.5,
-		reviews: 1243,
-		distance: "0.5 mi",
-	},
-	{
-		id: "2",
-		name: "Best Buy",
-		description:
-			"Electronics retailer with TVs, laptops, cell phones, cameras and more",
-		category: "retail",
-		rating: 4.2,
-		reviews: 856,
-		distance: "1.2 mi",
-	},
-	{
-		id: "3",
-		name: "Yoga Studio",
-		description:
-			"Professional yoga classes for all levels. Experienced instructors.",
-		category: "services",
-		rating: 4.7,
-		reviews: 432,
-		distance: "0.8 mi",
-	},
-];
-
 export default function CustomerHome() {
 	const [searchQuery, setSearchQuery] = useState("");
 	const [selectedCategories, setSelectedCategories] = useState<Category[]>([]);
@@ -82,10 +50,14 @@ export default function CustomerHome() {
 	const [showFilters, setShowFilters] = useState(false);
 	const [activeTab, setActiveTab] = useState<Tab>("announcements");
 	const inputRef = useRef<TextInput>(null);
+	const businesses = useBusinessStore((state) => state.businesses);
+	const fetchBusinesses = useBusinessStore((state) => state.fetchBusinesses);
 	const setMode = useModalSettingsStore((state) => state.setMode);
+	const [refreshing, setRefreshing] = useState(false);
 
 	useFocusEffect(() => {
 		setMode("customer");
+		fetchBusinesses();
 		return () => {};
 	});
 
@@ -123,15 +95,30 @@ export default function CustomerHome() {
 		}
 	});
 
-	const filteredBusinesses = mockBusinesses.filter((business) => {
-		const matchesSearch =
-			business.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-			business.description.toLowerCase().includes(searchQuery.toLowerCase());
-		const matchesCategory =
-			selectedCategories.length === 0 ||
-			selectedCategories.includes(business.category as Category);
-		return matchesSearch && matchesCategory;
-	});
+	const filteredBusinesses = businesses
+		.filter((business) => {
+			const matchesSearch =
+				business.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+				business
+					.business_information!!.description!!.toLowerCase()
+					.includes(searchQuery.toLowerCase());
+			const matchesCategory = selectedCategories.length == 0;
+			// selectedCategories.length === 0 ||
+			// selectedCategories.includes(business.category as Category);
+			return matchesSearch && matchesCategory;
+		})
+		.sort((a, b) => {
+			if (sortBy === "ratings") {
+				return (b.average_rating ?? 0) - (a.average_rating ?? 0);
+			} else if (sortBy === "alphabetical") {
+				return a.name.localeCompare(b.name);
+			} else if (sortBy === "distance") {
+				// TODO maybe remove distance because we have a map
+			} else if (sortBy === "popular") {
+				return (b.review_count ?? 0) - (a.review_count ?? 0);
+			}
+			return 0;
+		});
 
 	return (
 		<TouchableWithoutFeedback
@@ -165,7 +152,6 @@ export default function CustomerHome() {
 							<Feather name="sliders" size={20} color="black" />
 						</Pressable>
 					</View>
-					{/* TODO add colour transition animations */}
 					<ScrollView
 						className="mb-4 flex flex-row w-full max-h-10"
 						horizontal={true}
@@ -261,7 +247,7 @@ export default function CustomerHome() {
 												Most Popular
 											</Text>
 										</Pressable>
-										<Pressable
+										{/* <Pressable
 											className={`${sortBy === "distance" ? "bg-slate-500" : "bg-slate-100"} rounded-xl px-4 py-2 mr-2`}
 											onPress={() => setSortBy("distance")}
 										>
@@ -270,7 +256,7 @@ export default function CustomerHome() {
 											>
 												Distance
 											</Text>
-										</Pressable>
+										</Pressable> */}
 										<Pressable
 											className={`${sortBy === "ratings" ? "bg-slate-500" : "bg-slate-100"} rounded-xl px-4 py-2 mr-2`}
 											onPress={() => setSortBy("ratings")}
@@ -319,12 +305,18 @@ export default function CustomerHome() {
 					) : (
 						<FlatList
 							data={filteredBusinesses}
-							renderItem={({ item }) => <BusinessItem />}
+							renderItem={({ item }) => <BusinessItem businessId={item.id} />}
 							keyExtractor={(item) => item.id}
 							ItemSeparatorComponent={() => <View className="h-2" />}
 							scrollEnabled={true}
 							contentContainerStyle={{ paddingBottom: 8 }}
 							showsVerticalScrollIndicator={false}
+							refreshing={refreshing}
+							onRefresh={async () => {
+								setRefreshing(true);
+								await fetchBusinesses();
+								setRefreshing(false);
+							}}
 						/>
 					)}
 				</View>

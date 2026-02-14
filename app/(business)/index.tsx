@@ -1,25 +1,32 @@
+import { ReviewWithUser } from "@/db/api/reviews";
+import { useAuthStore } from "@/store/useAuthStore";
 import { useModalSettingsStore } from "@/store/useModalSettingsStore";
+import { useReviewStore } from "@/store/useReviewStore";
 import Entypo from "@expo/vector-icons/Entypo";
 import { useFocusEffect } from "expo-router";
+import { useEffect, useState } from "react";
 import { FlatList, Image, Pressable, Text, View } from "react-native";
 import "../../global.css";
-import { Review } from "../../models/review";
 import ActivityItem from "../components/activityItem";
 import ProfilePicture from "../components/profilePicture";
 
-const dummyData: Review[] = [
-	new Review(5, "Great service!", new Date("2024-01-01"), "asdfjioj23of"),
-	new Review(4, "Nice ambiance.", new Date("2024-01-02"), "asdklfjlk23"),
-	new Review(3, "Average experience.", new Date("2024-01-03"), "asduihfiuh123"),
-];
-
 export default function BusinessHome() {
 	const setMode = useModalSettingsStore((state) => state.setMode);
+	const ownedBusiness = useAuthStore((state) => state.ownedBusiness);
+	const fetchReviews = useReviewStore((state) => state.fetchReviewsForBusiness);
+	const fetchedReviews = useReviewStore((state) => state.reviews);
+	const [reviews, setReviews] = useState<ReviewWithUser[]>();
 
 	useFocusEffect(() => {
 		setMode("business");
 		return () => {};
 	});
+
+	useEffect(() => {
+		fetchReviews(ownedBusiness!!.id).then(() => {
+			setReviews(fetchedReviews);
+		});
+	}, [ownedBusiness]);
 
 	return (
 		// TODO Make this scrollable maybe
@@ -34,7 +41,7 @@ export default function BusinessHome() {
 				<View className="relative w-full h-48 mt-8">
 					<Image className="bg-gray-500 w-full h-full rounded-3xl" />
 					<Text className="bottom-11 left-4 text-white font-bold text-2xl">
-						My Business
+						{ownedBusiness?.name}
 					</Text>
 					<Pressable className="absolute top-4 right-2">
 						<Entypo name="dots-three-vertical" size={24} color="white" />
@@ -46,20 +53,19 @@ export default function BusinessHome() {
 					</Text>
 					<FlatList
 						className="mt-2"
-						data={dummyData}
+						data={reviews}
 						renderItem={({ item }) => {
-							const reviewObject = item.getReview();
 							return (
 								<ActivityItem
-									id={reviewObject.id}
-									rating={reviewObject.rating}
-									comment={reviewObject.comment}
-									customer={reviewObject.customer}
-									date={reviewObject.date}
+									id={item.id}
+									rating={item.rating!!}
+									comment={item.review ?? ""}
+									customer={item.reviewerid!!}
+									date={item.date}
 								/>
 							);
 						}}
-						keyExtractor={(item) => item.getReview().id}
+						keyExtractor={(item) => item.id}
 						ItemSeparatorComponent={() => <View className="h-2" />}
 					/>
 				</View>
