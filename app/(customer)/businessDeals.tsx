@@ -25,6 +25,9 @@ const testBusiness = new Business(
 	"Fast Food",
 	"McDonald's is the world's leading global foodservice retailer with over 40,000 locations in more than 100 countries, serving burgers, fries, chicken, and breakfast items.",
 	"https://creativereview.imgix.net/uploads/2020/03/mcds-banner.jpg",
+    43.8150,
+    -79.4180
+
 ); // fix this later to make it not test
 
 const testreview1 = new Review(
