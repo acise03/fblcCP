@@ -14,6 +14,7 @@ import {
     TextInput,
     View,
 } from "react-native";
+import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 import "../../global.css";
 import ImageUploadItem from "../components/imageUploadItem";
 import ProfilePicture from "../components/profilePicture";
@@ -50,6 +51,7 @@ const fieldPlaceholders: Record<EditableInfoField, string> = {
 export default function BusinessAbout() {
 	const setMode = useModalSettingsStore((state) => state.setMode);
 	const [dropdownVisible, setDropdownVisible] = useState(false);
+	const [placeId, setPlaceId] = useState<string | null>(null);
 	const ownedBusiness = useAuthStore((state) => state.ownedBusiness);
 	const updateBusiness = useBusinessStore((state) => state.updateBusiness);
 	const updateBusinessAddress = useBusinessStore(
@@ -224,7 +226,6 @@ export default function BusinessAbout() {
 						onPress={() => setDropdownVisible((prev) => !prev)}
 					>
 						<Entypo name="dots-three-vertical" size={24} color="white" />
-						{/* TODO fix the ui also in a lot of other places */}
 						{dropdownVisible && (
 							<View
 								style={{
@@ -324,36 +325,79 @@ export default function BusinessAbout() {
 
 									{isEditing ? (
 										<View style={{ flexDirection: "column", marginTop: 8 }}>
-											<TextInput
-												value={draftValues[field]}
-												onChangeText={(text) =>
-													setDraftValues((prev) => ({ ...prev, [field]: text }))
-												}
-												placeholder={fieldPlaceholders[field]}
-												style={{
-													backgroundColor: "white",
-													borderRadius: 6,
-													paddingHorizontal: 8,
-													paddingVertical: 8,
-													borderWidth: 1,
-													borderColor: "#e5e7eb",
-													minHeight: isMultiline ? 90 : 40,
-													textAlignVertical: isMultiline ? "top" : "center",
-												}}
-												multiline={isMultiline}
-												autoCapitalize={
-													field === "email" || field === "website"
-														? "none"
-														: "sentences"
-												}
-												keyboardType={
-													field === "email"
-														? "email-address"
-														: field === "phone"
-															? "phone-pad"
-															: "default"
-												}
-											/>
+											{field === "address" ? (
+												<GooglePlacesAutocomplete
+													placeholder="Address"
+													fetchDetails={true}
+													keepResultsAfterBlur={true}
+													onPress={(data, details = null) => {
+														console.log(data);
+														setDraftValues((prev) => ({
+															...prev,
+															address: details?.formatted_address!!,
+														}));
+														setPlaceId(data.place_id);
+													}}
+													debounce={250}
+													enablePoweredByContainer={false}
+													query={{
+														key: process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY,
+														language: "en",
+													}}
+													textInputProps={{
+														value: draftValues.address,
+														onChangeText: (text: string) => {
+															setDraftValues((prev) => ({
+																...prev,
+																address: text,
+															}));
+															setPlaceId(null);
+														},
+													}}
+													styles={{
+														container: { flex: 0 },
+														listView: {
+															zIndex: 60,
+															elevation: 8,
+															backgroundColor: "white",
+														},
+													}}
+												/>
+											) : (
+												<TextInput
+													value={draftValues[field]}
+													onChangeText={(text) =>
+														setDraftValues((prev) => ({
+															...prev,
+															[field]: text,
+														}))
+													}
+													placeholder={fieldPlaceholders[field]}
+													style={{
+														backgroundColor: "white",
+														borderRadius: 6,
+														paddingHorizontal: 8,
+														paddingVertical: 8,
+														borderWidth: 1,
+														borderColor: "#e5e7eb",
+														minHeight: isMultiline ? 90 : 40,
+														textAlignVertical: isMultiline ? "top" : "center",
+													}}
+													multiline={isMultiline}
+													autoCapitalize={
+														field === "email" || field === "website"
+															? "none"
+															: "sentences"
+													}
+													keyboardType={
+														field === "email"
+															? "email-address"
+															: field === "phone"
+																? "phone-pad"
+																: "default"
+													}
+												/>
+											)}
 											{fieldErrors[field] ? (
 												<Text style={{ color: "#dc2626", marginTop: 6 }}>
 													{fieldErrors[field]}

@@ -3,10 +3,9 @@ import { ReviewWithUser } from "@/db/api/reviews";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useModalSettingsStore } from "@/store/useModalSettingsStore";
 import { useReviewStore } from "@/store/useReviewStore";
-import Entypo from "@expo/vector-icons/Entypo";
 import { useFocusEffect } from "expo-router";
 import { useEffect, useState } from "react";
-import { FlatList, Image, Pressable, Text, View } from "react-native";
+import { FlatList, Image, Text, View } from "react-native";
 import "../../global.css";
 import ActivityItem from "../components/activityItem";
 import ProfilePicture from "../components/profilePicture";
@@ -60,9 +59,6 @@ export default function BusinessHome() {
 					<Text className="bottom-11 left-4 text-white font-bold text-2xl">
 						{ownedBusiness?.name}
 					</Text>
-					<Pressable className="absolute top-4 right-2">
-						<Entypo name="dots-three-vertical" size={24} color="white" />
-					</Pressable>
 				</View>
 				<View className="flex flex-col mt-6">
 					<Text className="dark:text-gray-300 text-zinc-700 font-semibold text-xl">

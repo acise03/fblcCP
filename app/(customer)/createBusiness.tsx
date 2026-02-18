@@ -10,14 +10,16 @@ import {
     TouchableWithoutFeedback,
     View,
 } from "react-native";
+import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 
 export default function CreateBusiness() {
 	const [businessName, setBusinessName] = useState("");
-	const [address, setAddress] = useState("");
 	const [description, setDescription] = useState("");
 	const [email, setEmail] = useState("");
 	const [phone, setPhone] = useState("");
+	const [placeId, setPlaceId] = useState<string | null>(null);
 	const [website, setWebsite] = useState("");
+	const [address, setAddress] = useState("");
 	const createBusiness = useBusinessStore((state) => state.createBusiness);
 	const updateBusinessInfo = useBusinessStore(
 		(state) => state.updateBusinessInfo,
@@ -27,16 +29,14 @@ export default function CreateBusiness() {
 	);
 	const refreshBusiness = useAuthStore((state) => state.refreshOwnedBusiness);
 	const loading = useAuthStore((state) => state.loading);
-	if (loading) return null;
 	const userId = useAuthStore((state) => state.user!!.id);
 	const isValidEmail = (value: string) =>
 		/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 	const isValidPhone = (value: string) => /^\+?[0-9().\-\s]{7,20}$/.test(value);
 	const isValidWebsite = (value: string) =>
 		/^(https?:\/\/)?([a-z0-9-]+\.)+[a-z]{2,}(\/.*)?$/i.test(value);
-	const isValidAddress = (value: string) =>
-		/^(?=.*[a-zA-Z])(?=.*\d).{8,}$/.test(value.trim());
 	const error = useBusinessStore((state) => state.error);
+	if (loading) return null;
 
 	return (
 		<TouchableWithoutFeedback
@@ -53,10 +53,18 @@ export default function CreateBusiness() {
 						value={businessName}
 						placeholder="Business Name"
 					/>
-					<TextInput
-						onChangeText={setAddress}
-						value={address}
+					<GooglePlacesAutocomplete
 						placeholder="Address"
+						fetchDetails={true}
+						onPress={(data, details = null) => {
+							console.log(data);
+							setAddress(details?.formatted_address!!);
+							setPlaceId(data.place_id);
+						}}
+						query={{
+							key: process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY,
+							language: "en",
+						}}
 					/>
 					<TextInput
 						onChangeText={setDescription}
@@ -84,19 +92,19 @@ export default function CreateBusiness() {
 					<Pressable
 						onPress={async () => {
 							const b = businessName.trim();
-							const a = address.trim();
 							const d = description.trim();
 							const e = email.trim().toLowerCase();
 							const p = phone.trim();
 							const w = website.trim();
 							console.log("business create pressed");
 
-							// if (!b || !a || !d || !e || !p || !w) return;
-							// if (!isValidEmail(e)) return;
-							// if (!isValidPhone(p)) return;
-							// if (!isValidWebsite(w)) return;
-							// if (!isValidAddress(a)) return;
+							if (!b) return;
+							if (e && !isValidEmail(e)) return;
+							if (p && !isValidPhone(p)) return;
+							if (w && !isValidWebsite(w)) return;
 							// TODO deal with guards later
+
+							if (!placeId) return;
 							console.log("guards passed");
 
 							await createBusiness(b, userId).then((business) => {
