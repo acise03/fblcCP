@@ -19,11 +19,14 @@ export default function ActivityItem({
 	customer,
 }: ActivityItemProps) {
 	const [username, setUsername] = useState(customer);
+	const d = new Date(date);
+	const dateLabel = Number.isNaN(d.getTime()) ? "" : d.toDateString();
 
 	useEffect(() => {
 		let mounted = true;
-		usersApi.getById(id).then((user) => {
+		usersApi.getById(customer).then((user) => {
 			if (!mounted || !user) return;
+			console.log("getting username");
 			setUsername(`${user.firstname} ${user.lastname}`.trim());
 		});
 		return () => {
@@ -31,13 +34,15 @@ export default function ActivityItem({
 		};
 	}, [id]);
 
+	console.log(date);
+
 	return (
 		<View className="px-4 flex flex-row items-center rounded-2xl bg-orange-50 w-full h-20">
 			<Image className="rounded-full w-12 h-12 bg-gray-500" />
 			<View className="px-4 flex flex-col">
-				<Text className="text-xl font-bold">{customer}</Text>
+				<Text className="text-xl font-bold">{username}</Text>
 				<Text className="text-md font-medium">{comment}</Text>
-				<Text className="text-md font-medium">{date.toDateString()}</Text>
+				<Text className="text-md font-medium">{dateLabel}</Text>
 				<View style={{ flexDirection: "row" }}>
 					{[1, 2, 3, 4, 5].map((star) => (
 						<Text key={star}>{star <= rating ? "★" : "☆"}</Text>

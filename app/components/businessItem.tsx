@@ -1,30 +1,14 @@
 import { BusinessWithInfo } from "@/db/api";
-import { useBusinessStore } from "@/store/useBusinessStore";
 import { useModalReviewStore } from "@/store/useModalReviewStore";
-import { useEffect, useState } from "react";
 import { Image, Pressable, Text, View } from "react-native";
 
 type BusinessItemProps = {
-	businessId: string;
+	business: BusinessWithInfo;
 };
 
-export default function BusinessItem({ businessId }: BusinessItemProps) {
-	const fetchBusiness = useBusinessStore((state) => state.fetchBusinessById);
-	const selectedBusiness = useBusinessStore((state) => state.selectedBusiness);
+export default function BusinessItem({ business }: BusinessItemProps) {
 	const setVisible = useModalReviewStore((state) => state.setVisible);
 	const setActiveBusiness = useModalReviewStore((state) => state.setBusiness);
-	const [business, setBusiness] = useState<BusinessWithInfo | null>();
-
-	useEffect(() => {
-		let mounted = true;
-		fetchBusiness(businessId).then((res) => {
-			if (!mounted) return;
-			setBusiness(selectedBusiness);
-		});
-		return () => {
-			mounted = false;
-		};
-	}, [businessId]);
 
 	if (!business)
 		return (
@@ -63,7 +47,7 @@ export default function BusinessItem({ businessId }: BusinessItemProps) {
 				<Pressable
 					onPress={() => {
 						setVisible(true);
-						setActiveBusiness(businessId);
+						setActiveBusiness(business.id);
 					}}
 				>
 					<Text className="text-md font-medium">Leave Review</Text>

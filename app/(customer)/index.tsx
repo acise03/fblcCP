@@ -54,10 +54,13 @@ export default function CustomerHome() {
 	const fetchBusinesses = useBusinessStore((state) => state.fetchBusinesses);
 	const setMode = useModalSettingsStore((state) => state.setMode);
 	const [refreshing, setRefreshing] = useState(false);
+	const [loading, setLoading] = useState(0);
 
 	useFocusEffect(() => {
 		setMode("customer");
-		fetchBusinesses();
+		fetchBusinesses().then(() => {
+			setLoading((prev) => prev + 1);
+		});
 		return () => {};
 	});
 
@@ -247,16 +250,6 @@ export default function CustomerHome() {
 												Most Popular
 											</Text>
 										</Pressable>
-										{/* <Pressable
-											className={`${sortBy === "distance" ? "bg-slate-500" : "bg-slate-100"} rounded-xl px-4 py-2 mr-2`}
-											onPress={() => setSortBy("distance")}
-										>
-											<Text
-												className={`${sortBy === "distance" ? "text-white" : ""} font-medium`}
-											>
-												Distance
-											</Text>
-										</Pressable> */}
 										<Pressable
 											className={`${sortBy === "ratings" ? "bg-slate-500" : "bg-slate-100"} rounded-xl px-4 py-2 mr-2`}
 											onPress={() => setSortBy("ratings")}
@@ -305,7 +298,7 @@ export default function CustomerHome() {
 					) : (
 						<FlatList
 							data={filteredBusinesses}
-							renderItem={({ item }) => <BusinessItem businessId={item.id} />}
+							renderItem={({ item }) => <BusinessItem business={item} />}
 							keyExtractor={(item) => item.id}
 							ItemSeparatorComponent={() => <View className="h-2" />}
 							scrollEnabled={true}

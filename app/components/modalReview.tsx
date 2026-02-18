@@ -18,10 +18,12 @@ export default function ModalReviews() {
 	const createReview = useReviewStore((state) => state.createReview);
 	const fetchPrev = useReviewStore((state) => state.fetchUserReviewForBusiness);
 	const userReview = useReviewStore((state) => state.userReview);
-	const userId = useAuthStore((state) => state.user!!.id);
+	const user = useAuthStore((state) => state.user);
 	const [review, setReview] = useState("");
 	const [rating, setRating] = useState(0);
 	const [error, setError] = useState("");
+	if (!user) return null;
+	const userId = user?.id;
 
 	return (
 		<Modal transparent visible={modalVisible} animationType="slide">
@@ -44,24 +46,28 @@ export default function ModalReviews() {
 							placeholder="Leave a review"
 						/>
 						<Pressable
-							onPress={() => {
+							onPress={async () => {
 								// This check could be redundant as it checks on DB end
-								fetchPrev(userId, activeBusiness).then(() => {
-									if (userReview === null) {
-										createReview({
-											businessid: activeBusiness,
-											reviewerid: userId,
-											rating: rating,
-											review: review,
-										});
-										ToastAndroid.show("Review created", ToastAndroid.SHORT);
-										setVisible(false);
-									} else {
-										setError(
-											"You already have a review on this business, edit it instead.",
-										);
-									}
-								});
+								const userReviewNew = await fetchPrev(userId, activeBusiness);
+
+								if (userReviewNew === null) {
+									createReview({
+										businessid: activeBusiness,
+										reviewerid: userId,
+										rating: rating,
+										review: review,
+									});
+									ToastAndroid.show("Review created", ToastAndroid.SHORT);
+									setVisible(false);
+								} else {
+									setError(
+										"You already have a review on this business, edit it instead.",
+									);
+								}
+
+								// fetchPrev(userId, activeBusiness).then(() => {
+
+								// });
 							}}
 						>
 							<Text>Submit Review</Text>

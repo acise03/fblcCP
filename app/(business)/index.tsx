@@ -16,7 +16,6 @@ export default function BusinessHome() {
 	const [ownedBusiness, setOwnedBusiness] = useState<BusinessWithInfo>();
 	const refreshBusiness = useAuthStore((state) => state.refreshOwnedBusiness);
 	const fetchReviews = useReviewStore((state) => state.fetchReviewsForBusiness);
-	const oB = useAuthStore((state) => state.ownedBusiness);
 	const fetchedReviews = useReviewStore((state) => state.reviews);
 	const [reviews, setReviews] = useState<ReviewWithUser[]>();
 	const userId = useAuthStore((state) => state.user!!.id);
@@ -28,16 +27,19 @@ export default function BusinessHome() {
 
 	useEffect(() => {
 		let mounted = true;
-		if (!ownedBusiness) {
-			refreshBusiness().then((res) => {
-				setOwnedBusiness(oB!!);
-			});
-		} else {
-			fetchReviews(ownedBusiness!!.id).then(() => {
+		const run = async () => {
+			if (!ownedBusiness) {
+				const oB = await refreshBusiness();
 				if (!mounted) return;
-				setReviews(fetchedReviews);
-			});
-		}
+				setOwnedBusiness(oB ?? undefined);
+				return;
+			}
+
+			const reviews = await fetchReviews(ownedBusiness.id);
+			if (!mounted) return;
+			setReviews(reviews ?? []);
+		};
+		run();
 		return () => {
 			mounted = false;
 		};
@@ -70,6 +72,7 @@ export default function BusinessHome() {
 						className="mt-2"
 						data={reviews}
 						renderItem={({ item }) => {
+							console.log(item);
 							return (
 								<ActivityItem
 									id={item.id}

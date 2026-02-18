@@ -29,7 +29,7 @@ type AuthStore = {
 	signIn: (email: string, password: string) => Promise<void>;
 	signOut: () => Promise<void>;
 	updateProfile: (updates: Partial<Omit<User, "id">>) => Promise<void>;
-	refreshOwnedBusiness: () => Promise<void>;
+	refreshOwnedBusiness: () => Promise<BusinessWithInfo | null>;
 	setError: (error: string | null) => void;
 };
 
@@ -155,8 +155,10 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
 		try {
 			const ownedBusiness = await businessesApi.getByOwner(user.id);
 			set({ ownedBusiness });
+			return ownedBusiness;
 		} catch (error) {
 			set({ error: (error as Error).message });
+			return null;
 		}
 	},
 

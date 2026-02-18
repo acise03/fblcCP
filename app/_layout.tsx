@@ -12,6 +12,7 @@ import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useModalSettingsStore } from "@/store/useModalSettingsStore";
 import { Platform, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import ModalReviews from "./components/modalReview";
 import ModalSettings from "./components/modalSettings";
 
 export const unstable_settings = {
@@ -32,6 +33,7 @@ export default function RootLayout() {
 					<Stack.Screen name="(business)" options={{ headerShown: false }} />
 				</Stack>
 				<ModalSettings />
+				<ModalReviews />
 				<StatusBar style="auto" />
 			</Container>
 		</ThemeProvider>
