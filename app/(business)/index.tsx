@@ -1,3 +1,4 @@
+import { BusinessWithInfo } from "@/db/api";
 import { ReviewWithUser } from "@/db/api/reviews";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useModalSettingsStore } from "@/store/useModalSettingsStore";
@@ -12,10 +13,13 @@ import ProfilePicture from "../components/profilePicture";
 
 export default function BusinessHome() {
 	const setMode = useModalSettingsStore((state) => state.setMode);
-	const ownedBusiness = useAuthStore((state) => state.ownedBusiness);
+	const [ownedBusiness, setOwnedBusiness] = useState<BusinessWithInfo>();
+	const refreshBusiness = useAuthStore((state) => state.refreshOwnedBusiness);
 	const fetchReviews = useReviewStore((state) => state.fetchReviewsForBusiness);
+	const oB = useAuthStore((state) => state.ownedBusiness);
 	const fetchedReviews = useReviewStore((state) => state.reviews);
 	const [reviews, setReviews] = useState<ReviewWithUser[]>();
+	const userId = useAuthStore((state) => state.user!!.id);
 
 	useFocusEffect(() => {
 		setMode("business");
@@ -24,10 +28,16 @@ export default function BusinessHome() {
 
 	useEffect(() => {
 		let mounted = true;
-		fetchReviews(ownedBusiness!!.id).then(() => {
-			if (!mounted) return;
-			setReviews(fetchedReviews);
-		});
+		if (!ownedBusiness) {
+			refreshBusiness().then((res) => {
+				setOwnedBusiness(oB!!);
+			});
+		} else {
+			fetchReviews(ownedBusiness!!.id).then(() => {
+				if (!mounted) return;
+				setReviews(fetchedReviews);
+			});
+		}
 		return () => {
 			mounted = false;
 		};

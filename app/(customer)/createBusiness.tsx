@@ -1,5 +1,6 @@
 import { useAuthStore } from "@/store/useAuthStore";
 import { useBusinessStore } from "@/store/useBusinessStore";
+import { router } from "expo-router";
 import { useState } from "react";
 import {
     Keyboard,
@@ -24,9 +25,10 @@ export default function CreateBusiness() {
 	const updateBusinessAddress = useBusinessStore(
 		(state) => state.updateBusinessAddress,
 	);
+	const refreshBusiness = useAuthStore((state) => state.refreshOwnedBusiness);
 	const loading = useAuthStore((state) => state.loading);
 	if (loading) return null;
-	const userId = useAuthStore((state) => state.profile!!.id);
+	const userId = useAuthStore((state) => state.user!!.id);
 	const isValidEmail = (value: string) =>
 		/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 	const isValidPhone = (value: string) => /^\+?[0-9().\-\s]{7,20}$/.test(value);
@@ -87,21 +89,29 @@ export default function CreateBusiness() {
 							const e = email.trim().toLowerCase();
 							const p = phone.trim();
 							const w = website.trim();
+							console.log("business create pressed");
 
-							if (!b || !a || !d || !e || !p || !w) return;
-							if (!isValidEmail(e)) return;
-							if (!isValidPhone(p)) return;
-							if (!isValidWebsite(w)) return;
-							if (!isValidAddress(a)) return;
+							// if (!b || !a || !d || !e || !p || !w) return;
+							// if (!isValidEmail(e)) return;
+							// if (!isValidPhone(p)) return;
+							// if (!isValidWebsite(w)) return;
+							// if (!isValidAddress(a)) return;
+							// TODO deal with guards later
+							console.log("guards passed");
 
-							const business = await createBusiness(b, userId);
-							updateBusinessAddress(business.id, address);
-							updateBusinessInfo(business.id, {
-								description: d,
-								email: e,
-								phone: p,
-								website: w,
+							await createBusiness(b, userId).then((business) => {
+								updateBusinessAddress(business.id, address).then((res) => {
+									updateBusinessInfo(business.id, {
+										description: d,
+										email: e,
+										phone: p,
+										website: w,
+									});
+								});
 							});
+
+							refreshBusiness();
+							if (!error) router.replace("/(business)");
 						}}
 					>
 						<Text>Create Business</Text>

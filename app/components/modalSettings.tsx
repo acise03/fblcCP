@@ -11,7 +11,7 @@ export default function ModalSettings() {
 	const setVisible = useModalSettingsStore((state) => state.setVisible);
 	const toggleMode = useModalSettingsStore((state) => state.toggleMode);
 	const router = useRouter();
-	const isBusiness = useAuthStore((state) => state.isBusinessOwner);
+	const isBusiness = useAuthStore((state) => state.ownedBusiness !== null);
 
 	return (
 		<Modal transparent visible={modalVisible} animationType="slide">
