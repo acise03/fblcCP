@@ -96,7 +96,7 @@ export default function CustomerHome() {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
-					Authorization: `Bearer ${ENV.REACT_APP_API_KEY}`,
+					Authorization: `Bearer ${process.env.EXPO_PUBLIC_GROQ_API_KEY}`,
 				},
 				body: JSON.stringify({
 					model: "openai/gpt-oss-120b",
