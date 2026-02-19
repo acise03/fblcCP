@@ -1,9 +1,8 @@
 import { supabase } from "@/lib/supabase";
 import type {
   Business,
-  NewBusiness,
-  BusinessInfo,
   BusinessAddress,
+  BusinessInfo
 } from "../schema";
 
 export type BusinessWithInfo = Business & {
@@ -92,7 +91,11 @@ export const businessesApi = {
     return data;
   },
 
-  async create(business: { name: string; ownerid: string }): Promise<Business> {
+  async create(business: {
+    name: string;
+    ownerid: string;
+    category?: string;
+  }): Promise<Business> {
     const { data, error } = await supabase
       .from("businesses")
       .insert(business)

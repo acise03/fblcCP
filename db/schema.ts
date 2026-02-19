@@ -1,11 +1,11 @@
 import {
-  pgTable,
-  uuid,
-  varchar,
   integer,
+  pgSchema,
+  pgTable,
   text,
   timestamp,
-  pgSchema,
+  uuid,
+  varchar,
 } from "drizzle-orm/pg-core";
 
 // Reference Supabase's auth schema
@@ -36,6 +36,9 @@ export const Businesses = pgTable("businesses", {
     .notNull()
     .references(() => Users.id, { onDelete: "cascade" }),
   name: varchar("name", { length: 255 }).notNull(),
+  category: varchar("category", { length: 255 })
+    .notNull()
+    .default("Miscellaneous"),
 });
 
 export const BusinessInformation = pgTable("business_information", {

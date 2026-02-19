@@ -1,5 +1,5 @@
-import { create } from "zustand";
 import { businessesApi, BusinessWithInfo } from "@/db/api/businesses";
+import { create } from "zustand";
 
 type BusinessStore = {
   businesses: BusinessWithInfo[];
@@ -10,8 +10,15 @@ type BusinessStore = {
   // Actions
   fetchBusinesses: () => Promise<void>;
   fetchBusinessById: (id: string) => Promise<void>;
-  createBusiness: (name: string, ownerId: string) => Promise<BusinessWithInfo>;
-  updateBusiness: (id: string, updates: { name?: string }) => Promise<void>;
+  createBusiness: (
+    name: string,
+    ownerId: string,
+    category?: string,
+  ) => Promise<BusinessWithInfo>;
+  updateBusiness: (
+    id: string,
+    updates: { name?: string; category?: string },
+  ) => Promise<void>;
   updateBusinessInfo: (
     businessId: string,
     info: {
@@ -53,15 +60,15 @@ export const useBusinessStore = create<BusinessStore>((set, get) => ({
     }
   },
 
-  createBusiness: async (name: string, ownerId: string) => {
+  createBusiness: async (name: string, ownerId: string, category?: string) => {
     try {
       set({ loading: true, error: null });
       const newBusiness = await businessesApi.create({
         name,
         ownerid: ownerId,
+        category,
       });
 
-      // Fetch the full business with relations
       const fullBusiness = await businessesApi.getById(newBusiness.id);
 
       set((state) => ({
