@@ -45,7 +45,6 @@ export default function BusinessHome() {
 	}, [ownedBusiness]);
 
 	return (
-		// TODO Make this scrollable maybe
 		<View className="h-full w-full bg-white">
 			<View className="mx-8 mt-8 flex flex-1 flex-col bg-white">
 				<View className="flex flex-row items-center justify-between">

@@ -14,7 +14,6 @@ type AuthStore = {
 	error: string | null;
 
 	// Computed
-	// TODO derived states are bad
 	isAuthenticated: boolean;
 	isBusinessOwner: boolean;
 
@@ -150,7 +149,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
 
 	refreshOwnedBusiness: async () => {
 		const { user } = get();
-		if (!user) return;
+		if (!user) return null;
 
 		try {
 			const ownedBusiness = await businessesApi.getByOwner(user.id);

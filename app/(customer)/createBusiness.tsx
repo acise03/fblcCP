@@ -1,15 +1,8 @@
 import { useAuthStore } from "@/store/useAuthStore";
 import { useBusinessStore } from "@/store/useBusinessStore";
 import { router } from "expo-router";
-import { useState } from "react";
-import {
-    Keyboard,
-    Pressable,
-    Text,
-    TextInput,
-    TouchableWithoutFeedback,
-    View,
-} from "react-native";
+import React, { useState } from "react";
+import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 
 export default function CreateBusiness() {
@@ -20,6 +13,11 @@ export default function CreateBusiness() {
 	const [placeId, setPlaceId] = useState<string | null>(null);
 	const [website, setWebsite] = useState("");
 	const [address, setAddress] = useState("");
+	const [category, setCategory] = useState<
+		"food" | "retail" | "services" | "misc"
+	>("misc");
+	const [categoryMenuOpen, setCategoryMenuOpen] = useState(false);
+	const categoryOptions = ["food", "retail", "services", "misc"] as const;
 	const createBusiness = useBusinessStore((state) => state.createBusiness);
 	const updateBusinessInfo = useBusinessStore(
 		(state) => state.updateBusinessInfo,
@@ -39,11 +37,8 @@ export default function CreateBusiness() {
 	if (loading) return null;
 
 	return (
-		<TouchableWithoutFeedback
-			onPress={() => {
-				Keyboard.dismiss();
-			}}
-			accessible={false}
+		<ScrollView
+			contentContainerStyle={{ flexGrow: 1 }}
 			className="h-screen w-screen"
 		>
 			<View className="h-full w-full bg-white">
@@ -90,6 +85,33 @@ export default function CreateBusiness() {
 						inputMode="url"
 					/>
 					<Pressable
+						onPress={() => setCategoryMenuOpen((prev) => !prev)}
+						className="border border-gray-300 rounded-md px-3 py-3 mb-2"
+					>
+						<Text className="text-black">
+							{category.charAt(0).toUpperCase() + category.slice(1)}
+						</Text>
+					</Pressable>
+
+					{categoryMenuOpen && (
+						<View className="border border-gray-300 rounded-md mb-2">
+							{categoryOptions.map((option) => (
+								<Pressable
+									key={option}
+									onPress={() => {
+										setCategory(option);
+										setCategoryMenuOpen(false);
+									}}
+									className="px-3 py-3 border-b border-gray-200 last:border-b-0"
+								>
+									<Text className="text-black">
+										{option.charAt(0).toUpperCase() + option.slice(1)}
+									</Text>
+								</Pressable>
+							))}
+						</View>
+					)}
+					<Pressable
 						onPress={async () => {
 							const b = businessName.trim();
 							const d = description.trim();
@@ -102,12 +124,11 @@ export default function CreateBusiness() {
 							if (e && !isValidEmail(e)) return;
 							if (p && !isValidPhone(p)) return;
 							if (w && !isValidWebsite(w)) return;
-							// TODO deal with guards later
 
 							if (!placeId) return;
 							console.log("guards passed");
 
-							await createBusiness(b, userId).then((business) => {
+							await createBusiness(b, userId, category).then((business) => {
 								updateBusinessAddress(business.id, address).then((res) => {
 									updateBusinessInfo(business.id, {
 										description: d,
@@ -127,6 +148,6 @@ export default function CreateBusiness() {
 					</Pressable>
 				</View>
 			</View>
-		</TouchableWithoutFeedback>
+		</ScrollView>
 	);
 }

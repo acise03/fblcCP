@@ -1,14 +1,7 @@
 import { useAuthStore } from "@/store/useAuthStore";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
-import {
-    Keyboard,
-    Pressable,
-    Text,
-    TextInput,
-    TouchableWithoutFeedback,
-    View,
-} from "react-native";
+import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
 
 export default function Login() {
 	const [email, setEmail] = useState("");
@@ -32,12 +25,9 @@ export default function Login() {
 	}, [isAuth]);
 	// TODO add all the warnings when the things are wrong
 	return (
-		<TouchableWithoutFeedback
-			onPress={() => {
-				Keyboard.dismiss();
-			}}
-			accessible={false}
+		<ScrollView
 			className="h-screen w-screen"
+			contentContainerStyle={{ flexGrow: 1 }}
 		>
 			<View className="h-full w-full bg-white">
 				<View className="mx-8 mt-8 flex flex-1 flex-col bg-white justify-center">
@@ -124,6 +114,6 @@ export default function Login() {
 					</Pressable>
 				</View>
 			</View>
-		</TouchableWithoutFeedback>
+		</ScrollView>
 	);
 }

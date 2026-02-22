@@ -18,6 +18,11 @@ export default function TabLayout() {
 				tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
 				headerShown: false,
 				tabBarButton: HapticTab,
+				tabBarShowLabel: false,
+				tabBarStyle: {
+					paddingTop: 8,
+					height: 64,
+				},
 			}}
 		>
 			<Tabs.Screen
@@ -26,15 +31,6 @@ export default function TabLayout() {
 					title: "Home",
 					tabBarIcon: ({ color }) => (
 						<Feather name="home" size={24} color="black" />
-					),
-				}}
-			/>
-			<Tabs.Screen
-				name="businessDeals"
-				options={{
-					title: "View Business",
-					tabBarIcon: ({ color }) => (
-						<Feather name="table" size={24} color="black" />
 					),
 				}}
 			/>
@@ -56,6 +52,8 @@ export default function TabLayout() {
 					),
 				}}
 			/>
+			<Tabs.Screen name="businessDetails" options={{ href: null }} />
+			<Tabs.Screen name="createBusiness" options={{ href: null }} />
 		</Tabs>
 	);
 }

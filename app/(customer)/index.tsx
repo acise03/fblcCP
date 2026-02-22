@@ -4,14 +4,14 @@ import { useBusinessStore } from "@/store/useBusinessStore";
 import { useModalSettingsStore } from "@/store/useModalSettingsStore";
 import Feather from "@expo/vector-icons/Feather";
 import { useFocusEffect } from "expo-router";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
     FlatList,
     Pressable,
     ScrollView,
     Text,
     TextInput,
-    TouchableWithoutFeedback,
+    ToastAndroid,
     View,
 } from "react-native";
 import "../../global.css";
@@ -19,9 +19,39 @@ import AnnouncementItemCustomer from "../components/announcementItemCustomer";
 import BusinessItem from "../components/businessItem";
 import ProfilePicture from "../components/profilePicture";
 
-type Category = "food" | "retail" | "services" | "favourite" | "local";
+type Category = "food" | "retail" | "services" | "misc" | "favourite";
 type SortBy = "recent" | "popular" | "ratings" | "distance" | "alphabetical";
 type Tab = "announcements" | "businesses";
+
+const getFormattedAddressFromPlaceId = async (
+	placeId: string,
+): Promise<string | null> => {
+	try {
+		const url = `https://places.googleapis.com/v1/places/${encodeURIComponent(
+			placeId,
+		)}?fields=formattedAddress&key=${process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY}`;
+
+		const res = await fetch(url, {
+			method: "GET",
+			headers: {
+				"Content-Type": "application/json",
+			},
+		});
+
+		const json = await res.json();
+
+		if (res.ok) {
+			return json?.formattedAddress ?? null;
+		}
+
+		console.log("Places v1 error:", json);
+		ToastAndroid.show("Places error", ToastAndroid.SHORT);
+		return null;
+	} catch (err) {
+		ToastAndroid.show("Failed to fetch address", ToastAndroid.SHORT);
+		return null;
+	}
+};
 
 const mockAnnouncements = [
 	new Announcement(
@@ -55,6 +85,9 @@ export default function CustomerHome() {
 	const setMode = useModalSettingsStore((state) => state.setMode);
 	const [refreshing, setRefreshing] = useState(false);
 	const [loading, setLoading] = useState(0);
+	const [addressByBusinessId, setAddressByBusinessId] = useState<
+		Record<string, string>
+	>({});
 
 	useFocusEffect(() => {
 		setMode("customer");
@@ -71,8 +104,6 @@ export default function CustomerHome() {
 				: [...prev, category],
 		);
 	};
-
-	// TODO implement categories for businesses but I need backend for that
 
 	const filteredAnnouncements = mockAnnouncements.filter((item) => {
 		if (item instanceof Announcement) {
@@ -98,16 +129,36 @@ export default function CustomerHome() {
 		}
 	});
 
+	useEffect(() => {
+		const loadAddresses = async () => {
+			const entries = await Promise.all(
+				businesses.map(async (b) => {
+					const placeId = b.business_addresses?.address;
+					if (!placeId) return [b.id, ""] as const;
+					const formatted =
+						(await getFormattedAddressFromPlaceId(placeId)) ?? "";
+					return [b.id, formatted] as const;
+				}),
+			);
+			setAddressByBusinessId(Object.fromEntries(entries));
+		};
+
+		void loadAddresses();
+	}, [businesses]);
+
 	const filteredBusinesses = businesses
 		.filter((business) => {
+			const addr = (addressByBusinessId[business.id] ?? "").toLowerCase();
 			const matchesSearch =
+				searchQuery.length === 0 ||
 				business.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
 				business
 					.business_information!!.description!!.toLowerCase()
-					.includes(searchQuery.toLowerCase());
-			const matchesCategory = selectedCategories.length == 0;
-			// selectedCategories.length === 0 ||
-			// selectedCategories.includes(business.category as Category);
+					.includes(searchQuery.toLowerCase()) ||
+				addr.includes(searchQuery.toLowerCase());
+			const matchesCategory =
+				selectedCategories.length === 0 ||
+				selectedCategories.includes(business.category as Category);
 			return matchesSearch && matchesCategory;
 		})
 		.sort((a, b) => {
@@ -115,8 +166,6 @@ export default function CustomerHome() {
 				return (b.average_rating ?? 0) - (a.average_rating ?? 0);
 			} else if (sortBy === "alphabetical") {
 				return a.name.localeCompare(b.name);
-			} else if (sortBy === "distance") {
-				// TODO maybe remove distance because we have a map
 			} else if (sortBy === "popular") {
 				return (b.review_count ?? 0) - (a.review_count ?? 0);
 			}
@@ -124,11 +173,13 @@ export default function CustomerHome() {
 		});
 
 	return (
-		<TouchableWithoutFeedback
-			onPress={() => {
-				inputRef.current?.blur();
-			}}
-			accessible={false}
+		<ScrollView
+			contentContainerStyle={{ flexGrow: 1 }}
+			scrollEnabled={false}
+			bounces={false}
+			overScrollMode="never"
+			showsVerticalScrollIndicator={false}
+			showsHorizontalScrollIndicator={false}
 			className="h-screen w-screen"
 		>
 			<View className="h-full w-full bg-white">
@@ -179,10 +230,10 @@ export default function CustomerHome() {
 							<Text className="font-medium">Retail</Text>
 						</Pressable>
 						<Pressable
-							className={`${selectedCategories.includes("local") ? "bg-orange-50" : "bg-slate-100"} rounded-xl px-4 py-2 mr-2`}
-							onPress={() => toggleCategory("local")}
+							className={`${selectedCategories.includes("misc") ? "bg-orange-50" : "bg-slate-100"} rounded-xl px-4 py-2 mr-2`}
+							onPress={() => toggleCategory("misc")}
 						>
-							<Text className="font-medium">Local</Text>
+							<Text className="font-medium">Miscellaneous</Text>
 						</Pressable>
 						<Pressable
 							className={`${selectedCategories.includes("favourite") ? "bg-orange-50" : "bg-slate-100"} rounded-xl px-4 py-2`}
@@ -314,6 +365,6 @@ export default function CustomerHome() {
 					)}
 				</View>
 			</View>
-		</TouchableWithoutFeedback>
+		</ScrollView>
 	);
 }

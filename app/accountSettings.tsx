@@ -2,12 +2,11 @@ import { useAuthStore } from "@/store/useAuthStore";
 import { router } from "expo-router";
 import { useState } from "react";
 import {
-    Keyboard,
     Pressable,
+    ScrollView,
     Text,
     TextInput,
-    TouchableWithoutFeedback,
-    View,
+    View
 } from "react-native";
 
 export default function AccountSettings() {
@@ -16,12 +15,9 @@ export default function AccountSettings() {
 	const signOut = useAuthStore((state) => state.signOut);
 
 	return (
-		<TouchableWithoutFeedback
-			onPress={() => {
-				Keyboard.dismiss();
-			}}
-			accessible={false}
+		<ScrollView
 			className="h-screen w-screen"
+			contentContainerStyle={{ flexGrow: 1 }}
 		>
 			<View className="h-full w-full bg-white">
 				<View className="mx-8 mt-8 flex flex-1 flex-col bg-white justify-center">
@@ -51,6 +47,6 @@ export default function AccountSettings() {
 					</Pressable>
 				</View>
 			</View>
-		</TouchableWithoutFeedback>
+		</ScrollView>
 	);
 }

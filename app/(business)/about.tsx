@@ -12,6 +12,7 @@ import {
     ScrollView,
     Text,
     TextInput,
+    ToastAndroid,
     View,
 } from "react-native";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
@@ -48,11 +49,63 @@ const fieldPlaceholders: Record<EditableInfoField, string> = {
 	website: "Website URL",
 };
 
+type Category = "food" | "retail" | "services" | "misc";
+
+const toCategory = (value: unknown): Category => {
+	if (
+		value === "food" ||
+		value === "retail" ||
+		value === "services" ||
+		value === "misc"
+	) {
+		return value;
+	}
+	return "misc";
+};
+
+const getFormattedAddressFromPlaceId = async (
+	placeId: string,
+): Promise<string | null> => {
+	try {
+		const url = `https://places.googleapis.com/v1/places/${encodeURIComponent(
+			placeId,
+		)}?fields=formattedAddress&key=${process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY}`;
+
+		const res = await fetch(url, {
+			method: "GET",
+			headers: {
+				"Content-Type": "application/json",
+			},
+		});
+
+		const json = await res.json();
+
+		if (res.ok) {
+			return json?.formattedAddress ?? null;
+		}
+
+		console.log("Places v1 error:", json);
+		ToastAndroid.show("Places error", ToastAndroid.SHORT);
+		return null;
+	} catch (err) {
+		ToastAndroid.show("Failed to fetch address", ToastAndroid.SHORT);
+		return null;
+	}
+};
+
 export default function BusinessAbout() {
 	const setMode = useModalSettingsStore((state) => state.setMode);
 	const [dropdownVisible, setDropdownVisible] = useState(false);
 	const [placeId, setPlaceId] = useState<string | null>(null);
 	const ownedBusiness = useAuthStore((state) => state.ownedBusiness);
+	const [categoryMenuOpen, setCategoryMenuOpen] = useState(false);
+	const categoryOptions: readonly Category[] = [
+		"food",
+		"retail",
+		"services",
+		"misc",
+	];
+	const [category, setCategory] = useState<Category>("misc");
 	const updateBusiness = useBusinessStore((state) => state.updateBusiness);
 	const updateBusinessAddress = useBusinessStore(
 		(state) => state.updateBusinessAddress,
@@ -63,6 +116,7 @@ export default function BusinessAbout() {
 	const [editingName, setEditingName] = useState(false);
 	const [newName, setNewName] = useState("");
 	const refreshBusiness = useAuthStore((state) => state.refreshOwnedBusiness);
+	const [savedAddress, setSavedAddress] = useState("");
 
 	useFocusEffect(() => {
 		setMode("business");
@@ -90,13 +144,27 @@ export default function BusinessAbout() {
 	>({});
 
 	useEffect(() => {
-		setDraftValues({
-			description: ownedBusiness?.business_information?.description ?? "",
-			address: ownedBusiness?.business_addresses?.address ?? "",
-			phone: ownedBusiness?.business_information?.phone ?? "",
-			email: ownedBusiness?.business_information?.email ?? "",
-			website: ownedBusiness?.business_information?.website ?? "",
-		});
+		const hydrate = async () => {
+			const placeIdFromDb = ownedBusiness?.business_addresses?.address ?? "";
+
+			const resolvedAddress = placeIdFromDb
+				? ((await getFormattedAddressFromPlaceId(placeIdFromDb)) ?? "")
+				: "";
+
+			setSavedAddress(resolvedAddress);
+
+			setDraftValues({
+				description: ownedBusiness?.business_information?.description ?? "",
+				address: resolvedAddress,
+				phone: ownedBusiness?.business_information?.phone ?? "",
+				email: ownedBusiness?.business_information?.email ?? "",
+				website: ownedBusiness?.business_information?.website ?? "",
+			});
+
+			setCategory(toCategory(ownedBusiness?.category));
+		};
+
+		void hydrate();
 	}, [ownedBusiness]);
 
 	const validateField = (
@@ -151,7 +219,17 @@ export default function BusinessAbout() {
 		}
 
 		if (field === "address") {
-			await updateBusinessAddress(ownedBusiness.id, nextValue);
+			if (!placeId) {
+				setDraftValues((prev) => ({ ...prev, address: savedAddress }));
+				setEditingField(null);
+				ToastAndroid.show(
+					"Pick an address from suggestions.",
+					ToastAndroid.SHORT,
+				);
+				return;
+			}
+			await updateBusinessAddress(ownedBusiness.id, placeId!!);
+			setSavedAddress(draftValues.address.trim());
 		} else {
 			await updateBusinessInfo(ownedBusiness.id, {
 				[field]: nextValue,
@@ -294,6 +372,48 @@ export default function BusinessAbout() {
 					</View>
 				</View>
 				<View className="flex flex-col mt-6">
+					<View className="flex flex-row items-center justify-between">
+						<Text className="dark:text-gray-300 text-zinc-700 font-semibold text-xl">
+							Working Hours
+						</Text>
+					</View>
+					<Pressable
+						onPress={() => setCategoryMenuOpen((prev) => !prev)}
+						className="border border-gray-300 rounded-md px-3 py-3 mb-2"
+					>
+						<Text className="text-black">
+							{category.charAt(0).toUpperCase() + category.slice(1)}
+						</Text>
+					</Pressable>
+
+					{categoryMenuOpen && (
+						<View className="border border-gray-300 rounded-md mb-2">
+							{categoryOptions.map((option) => (
+								<Pressable
+									key={option}
+									onPress={() => {
+										setCategory(option);
+										setCategoryMenuOpen(false);
+									}}
+									className="px-3 py-3 border-b border-gray-200 last:border-b-0"
+								>
+									<Text className="text-black">
+										{option.charAt(0).toUpperCase() + option.slice(1)}
+									</Text>
+								</Pressable>
+							))}
+						</View>
+					)}
+
+					<Pressable
+						onPress={() =>
+							updateBusiness(ownedBusiness!!.id, { category: category })
+						}
+					>
+						<Text>Save</Text>
+					</Pressable>
+				</View>
+				<View className="flex flex-col mt-6">
 					<View className="flex flex-col mt-6">
 						{(
 							[
@@ -307,7 +427,7 @@ export default function BusinessAbout() {
 							const isEditing = editingField === field;
 							const currentValue =
 								field === "address"
-									? (ownedBusiness?.business_addresses?.address ?? "")
+									? (draftValues.address ?? "")
 									: ((ownedBusiness?.business_information?.[field] ??
 											"") as string);
 							const isMultiline = field === "description";
