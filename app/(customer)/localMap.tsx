@@ -1,7 +1,8 @@
 import React from "react";
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet, Text } from "react-native";
 import MapView, { Marker } from "react-native-maps";
 import { Business } from "@/models/business";
+import ProfilePicture from "../components/profilePicture";
 
 const testBusinesses: Business[] = [
   new Business(
@@ -36,10 +37,10 @@ export default function LocalMap() {
       <MapView
         style={{ flex: 1 }}
         initialRegion={{
-            latitude: 43.8110,
-            longitude: -79.4130,
-            latitudeDelta: 0.05,
-            longitudeDelta: 0.05,
+          latitude: 43.8110,
+          longitude: -79.4130,
+          latitudeDelta: 0.05,
+          longitudeDelta: 0.05,
         }}
       >
         {testBusinesses.map((business, index) => (
@@ -51,6 +52,28 @@ export default function LocalMap() {
           />
         ))}
       </MapView>
+      <Text
+        style={{
+          position: "absolute",
+          top: 20,
+          left: 18,
+          fontSize: 34,
+          fontWeight: "bold",
+          padding: 6,
+          borderRadius: 6,
+        }}
+      >
+        Map
+      </Text>
+      <View
+        style={{
+          position: "absolute",
+          top: 20,
+          right: 18,
+        }}
+      >
+        <ProfilePicture />
+      </View>
     </View>
   );
 }

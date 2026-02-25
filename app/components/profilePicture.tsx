@@ -1,6 +1,8 @@
 import { useModalSettingsStore } from "@/store/useModalSettingsStore";
 import { Image, Pressable } from "react-native";
 import "../../global.css";
+import Ionicons from '@expo/vector-icons/Ionicons';
+
 
 export default function ProfilePicture() {
 	const modalSettings = useModalSettingsStore((state) => state.visible);
@@ -8,10 +10,7 @@ export default function ProfilePicture() {
 
 	return (
 		<Pressable onPress={() => setVisible(!modalSettings)}>
-			<Image
-				resizeMode="contain"
-				className="rounded-full w-14 h-14 bg-gray-500"
-			/>
+			<Ionicons name="person-circle-outline" size={40} color="black" />
 		</Pressable>
 	);
 }

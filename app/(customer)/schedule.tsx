@@ -2,6 +2,8 @@ import { Business } from "@/models/business";
 import { Event } from "@/models/event";
 import { Review } from "@/models/review";
 import React, { useMemo, useState } from "react";
+import ProfilePicture from "../components/profilePicture";
+
 
 import {
   ScrollView,
@@ -103,49 +105,75 @@ export default function Schedule() {
   }, [selectedDate]);
 
   return (
-  <ScrollView >
-    <Calendar
-      markingType="multi-dot"
-      markedDates={markedDates}
-      onDayPress={(day: DateData) => {
-        setSelectedDate(day.dateString);
-        setSelectedEvent(null); 
-      }}
-    />
-
-    {(
-      <View  >
-        <Text style={{ color: "black", fontWeight: "bold"}}>
-          Events on {selectedDate}
-        </Text>
-
-        {selectedDayEvents.length === 0 ? (
-          <Text style={{ color: "black" }}>No events.</Text>
-        ) : (
-          selectedDayEvents.map((event, index) => (
-            <Text
-              style={{color: "black"}}
-              key={index}
-              onPress={() => setSelectedEvent(event)}
-            >
-             - {event.getName()}: {event.getDescription()}
+    <ScrollView
+      contentContainerStyle={{ flexGrow: 1 }}
+      scrollEnabled={false}
+      bounces={false}
+      overScrollMode="never"
+      showsVerticalScrollIndicator={false}
+      showsHorizontalScrollIndicator={false}
+      className="h-screen w-screen"
+    >
+      <View className="h-full w-full bg-white">
+        <View className="mx-8 mt-8 flex flex-col bg-white">
+          <View className="flex flex-row items-center justify-between">
+            <Text className="font-bold text-4xl text-black dark:text-white">
+              Calendar
             </Text>
-          ))
-        )}
-      </View>
-    )}
+            <ProfilePicture />
+          </View>
+          <  ScrollView style={{ backgroundColor: "white", flex: 1 }}>
+            <Calendar
+              markingType="multi-dot"
+              markedDates={markedDates}
+              onDayPress={(day: DateData) => {
+                setSelectedDate(day.dateString);
+                setSelectedEvent(null);
+              }}
+            />
 
-     {selectedEvent && (
-      <View >
-        <Text >
-          {selectedEvent.getName()}
-        </Text>
-        <Text>
-          {selectedEvent.getDescription()}
-        </Text>
-      </View>
-    )}
-  </ScrollView>
-);
-}
+            {(
+              <View  >
+                <View className="mt-4 flex flex-row items-center justify-between mb-2 mt-5">
+                  <Text className="font-bold text-2xl text-black dark:text-white">
+                  Events on {selectedDate}
+                  </Text>
+                </View>
+
  
+                {selectedDayEvents.length === 0 ? (
+                  <Text className="text-lg">No events.</Text>
+                ) : (
+                  selectedDayEvents.map((event, index) => (
+                    <Text
+                  
+                      key={index}
+                      onPress={() => setSelectedEvent(event)}
+                      className="text-lg"
+                    >
+                      - {event.getName()}: {event.getDescription()}
+                    </Text>
+                  ))
+                )}
+              </View>
+            )}
+
+            {selectedEvent && (
+              <View>
+                <Text className="text-lg" >
+                  {selectedEvent.getName()}
+                </Text>
+                <Text className="text-lg">
+                  {selectedEvent.getDescription()}
+                </Text>
+              </View>
+            )}
+          </ScrollView>
+        </View>
+
+
+      </View>
+    </ScrollView>
+  );
+}
+

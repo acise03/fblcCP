@@ -71,7 +71,7 @@ export default function BusinessItem({ business }: BusinessItemProps) {
 
 	return (
 		<Pressable
-			className="p-4 flex flex-row items-center rounded-2xl bg-orange-50 w-full"
+			className="p-4 flex flex-row items-center rounded-2xl bg-[#FFE4A3] w-full"
 			onPress={() => {
 				setActiveBusiness(business.id);
 				router.navigate("/(customer)/businessDetails");

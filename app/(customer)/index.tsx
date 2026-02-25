@@ -6,14 +6,15 @@ import Feather from "@expo/vector-icons/Feather";
 import { useFocusEffect } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import {
-    FlatList,
-    Pressable,
-    ScrollView,
-    Text,
-    TextInput,
-    ToastAndroid,
-    View,
+	FlatList,
+	Pressable,
+	ScrollView,
+	Text,
+	TextInput,
+	ToastAndroid,
+	View,
 } from "react-native";
+import Ionicons from '@expo/vector-icons/Ionicons';
 import "../../global.css";
 import AnnouncementItemCustomer from "../components/announcementItemCustomer";
 import BusinessItem from "../components/businessItem";
@@ -94,7 +95,7 @@ export default function CustomerHome() {
 		fetchBusinesses().then(() => {
 			setLoading((prev) => prev + 1);
 		});
-		return () => {};
+		return () => { };
 	});
 
 	const toggleCategory = (category: Category) => {
@@ -183,14 +184,54 @@ export default function CustomerHome() {
 			className="h-screen w-screen"
 		>
 			<View className="h-full w-full bg-white">
-				<View className="mx-8 mt-8 flex flex-1 flex-col bg-white">
+				<View className="mx-8 mt-8 flex flex-col bg-white">
 					<View className="flex flex-row items-center justify-between">
-						<Text className="font-bold text-2xl text-black dark:text-white">
-							Dashboard
+						<Text className="font-bold text-4xl text-black dark:text-white">
+							Home
 						</Text>
 						<ProfilePicture />
 					</View>
-					<View className="mb-4 mt-8 flex flex-row bg-orange-50 rounded-xl w-full items-center p-2 ps-4">
+					<View className="mt-4 flex flex-row items-center justify-between">
+						<Text className="font-bold text-2xl text-black dark:text-white">
+							Quick Search
+						</Text>
+					</View>
+					<ScrollView
+						className="mt-5 mb-4 flex flex-row w-full"
+						horizontal={true}
+						showsHorizontalScrollIndicator={false}
+					>
+						<Pressable
+							className={`${selectedCategories.includes("food") ? "bg-[#FFB627]" : "bg-[#FFE4A3]"} rounded-xl w-20 h-20 py-4 px-5 mr-5`} onPress={() => toggleCategory("food")}
+						>
+							<Ionicons name="fast-food-outline" size={35} color="black" />
+						</Pressable>
+						<Pressable
+							className={`${selectedCategories.includes("services") ? "bg-[#FFB627]" : "bg-[#FFE4A3]"} rounded-xl w-20 h-20 py-5 px-5 mr-5`}
+							onPress={() => toggleCategory("services")}
+						>
+							<Ionicons name="hammer-outline" size={35} color="black" />
+						</Pressable>
+						<Pressable
+							className={`${selectedCategories.includes("retail") ? "bg-[#FFB627]" : "bg-[#FFE4A3]"} rounded-xl w-20 h-20 py-4 px-5 mr-5`}
+							onPress={() => toggleCategory("retail")}
+						>
+							<Ionicons name="storefront-outline" size={35} color="black" />
+						</Pressable>
+						<Pressable
+							className={`${selectedCategories.includes("misc") ? "bg-[#FFB627]" : "bg-[#FFE4A3]"}  rounded-xl w-20 h-20 py-5 px-5 mr-5`}
+							onPress={() => toggleCategory("misc")}
+						>
+							<Ionicons name="cog-outline" size={35} color="black" />
+						</Pressable>
+						<Pressable
+							className={`${selectedCategories.includes("favourite") ? "bg-[#FFB627]" : "bg-[#FFE4A3]"}  rounded-xl w-20 h-20 py-5 px-5 mr-5`}
+							onPress={() => toggleCategory("favourite")}
+						>
+							<Ionicons name="star-outline" size={35} color="black" />
+						</Pressable>
+					</ScrollView>
+					<View className="mb-4 mt-4 flex flex-row bg-[#FFE4A3] rounded-xl w-full items-center p-2 ps-4">
 						<Feather name="search" size={20} color="black" />
 						<TextInput
 							ref={inputRef}
@@ -206,42 +247,6 @@ export default function CustomerHome() {
 							<Feather name="sliders" size={20} color="black" />
 						</Pressable>
 					</View>
-					<ScrollView
-						className="mb-4 flex flex-row w-full max-h-10"
-						horizontal={true}
-						showsHorizontalScrollIndicator={false}
-					>
-						<Pressable
-							className={`${selectedCategories.includes("food") ? "bg-orange-50" : "bg-slate-100"} rounded-xl px-4 py-2 mr-2`}
-							onPress={() => toggleCategory("food")}
-						>
-							<Text className="font-medium">Food</Text>
-						</Pressable>
-						<Pressable
-							className={`${selectedCategories.includes("services") ? "bg-orange-50" : "bg-slate-100"} rounded-xl px-4 py-2 mr-2`}
-							onPress={() => toggleCategory("services")}
-						>
-							<Text className="font-medium">Services</Text>
-						</Pressable>
-						<Pressable
-							className={`${selectedCategories.includes("retail") ? "bg-orange-50" : "bg-slate-100"} rounded-xl px-4 py-2 mr-2`}
-							onPress={() => toggleCategory("retail")}
-						>
-							<Text className="font-medium">Retail</Text>
-						</Pressable>
-						<Pressable
-							className={`${selectedCategories.includes("misc") ? "bg-orange-50" : "bg-slate-100"} rounded-xl px-4 py-2 mr-2`}
-							onPress={() => toggleCategory("misc")}
-						>
-							<Text className="font-medium">Miscellaneous</Text>
-						</Pressable>
-						<Pressable
-							className={`${selectedCategories.includes("favourite") ? "bg-orange-50" : "bg-slate-100"} rounded-xl px-4 py-2`}
-							onPress={() => toggleCategory("favourite")}
-						>
-							<Text className="font-medium">Favourites</Text>
-						</Pressable>
-					</ScrollView>
 					{showFilters && (
 						<View className="w-full flex flex-col bg-orange-50 p-4 rounded-xl">
 							<Text className="font-semibold">Sort By</Text>
@@ -318,22 +323,22 @@ export default function CustomerHome() {
 					)}
 					<View className="mb-4 mt-2 flex flex-row w-full items-center justify-items-start">
 						<Pressable
-							className={`${activeTab === "announcements" ? "bg-orange-50" : "bg-slate-100"} rounded-xl px-4 py-2 mr-2`}
+							className={`${activeTab === "announcements" ? "bg-[#FFB627]" : "bg-[#FFE4A3]"} rounded-xl px-4 py-2 mr-2`}
 							onPress={() => {
 								setActiveTab("announcements");
 								setSortBy("recent");
 							}}
 						>
-							<Text className="font-medium">Announcements</Text>
+							<Text className="text-xl font-bold">Announcements</Text>
 						</Pressable>
 						<Pressable
-							className={`${activeTab === "businesses" ? "bg-orange-50" : "bg-slate-100"} rounded-xl px-4 py-2 mr-2`}
+							className={`${activeTab === "businesses" ? "bg-[#FFB627]" : "bg-[#FFE4A3]"} rounded-xl px-4 py-2 mr-2`}
 							onPress={() => {
 								setActiveTab("businesses");
 								setSortBy("alphabetical");
 							}}
 						>
-							<Text className="font-medium">Find a Business</Text>
+							<Text className="text-xl font-bold">Find a Business</Text>
 						</Pressable>
 					</View>
 					{activeTab === "announcements" ? (
