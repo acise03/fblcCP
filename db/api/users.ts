@@ -1,5 +1,5 @@
 import { supabase } from "@/lib/supabase";
-import type { User, NewUser } from "../schema";
+import type { User } from "../schema";
 
 export const usersApi = {
   async getById(id: string): Promise<User | null> {
@@ -48,5 +48,44 @@ export const usersApi = {
       .upsert({ id: userId, address });
 
     if (error) throw error;
+  },
+
+  async getFavorite(userId: string): Promise<string[]> {
+    const { data, error } = await supabase
+      .from("favorite_businesses")
+      .select("businessid")
+      .eq("userid", userId);
+
+    if (error) throw error;
+    return data.map((row) => row.businessid);
+  },
+
+  async addFavorite(userId: string, businessId: string): Promise<void> {
+    const { error } = await supabase
+      .from("favorite_businesses")
+      .upsert({ userid: userId, businessid: businessId });
+
+    if (error) throw error;
+  },
+
+  async removeFavorite(userId: string, businessId: string): Promise<void> {
+    const { error } = await supabase
+      .from("favorite_businesses")
+      .delete()
+      .eq("userid", userId)
+      .eq("businessid", businessId);
+
+    if (error) throw error;
+  },
+
+  async isFavorite(userId: string, businessId: string): Promise<boolean> {
+    const { count, error } = await supabase
+      .from("favorite_businesses")
+      .select("userid", { count: "exact", head: true })
+      .eq("userid", userId)
+      .eq("businessid", businessId);
+
+    if (error) throw error;
+    return (count ?? 0) > 0;
   },
 };

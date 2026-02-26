@@ -3,6 +3,7 @@ import {
   pgEnum,
   pgSchema,
   pgTable,
+  primaryKey,
   text,
   timestamp,
   uuid,
@@ -73,6 +74,21 @@ export const BusinessPosts = pgTable("business_posts", {
   date: timestamp("date").defaultNow().notNull(),
 });
 
+export const FavoriteBusinesses = pgTable(
+  "favorite_businesses",
+  {
+    userid: uuid("userid")
+      .notNull()
+      .references(() => Users.id, { onDelete: "cascade" }),
+    businessid: uuid("businessid")
+      .notNull()
+      .references(() => Businesses.id, { onDelete: "cascade" }),
+  },
+  (table) => ({
+    pk: primaryKey({ columns: [table.userid, table.businessid] }),
+  }),
+);
+
 export const Reviews = pgTable("reviews", {
   id: uuid("id").primaryKey().defaultRandom(),
   businessid: uuid("businessid").references(() => Businesses.id, {
@@ -101,6 +117,9 @@ export type NewBusinessInfo = typeof BusinessInformation.$inferInsert;
 
 export type BusinessPost = typeof BusinessPosts.$inferSelect;
 export type NewBusinessPost = typeof BusinessPosts.$inferInsert;
+
+export type FavoriteBusiness = typeof FavoriteBusinesses.$inferSelect;
+export type NewFavoriteBusiness = typeof FavoriteBusinesses.$inferInsert;
 
 export type BusinessAddress = typeof BusinessAddresses.$inferSelect;
 export type NewBusinessAddress = typeof BusinessAddresses.$inferInsert;

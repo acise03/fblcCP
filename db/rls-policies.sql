@@ -37,6 +37,7 @@ ALTER TABLE business_information ENABLE ROW LEVEL SECURITY;
 ALTER TABLE business_addresses ENABLE ROW LEVEL SECURITY;
 ALTER TABLE reviews ENABLE ROW LEVEL SECURITY;
 ALTER TABLE business_posts ENABLE ROW LEVEL SECURITY;
+ALTER TABLE favorite_businesses ENABLE ROW LEVEL SECURITY;
 
 
 -- ============ USERS TABLE POLICIES ============
@@ -110,6 +111,20 @@ CREATE POLICY "business_posts_delete" ON business_posts
   FOR DELETE USING (
     businessid IN (SELECT id FROM businesses WHERE ownerid = auth.uid())
   );
+
+-- ============ FAVORITE_BUSINESSES TABLE POLICIES ============
+
+-- Users can read their own favorites
+CREATE POLICY "favorite_businesses_select" ON favorite_businesses
+  FOR SELECT USING (auth.uid() = userid);
+
+-- Users can add their own favorites
+CREATE POLICY "favorite_businesses_insert" ON favorite_businesses
+  FOR INSERT WITH CHECK (auth.uid() = userid);
+
+-- Users can remove their own favorites
+CREATE POLICY "favorite_businesses_delete" ON favorite_businesses
+  FOR DELETE USING (auth.uid() = userid);
 
 
 -- ============ BUSINESS_INFORMATION TABLE POLICIES ============
