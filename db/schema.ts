@@ -1,5 +1,6 @@
 import {
   integer,
+  pgEnum,
   pgSchema,
   pgTable,
   text,
@@ -59,6 +60,19 @@ export const BusinessAddresses = pgTable("business_addresses", {
   address: varchar("address", { length: 255 }),
 });
 
+export const PostType = pgEnum("post_type", ["announcement", "coupon", "sale"]);
+
+export const BusinessPosts = pgTable("business_posts", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  businessid: uuid("businessid")
+    .notNull()
+    .references(() => Businesses.id, { onDelete: "cascade" }),
+  type: PostType("type").notNull(),
+  highlight: varchar("highlight", { length: 255 }),
+  text: text("text").notNull(),
+  date: timestamp("date").defaultNow().notNull(),
+});
+
 export const Reviews = pgTable("reviews", {
   id: uuid("id").primaryKey().defaultRandom(),
   businessid: uuid("businessid").references(() => Businesses.id, {
@@ -84,6 +98,9 @@ export type NewBusiness = typeof Businesses.$inferInsert;
 
 export type BusinessInfo = typeof BusinessInformation.$inferSelect;
 export type NewBusinessInfo = typeof BusinessInformation.$inferInsert;
+
+export type BusinessPost = typeof BusinessPosts.$inferSelect;
+export type NewBusinessPost = typeof BusinessPosts.$inferInsert;
 
 export type BusinessAddress = typeof BusinessAddresses.$inferSelect;
 export type NewBusinessAddress = typeof BusinessAddresses.$inferInsert;

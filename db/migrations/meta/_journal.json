@@ -8,6 +8,13 @@
       "when": 1771469731729,
       "tag": "0000_plain_centennial",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1772118643069,
+      "tag": "0001_lonely_quicksilver",
+      "breakpoints": true
     }
   ]
 }

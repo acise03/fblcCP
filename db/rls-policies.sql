@@ -36,6 +36,7 @@ ALTER TABLE businesses ENABLE ROW LEVEL SECURITY;
 ALTER TABLE business_information ENABLE ROW LEVEL SECURITY;
 ALTER TABLE business_addresses ENABLE ROW LEVEL SECURITY;
 ALTER TABLE reviews ENABLE ROW LEVEL SECURITY;
+ALTER TABLE business_posts ENABLE ROW LEVEL SECURITY;
 
 
 -- ============ USERS TABLE POLICIES ============
@@ -85,6 +86,30 @@ CREATE POLICY "businesses_update" ON businesses
 -- Only owner can delete their business
 CREATE POLICY "businesses_delete" ON businesses
   FOR DELETE USING (auth.uid() = ownerid);
+
+-- ============ BUSINESS_POSTS TABLE POLICIES ============
+
+-- Anyone can read business posts
+CREATE POLICY "business_posts_select" ON business_posts
+  FOR SELECT USING (true);
+
+-- Owner can insert posts for their own business
+CREATE POLICY "business_posts_insert" ON business_posts
+  FOR INSERT WITH CHECK (
+    businessid IN (SELECT id FROM businesses WHERE ownerid = auth.uid())
+  );
+
+-- Owner can update posts for their own business
+CREATE POLICY "business_posts_update" ON business_posts
+  FOR UPDATE USING (
+    businessid IN (SELECT id FROM businesses WHERE ownerid = auth.uid())
+  );
+
+-- Owner can delete posts for their own business
+CREATE POLICY "business_posts_delete" ON business_posts
+  FOR DELETE USING (
+    businessid IN (SELECT id FROM businesses WHERE ownerid = auth.uid())
+  );
 
 
 -- ============ BUSINESS_INFORMATION TABLE POLICIES ============
