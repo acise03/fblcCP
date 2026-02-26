@@ -162,3 +162,59 @@ CREATE POLICY "reviews_delete" ON reviews
 ALTER TABLE reviews
   ADD CONSTRAINT reviews_unique_user_business
   UNIQUE (businessid, reviewerid);
+
+
+-- ============ STORAGE (BUSINESS BANNERS) ============
+
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('business-banners', 'business-banners', true)
+ON CONFLICT (id) DO NOTHING;
+
+CREATE POLICY "storage_banners_public_select" ON storage.objects
+  FOR SELECT TO public
+  USING (bucket_id = 'business-banners');
+
+CREATE POLICY "storage_banners_owner_insert" ON storage.objects
+  FOR INSERT TO authenticated
+  WITH CHECK (
+    bucket_id = 'business-banners'
+    AND EXISTS (
+      SELECT 1
+      FROM public.businesses b
+      WHERE b.id::text = (storage.foldername(name))[1]
+        AND b.ownerid = auth.uid()
+    )
+  );
+
+CREATE POLICY "storage_banners_owner_update" ON storage.objects
+  FOR UPDATE TO authenticated
+  USING (
+    bucket_id = 'business-banners'
+    AND EXISTS (
+      SELECT 1
+      FROM public.businesses b
+      WHERE b.id::text = (storage.foldername(name))[1]
+        AND b.ownerid = auth.uid()
+    )
+  )
+  WITH CHECK (
+    bucket_id = 'business-banners'
+    AND EXISTS (
+      SELECT 1
+      FROM public.businesses b
+      WHERE b.id::text = (storage.foldername(name))[1]
+        AND b.ownerid = auth.uid()
+    )
+  );
+
+CREATE POLICY "storage_banners_owner_delete" ON storage.objects
+  FOR DELETE TO authenticated
+  USING (
+    bucket_id = 'business-banners'
+    AND EXISTS (
+      SELECT 1
+      FROM public.businesses b
+      WHERE b.id::text = (storage.foldername(name))[1]
+        AND b.ownerid = auth.uid()
+    )
+  );

@@ -1,9 +1,5 @@
 import { supabase } from "@/lib/supabase";
-import type {
-  Business,
-  BusinessAddress,
-  BusinessInfo
-} from "../schema";
+import type { Business, BusinessAddress, BusinessInfo } from "../schema";
 
 export type BusinessWithInfo = Business & {
   business_information: BusinessInfo | null;
@@ -13,6 +9,30 @@ export type BusinessWithInfo = Business & {
 };
 
 export const businessesApi = {
+  async uploadBanner(businessId: string, fileUri: string): Promise<string> {
+    const response = await fetch(fileUri);
+    const blob = await response.blob();
+
+    const cleanUri = fileUri.split("?")[0];
+    const extension = (cleanUri.split(".").pop() || "jpg").toLowerCase();
+    const filePath = `${businessId}/banner-${Date.now()}.${extension}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from("business-banners")
+      .upload(filePath, blob, {
+        upsert: true,
+        contentType: blob.type || `image/${extension}`,
+      });
+
+    if (uploadError) throw uploadError;
+
+    const { data } = supabase.storage
+      .from("business-banners")
+      .getPublicUrl(filePath);
+
+    return data.publicUrl;
+  },
+
   async getAll(): Promise<BusinessWithInfo[]> {
     const { data, error } = await supabase
       .from("businesses")
