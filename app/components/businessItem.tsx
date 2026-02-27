@@ -1,5 +1,7 @@
-import { BusinessWithInfo } from "@/db/api";
+import { BusinessWithInfo, usersApi } from "@/db/api";
+import { useAuthStore } from "@/store/useAuthStore";
 import { useModalReviewStore } from "@/store/useModalReviewStore";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import { Image, Pressable, Text, ToastAndroid, View } from "react-native";
@@ -47,7 +49,10 @@ const formatCategory = (value?: string | null) => {
 export default function BusinessItem({ business }: BusinessItemProps) {
 	const setVisible = useModalReviewStore((state) => state.setVisible);
 	const setActiveBusiness = useModalReviewStore((state) => state.setBusiness);
+	const userId = useAuthStore((state) => state.user!!.id);
 	const [address, setAddress] = useState("");
+	const favs = useAuthStore((state) => state.favBusinesses);
+	const setFavs = useAuthStore((state) => state.setFavs);
 
 	if (!business)
 		return (
@@ -87,12 +92,11 @@ export default function BusinessItem({ business }: BusinessItemProps) {
 				</Text>
 				<Text className="text-sm text-gray-500">{address}</Text>
 				<Text className="text-sm text-gray-500">
-					{business?.average_rating}
+					{business?.average_rating} average rating
 				</Text>
 				<Text className="text-sm text-gray-500">
 					{business?.review_count} reviews
 				</Text>
-				<Text className="text-sm text-gray-500">{business?.review_count}</Text>
 				<Text className="text-sm text-gray-500">
 					{business?.business_information?.website}
 				</Text>
@@ -105,6 +109,26 @@ export default function BusinessItem({ business }: BusinessItemProps) {
 				<Text className="text-sm text-gray-500">
 					{formatCategory(business?.category)}
 				</Text>
+				<Pressable
+					onPress={async () => {
+						console.log("clicked");
+						if (!favs || !favs.includes(business.id)) {
+							await usersApi.addFavorite(userId, business.id);
+						} else {
+							await usersApi.removeFavorite(userId, business.id);
+						}
+						usersApi.getFavorite(userId).then((favs) => {
+							console.log(favs);
+							setFavs(favs);
+						});
+					}}
+				>
+					{!favs || !favs.includes(business.id) ? (
+						<FontAwesome name="star-o" size={24} color="black" />
+					) : (
+						<FontAwesome name="star" size={24} color="black" />
+					)}
+				</Pressable>
 				<Pressable
 					onPress={() => {
 						setVisible(true);

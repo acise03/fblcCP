@@ -12,12 +12,14 @@ type AuthStore = {
 	ownedBusiness: BusinessWithInfo | null;
 	loading: boolean;
 	error: string | null;
+	favBusinesses: string[] | null;
 
 	// Computed
 	isAuthenticated: boolean;
 	isBusinessOwner: boolean;
 
 	// Actions
+	setFavs: (favs: string[]) => void;
 	initialize: () => Promise<void>;
 	signUp: (
 		email: string,
@@ -39,6 +41,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
 	ownedBusiness: null,
 	loading: true,
 	error: null,
+	favBusinesses: null,
 
 	get isAuthenticated() {
 		console.log(`setting isauth ${get().session}`);
@@ -47,6 +50,10 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
 
 	get isBusinessOwner() {
 		return get().ownedBusiness !== null;
+	},
+
+	setFavs: (favs: string[]) => {
+		set({ favBusinesses: favs });
 	},
 
 	initialize: async () => {

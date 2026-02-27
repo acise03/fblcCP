@@ -1,8 +1,8 @@
 import { useAuthStore } from "@/store/useAuthStore";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
-import Ionicons from '@expo/vector-icons/Ionicons';
 
 export default function Login() {
 	const [email, setEmail] = useState("");
@@ -34,12 +34,12 @@ export default function Login() {
 				<View className="flex-row self-center bg-[#DCD5CC] rounded-full p-1 mb-10">
 					<Pressable
 						onPress={() => setLogin(true)}
-						className={`px-6 py-2 rounded-full ${login ? "bg-[#E8B24E]" : ""
-							}`}
+						className={`px-6 py-2 rounded-full ${login ? "bg-[#E8B24E]" : ""}`}
 					>
 						<Text
-							className={`font-semibold ${login ? "text-black" : "text-gray-600"
-								}`}
+							className={`font-semibold ${
+								login ? "text-black" : "text-gray-600"
+							}`}
 						>
 							Sign In
 						</Text>
@@ -47,12 +47,12 @@ export default function Login() {
 
 					<Pressable
 						onPress={() => setLogin(false)}
-						className={`px-6 py-2 rounded-full ${!login ? "bg-[#E8B24E]" : ""
-							}`}
+						className={`px-6 py-2 rounded-full ${!login ? "bg-[#E8B24E]" : ""}`}
 					>
 						<Text
-							className={`font-semibold ${!login ? "text-black" : "text-gray-600"
-								}`}
+							className={`font-semibold ${
+								!login ? "text-black" : "text-gray-600"
+							}`}
 						>
 							Sign Up
 						</Text>
@@ -69,7 +69,8 @@ export default function Login() {
 				<View className="mx-8 mt-8 flex flex-col bg-white">
 					{login ? (
 						<>
-							<View className="flex-row items-center bg-white border border-black rounded-xl px-4 py-4 mb-4">								<Ionicons name="mail-outline" size={20} color="black" />
+							<View className="flex-row items-center bg-white border border-black rounded-xl px-4 py-4 mb-4">
+								<Ionicons name="mail-outline" size={20} color="black" />
 								<TextInput
 									className="ml-3 flex-1 text-base text-black"
 									onChangeText={setEmail}
@@ -78,7 +79,8 @@ export default function Login() {
 									inputMode="email"
 								/>
 							</View>
-							<View className="flex-row items-center bg-white border border-black rounded-xl px-4 py-4 mb-4">								<Ionicons name="lock-closed-outline" size={20} color="black" />
+							<View className="flex-row items-center bg-white border border-black rounded-xl px-4 py-4 mb-4">
+								<Ionicons name="lock-closed-outline" size={20} color="black" />
 								<TextInput
 									className="ml-3 flex-1 text-base text-black"
 									onChangeText={setPassword}
@@ -90,7 +92,8 @@ export default function Login() {
 						</>
 					) : (
 						<>
-							<View className="flex-row items-center bg-white border border-black rounded-xl px-4 py-4 mb-4">								<Ionicons name="lock-closed-outline" size={20} color="black" />
+							<View className="flex-row items-center bg-white border border-black rounded-xl px-4 py-4 mb-4">
+								<Ionicons name="lock-closed-outline" size={20} color="black" />
 								<TextInput
 									className="ml-3 flex-1 text-base text-black"
 									onChangeText={setEmail}
@@ -99,15 +102,18 @@ export default function Login() {
 									inputMode="email"
 								/>
 							</View>
-							<View className="flex-row items-center bg-white border border-black rounded-xl px-4 py-4 mb-4">								<Ionicons name="lock-closed-outline" size={20} color="black" />
+							<View className="flex-row items-center bg-white border border-black rounded-xl px-4 py-4 mb-4">
+								<Ionicons name="lock-closed-outline" size={20} color="black" />
 								<TextInput
 									className="ml-3 flex-1 text-base text-black"
 									onChangeText={setPassword}
 									value={password}
 									placeholder="Password"
 									secureTextEntry={true}
-								/></View>
-							<View className="flex-row items-center bg-white border border-black rounded-xl px-4 py-4 mb-4">								<Ionicons name="lock-closed-outline" size={20} color="black" />
+								/>
+							</View>
+							<View className="flex-row items-center bg-white border border-black rounded-xl px-4 py-4 mb-4">
+								<Ionicons name="lock-closed-outline" size={20} color="black" />
 								<TextInput
 									className="ml-3 flex-1 text-base text-black"
 									onChangeText={setConfirmPassword}
@@ -116,7 +122,8 @@ export default function Login() {
 									secureTextEntry={true}
 								/>
 							</View>
-							<View className="flex-row items-center bg-white border border-black rounded-xl px-4 py-4 mb-4">								<Ionicons name="lock-closed-outline" size={20} color="black" />
+							<View className="flex-row items-center bg-white border border-black rounded-xl px-4 py-4 mb-4">
+								<Ionicons name="lock-closed-outline" size={20} color="black" />
 								<TextInput
 									className="ml-3 flex-1 text-base text-black"
 									onChangeText={setFirstName}
@@ -124,7 +131,8 @@ export default function Login() {
 									placeholder="First Name"
 								/>
 							</View>
-							<View className="flex-row items-center bg-white border border-black rounded-xl px-4 py-4 mb-4">								<Ionicons name="lock-closed-outline" size={20} color="black" />
+							<View className="flex-row items-center bg-white border border-black rounded-xl px-4 py-4 mb-4">
+								<Ionicons name="lock-closed-outline" size={20} color="black" />
 								<TextInput
 									className="ml-3 flex-1 text-base text-black"
 									onChangeText={setLastName}
@@ -156,18 +164,11 @@ export default function Login() {
 							}
 						}}
 					>
-						<Text>
-							{login
-								? "Log in"
-								: "Sign up"}
-						</Text>
+						<Text>{login ? "Log in" : "Sign up"}</Text>
 					</Pressable>
 					<Text>
-						{login
-							? ""
-							: "After signing up check your email and log in again"}
+						{login ? "" : "After signing up check your email and log in again"}
 					</Text>
-
 				</View>
 			</View>
 		</ScrollView>

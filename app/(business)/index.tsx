@@ -48,9 +48,7 @@ export default function BusinessHome() {
 		<View className="h-full w-full bg-white">
 			<View className="mx-8 mt-8 flex flex-1 flex-col bg-white">
 				<View className="flex flex-row items-center justify-between">
-					<Text className="font-bold text-2xl text-black dark:text-white">
-						Dashboard
-					</Text>
+					<Text className="font-bold text-2xl text-black ">Dashboard</Text>
 					<ProfilePicture />
 				</View>
 				<View className="relative w-full h-48 mt-8">
@@ -60,9 +58,7 @@ export default function BusinessHome() {
 					</Text>
 				</View>
 				<View className="flex flex-col mt-6">
-					<Text className="dark:text-gray-300 text-zinc-700 font-semibold text-xl">
-						Activity
-					</Text>
+					<Text className=" text-zinc-700 font-semibold text-xl">Activity</Text>
 					<FlatList
 						className="mt-2"
 						data={reviews}

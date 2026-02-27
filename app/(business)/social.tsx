@@ -45,15 +45,10 @@ export default function BusinessSocial() {
 		<View className="h-full w-full bg-white">
 			<View className="mx-8 mt-8 flex flex-1 flex-col bg-white">
 				<View className="flex flex-row items-center justify-between">
-					<Text className="font-bold text-2xl text-black dark:text-white">
-						Social
-					</Text>
+					<Text className="font-bold text-2xl text-black">Social</Text>
 					<ProfilePicture />
 				</View>
 				<View className="flex flex-col mt-6">
-					{/* <Text className="dark:text-gray-300 text-zinc-700 font-semibold text-xl">
-						Posts
-					</Text> */}
 					<View className="flex flex-col rounded-2xl bg-orange-50 w-full h-56 mt-2 px-2 py-1 pb-3 justify-between">
 						<TextInput
 							placeholder="Message"
@@ -86,9 +81,7 @@ export default function BusinessSocial() {
 					</View>
 				</View>
 				<View className="flex flex-col flex-1 mt-6">
-					<Text className="dark:text-gray-300 text-zinc-700 font-semibold text-xl">
-						Recent
-					</Text>
+					<Text className=" text-zinc-700 font-semibold text-xl">Recent</Text>
 					<FlatList
 						className="mt-2"
 						data={dummyData}

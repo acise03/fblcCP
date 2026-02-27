@@ -8,6 +8,7 @@ import { useAuthStore } from "@/store/useAuthStore";
 import { useBusinessStore } from "@/store/useBusinessStore";
 import { useModalReviewStore } from "@/store/useModalReviewStore";
 import { useReviewStore } from "@/store/useReviewStore";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { ScrollView, Text, View } from "react-native";
 import "../../global.css";
 import ProfilePicture from "../components/profilePicture";
@@ -26,7 +27,8 @@ export default function BusinessDetails() {
 	const setVisible = useModalReviewStore((state) => state.setVisible);
 	const setEdit = useModalReviewStore((state) => state.setEdit);
 	const userId = useAuthStore((state) => state.user!!.id);
-	// TODO allow editing and your own review should be pinned
+	const favs = useAuthStore((state) => state.favBusinesses);
+	const setFavs = useAuthStore((state) => state.setFavs);
 
 	useEffect(() => {
 		if (!activeBusiness) {
@@ -125,7 +127,7 @@ export default function BusinessDetails() {
 		<View className="h-full w-full bg-white">
 			<View className="mx-8 mt-8 flex flex-1 flex-col bg-white">
 				<View className="flex flex-row items-center justify-between mb-2">
-					<Text className="font-bold text-2xl text-black dark:text-white">
+					<Text className="font-bold text-2xl text-black ">
 						{business.name}
 					</Text>
 					<ProfilePicture />
@@ -138,16 +140,34 @@ export default function BusinessDetails() {
 
 				<ScrollView className="flex-1 w-full px-4">
 					<View className="flex flex-col items-start mb-2 px-4 gap-2">
-						<Text className="text-xl font-semibold text-black dark:text-white">
-							About
-						</Text>
+						<Pressable
+							onPress={async () => {
+								console.log("clicked");
+								if (!favs || !favs.includes(business.id)) {
+									await usersApi.addFavorite(userId, business.id);
+								} else {
+									await usersApi.removeFavorite(userId, business.id);
+								}
+								usersApi.getFavorite(userId).then((favs) => {
+									console.log(favs);
+									setFavs(favs);
+								});
+							}}
+						>
+							{!favs || !favs.includes(business.id) ? (
+								<FontAwesome name="star-o" size={24} color="black" />
+							) : (
+								<FontAwesome name="star" size={24} color="black" />
+							)}
+						</Pressable>
+						<Text className="text-xl font-semibold text-black ">About</Text>
 
-						<Text className="text-base text-black dark:text-white w-full">
+						<Text className="text-base text-black  w-full">
 							{business.business_information?.description}
 						</Text>
 					</View>
 					<View className="flex flex-col items-start mb-2 px-4 gap-2">
-						<Text className="text-xl font-semibold text-black dark:text-white">
+						<Text className="text-xl font-semibold text-black ">
 							Announcements
 						</Text>
 
@@ -155,7 +175,7 @@ export default function BusinessDetails() {
 							return (
 								<View className="w-full bg-gray-100 dark:bg-gray-800 rounded-xl p-3 mb-2">
 									<View className="flex-row justify-between mb-1">
-										<Text className="font-semibold text-black dark:text-white">
+										<Text className="font-semibold text-black ">
 											{event.getName()}
 										</Text>
 									</View>
@@ -173,19 +193,17 @@ export default function BusinessDetails() {
 						})} */}
 					</View>
 					<View className="flex flex-col items-start mb-2 px-4 gap-2">
-						<Text className="text-xl font-semibold text-black dark:text-white">
+						<Text className="text-xl font-semibold text-black ">
 							AI Summary of Reviews:
 						</Text>
-						<Text className="italic text-base text-black dark:text-white w-full">
+						<Text className="italic text-base text-black  w-full">
 							{AISummary}
 						</Text>
 					</View>
 
 					<View className="flex flex-col items-start mb-2 px-4 gap-2">
-						<Text className="text-xl font-semibold text-black dark:text-white">
-							Reviews
-						</Text>
-						<Text className="text-base text-black dark:text-white w-full">
+						<Text className="text-xl font-semibold text-black ">Reviews</Text>
+						<View className="w-full">
 							{reviews != null &&
 								reviews.length > 0 &&
 								[...reviews]
@@ -201,9 +219,9 @@ export default function BusinessDetails() {
 											: d.toLocaleDateString();
 
 										return (
-											<View className="w-full bg-gray-100 dark:bg-gray-800 rounded-xl p-3 mb-2">
+											<View className="w-full bg-gray-100 rounded-xl p-3 mb-2">
 												<View className="flex-row justify-between mb-1">
-													<Text className="font-semibold text-black dark:text-white">
+													<Text className="font-semibold text-black ">
 														{usernameById[review.reviewerid!!]}
 													</Text>
 													<Text className="text-yellow-500">
@@ -211,7 +229,7 @@ export default function BusinessDetails() {
 													</Text>
 												</View>
 
-												<Text className="text-sm text-gray-700 dark:text-gray-300 mb-1">
+												<Text className="text-sm text-gray-700 mb-1">
 													{review.review}
 												</Text>
 
@@ -243,7 +261,7 @@ export default function BusinessDetails() {
 											</View>
 										);
 									})}
-						</Text>
+						</View>
 					</View>
 					<Pressable onPress={() => setVisible(true)}>
 						<Text>Leave a review</Text>

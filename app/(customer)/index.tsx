@@ -1,20 +1,22 @@
+import { usersApi } from "@/db/api";
 import { Announcement } from "@/models/announcement";
 import { Poll } from "@/models/poll";
+import { useAuthStore } from "@/store/useAuthStore";
 import { useBusinessStore } from "@/store/useBusinessStore";
 import { useModalSettingsStore } from "@/store/useModalSettingsStore";
 import Feather from "@expo/vector-icons/Feather";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { useFocusEffect } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import {
-	FlatList,
-	Pressable,
-	ScrollView,
-	Text,
-	TextInput,
-	ToastAndroid,
-	View,
+    FlatList,
+    Pressable,
+    ScrollView,
+    Text,
+    TextInput,
+    ToastAndroid,
+    View,
 } from "react-native";
-import Ionicons from '@expo/vector-icons/Ionicons';
 import "../../global.css";
 import AnnouncementItemCustomer from "../components/announcementItemCustomer";
 import BusinessItem from "../components/businessItem";
@@ -80,6 +82,9 @@ export default function CustomerHome() {
 	const [sortBy, setSortBy] = useState<SortBy>("recent");
 	const [showFilters, setShowFilters] = useState(false);
 	const [activeTab, setActiveTab] = useState<Tab>("announcements");
+	const userId = useAuthStore((state) => state.user!!.id);
+	const setFavs = useAuthStore((state) => state.setFavs);
+	const favs = useAuthStore((state) => state.favBusinesses);
 	const inputRef = useRef<TextInput>(null);
 	const businesses = useBusinessStore((state) => state.businesses);
 	const fetchBusinesses = useBusinessStore((state) => state.fetchBusinesses);
@@ -95,7 +100,7 @@ export default function CustomerHome() {
 		fetchBusinesses().then(() => {
 			setLoading((prev) => prev + 1);
 		});
-		return () => { };
+		return () => {};
 	});
 
 	const toggleCategory = (category: Category) => {
@@ -159,7 +164,9 @@ export default function CustomerHome() {
 				addr.includes(searchQuery.toLowerCase());
 			const matchesCategory =
 				selectedCategories.length === 0 ||
-				selectedCategories.includes(business.category as Category);
+				selectedCategories.includes(business.category as Category) ||
+				(selectedCategories.includes("favourite") &&
+					favs?.includes(business.id));
 			return matchesSearch && matchesCategory;
 		})
 		.sort((a, b) => {
@@ -186,15 +193,11 @@ export default function CustomerHome() {
 			<View className="h-full w-full bg-white">
 				<View className="mx-8 mt-8 flex flex-col bg-white">
 					<View className="flex flex-row items-center justify-between">
-						<Text className="font-bold text-4xl text-black dark:text-white">
-							Home
-						</Text>
+						<Text className="font-bold text-4xl text-black">Home</Text>
 						<ProfilePicture />
 					</View>
 					<View className="mt-4 flex flex-row items-center justify-between">
-						<Text className="font-bold text-2xl text-black dark:text-white">
-							Quick Search
-						</Text>
+						<Text className="font-bold text-2xl text-black">Quick Search</Text>
 					</View>
 					<ScrollView
 						className="mt-5 mb-4 flex flex-row w-full"
@@ -202,7 +205,8 @@ export default function CustomerHome() {
 						showsHorizontalScrollIndicator={false}
 					>
 						<Pressable
-							className={`${selectedCategories.includes("food") ? "bg-[#FFB627]" : "bg-[#FFE4A3]"} rounded-xl w-20 h-20 py-4 px-5 mr-5`} onPress={() => toggleCategory("food")}
+							className={`${selectedCategories.includes("food") ? "bg-[#FFB627]" : "bg-[#FFE4A3]"} rounded-xl w-20 h-20 py-4 px-5 mr-5`}
+							onPress={() => toggleCategory("food")}
 						>
 							<Ionicons name="fast-food-outline" size={35} color="black" />
 						</Pressable>
@@ -364,7 +368,10 @@ export default function CustomerHome() {
 							onRefresh={async () => {
 								setRefreshing(true);
 								await fetchBusinesses();
-								setRefreshing(false);
+								usersApi.getFavorite(userId).then((favs) => {
+									setFavs(favs);
+									setRefreshing(false);
+								});
 							}}
 						/>
 					)}
