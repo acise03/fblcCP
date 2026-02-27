@@ -52,6 +52,12 @@ export default function TabLayout() {
 					),
 				}}
 			/>
+			<Tabs.Screen
+				name="post"
+				options={{
+					href: null,
+				}}
+			/>
 		</Tabs>
 	);
 }

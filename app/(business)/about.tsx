@@ -7,14 +7,14 @@ import * as ImagePicker from "expo-image-picker";
 import { useFocusEffect } from "expo-router";
 import { useEffect, useState } from "react";
 import {
-    FlatList,
-    Image,
-    Pressable,
-    ScrollView,
-    Text,
-    TextInput,
-    ToastAndroid,
-    View,
+	FlatList,
+	Image,
+	Pressable,
+	ScrollView,
+	Text,
+	TextInput,
+	ToastAndroid,
+	View,
 } from "react-native";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 import "../../global.css";
@@ -124,7 +124,7 @@ export default function BusinessAbout() {
 
 	useFocusEffect(() => {
 		setMode("business");
-		return () => {};
+		return () => { };
 	});
 
 	if (dummyImages.length % 2 !== 0) {
@@ -249,9 +249,9 @@ export default function BusinessAbout() {
 
 	return (
 		<ScrollView className="h-full w-full bg-white">
-			<View className="mx-8 mt-8 flex flex-1 flex-col">
+			<View className="mx-8 mt-8 flex flex-col bg-white">
 				<View className="flex flex-row items-center justify-between">
-					<Text className="font-bold text-2xl text-black">Business</Text>
+					<Text className="font-bold text-4xl text-black">Configuration</Text>
 					<ProfilePicture />
 				</View>
 				<View className="relative w-full h-48 mt-8">
@@ -364,82 +364,12 @@ export default function BusinessAbout() {
 						)}
 					</Pressable>
 				</View>
-				<View className="flex flex-col mt-6">
-					<View className="flex flex-row items-center justify-between">
-						<Text className=" text-zinc-700 font-semibold text-xl">
-							Working Hours
-						</Text>
-						<Pressable className="">
-							<Feather name="edit-3" size={22} color="black" />
-						</Pressable>
-					</View>
-					<View className="flex flex-col">
-						<Text className=" text-zinc-700 font-normal text-md">
-							Saturday Closed
-						</Text>
-						<Text className=" text-zinc-700 font-normal text-md">
-							Sunday Closed
-						</Text>
-						<Text className=" text-zinc-700 font-normal text-md">
-							Monday Closed
-						</Text>
-						<Text className=" text-zinc-700 font-normal text-md">
-							Tuesday Closed
-						</Text>
-						<Text className=" text-zinc-700 font-normal text-md">
-							Wednesday Closed
-						</Text>
-						<Text className=" text-zinc-700 font-normal text-md">
-							Thursday Closed
-						</Text>
-						<Text className=" text-zinc-700 font-normal text-md">
-							Friday Closed
-						</Text>
-					</View>
-				</View>
-				<View className="flex flex-col mt-6">
-					<View className="flex flex-row items-center justify-between">
-						<Text className=" text-zinc-700 font-semibold text-xl">
-							Working Hours
-						</Text>
-					</View>
-					<Pressable
-						onPress={() => setCategoryMenuOpen((prev) => !prev)}
-						className="border border-gray-300 rounded-md px-3 py-3 mb-2"
-					>
-						<Text className="text-black">
-							{category.charAt(0).toUpperCase() + category.slice(1)}
-						</Text>
-					</Pressable>
 
-					{categoryMenuOpen && (
-						<View className="border border-gray-300 rounded-md mb-2">
-							{categoryOptions.map((option) => (
-								<Pressable
-									key={option}
-									onPress={() => {
-										setCategory(option);
-										setCategoryMenuOpen(false);
-									}}
-									className="px-3 py-3 border-b border-gray-200 last:border-b-0"
-								>
-									<Text className="text-black">
-										{option.charAt(0).toUpperCase() + option.slice(1)}
-									</Text>
-								</Pressable>
-							))}
-						</View>
-					)}
-
-					<Pressable
-						onPress={() =>
-							updateBusiness(ownedBusiness!!.id, { category: category })
-						}
-					>
-						<Text>Save</Text>
-					</Pressable>
-				</View>
 				<View className="flex flex-col mt-6">
+					<Text className="text-zinc-700 font-semibold text-2xl">
+						Information
+					</Text>
+
 					<View className="flex flex-col mt-6">
 						{(
 							[
@@ -455,7 +385,7 @@ export default function BusinessAbout() {
 								field === "address"
 									? (draftValues.address ?? "")
 									: ((ownedBusiness?.business_information?.[field] ??
-											"") as string);
+										"") as string);
 							const isMultiline = field === "description";
 
 							return (
@@ -510,39 +440,36 @@ export default function BusinessAbout() {
 													}}
 												/>
 											) : (
-												<TextInput
-													value={draftValues[field]}
-													onChangeText={(text) =>
-														setDraftValues((prev) => ({
-															...prev,
-															[field]: text,
-														}))
-													}
-													placeholder={fieldPlaceholders[field]}
-													style={{
-														backgroundColor: "white",
-														borderRadius: 6,
-														paddingHorizontal: 8,
-														paddingVertical: 8,
-														borderWidth: 1,
-														borderColor: "#e5e7eb",
-														minHeight: isMultiline ? 90 : 40,
-														textAlignVertical: isMultiline ? "top" : "center",
-													}}
-													multiline={isMultiline}
-													autoCapitalize={
-														field === "email" || field === "website"
-															? "none"
-															: "sentences"
-													}
-													keyboardType={
-														field === "email"
-															? "email-address"
-															: field === "phone"
-																? "phone-pad"
-																: "default"
-													}
-												/>
+												<View className="flex-row items-center bg-white border border-black rounded-xl px-4 py-4 mb-4">
+													<TextInput
+														value={draftValues[field]}
+														onChangeText={(text) =>
+															setDraftValues((prev) => ({
+																...prev,
+																[field]: text,
+															}))
+														}
+														placeholder={fieldPlaceholders[field]}
+														style={{
+															backgroundColor: "white",
+
+															textAlignVertical: isMultiline ? "top" : "center",
+														}}
+														multiline={isMultiline}
+														autoCapitalize={
+															field === "email" || field === "website"
+																? "none"
+																: "sentences"
+														}
+														keyboardType={
+															field === "email"
+																? "email-address"
+																: field === "phone"
+																	? "phone-pad"
+																	: "default"
+														}
+													/>
+												</View>
 											)}
 											{fieldErrors[field] ? (
 												<Text style={{ color: "#dc2626", marginTop: 6 }}>
@@ -559,7 +486,7 @@ export default function BusinessAbout() {
 											</View>
 										</View>
 									) : (
-										<Text className=" text-zinc-700 font-normal text-lg mt-1">
+										<Text className=" text-zinc-700 text-xl text-lg mt-1">
 											{currentValue.trim().length > 0
 												? currentValue
 												: "Not provided"}
@@ -568,6 +495,75 @@ export default function BusinessAbout() {
 								</View>
 							);
 						})}
+					</View>
+					<View className="flex flex-col mb-4">
+						<Text className="mb-2 text-xl font-semibold">Category</Text>
+						<Pressable
+							onPress={() => setCategoryMenuOpen((prev) => !prev)}
+							className="border border-gray-300 rounded-md px-3 py-3 mb-2"
+						>
+							<Text className="text-black">
+								{category.charAt(0).toUpperCase() + category.slice(1)}
+							</Text>
+						</Pressable>
+
+						{categoryMenuOpen && (
+							<View className="border border-gray-300 rounded-md mb-2">
+								{categoryOptions.map((option) => (
+									<Pressable
+										key={option}
+										onPress={() => {
+											setCategory(option);
+											setCategoryMenuOpen(false);
+										}}
+										className="px-3 py-3 border-b border-gray-200 last:border-b-0"
+									>
+										<Text className="text-black">
+											{option.charAt(0).toUpperCase() + option.slice(1)}
+										</Text>
+									</Pressable>
+								))}
+							</View>
+						)}
+
+						<Pressable
+							onPress={() =>
+								updateBusiness(ownedBusiness!!.id, { category: category })
+							}
+						>
+							<Text> Save</Text>
+						</Pressable>
+					</View>
+
+					<View className="flex flex-col">
+						<View className="flex flex-row items-center justify-between">
+							<Text className=" text-zinc-700 font-semibold text-xl">
+								Working Hours
+							</Text>
+						</View>
+						<View className="flex flex-col">
+							<Text className=" text-zinc-700 text-xl text-md">
+								Saturday Closed
+							</Text>
+							<Text className=" text-zinc-700 text-xl text-md">
+								Sunday Closed
+							</Text>
+							<Text className=" text-zinc-700 text-xl text-md">
+								Monday Closed
+							</Text>
+							<Text className=" text-zinc-700 text-xl text-md">
+								Tuesday Closed
+							</Text>
+							<Text className=" text-zinc-700 text-xl text-md">
+								Wednesday Closed
+							</Text>
+							<Text className=" text-zinc-700 text-xl text-md">
+								Thursday Closed
+							</Text>
+							<Text className=" text-zinc-700 text-xl text-md">
+								Friday Closed
+							</Text>
+						</View>
 					</View>
 				</View>
 				<View className="flex flex-col mt-6">

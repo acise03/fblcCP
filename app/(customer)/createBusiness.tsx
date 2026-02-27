@@ -43,47 +43,65 @@ export default function CreateBusiness() {
 		>
 			<View className="h-full w-full bg-white">
 				<View className="mx-8 mt-8 flex flex-1 flex-col bg-white justify-center">
-					<TextInput
-						onChangeText={setBusinessName}
-						value={businessName}
-						placeholder="Business Name"
-					/>
-					<GooglePlacesAutocomplete
-						placeholder="Address"
-						fetchDetails={true}
-						onPress={(data, details = null) => {
-							console.log(data);
-							setAddress(details?.formatted_address!!);
-							setPlaceId(data.place_id);
-						}}
-						query={{
-							key: process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY,
-							language: "en",
-						}}
-					/>
-					<TextInput
-						onChangeText={setDescription}
-						value={description}
-						placeholder="Description"
-					/>
-					<TextInput
-						onChangeText={setEmail}
-						value={email}
-						placeholder="Email"
-						inputMode="email"
-					/>
-					<TextInput
-						onChangeText={setPhone}
-						value={phone}
-						placeholder="Phone"
-						inputMode="tel"
-					/>
-					<TextInput
-						onChangeText={setWebsite}
-						value={website}
-						placeholder="Website"
-						inputMode="url"
-					/>
+					<Text className="text-4xl font-extrabold text-[#2B1E1B] mb-2 text-center">
+						Create A Business
+					</Text>
+					<View className=" mt-4 flex-row items-center bg-white border border-black rounded-xl px-4 py-4 mb-4">
+						<TextInput
+							onChangeText={setBusinessName}
+							value={businessName}
+							className="text-lg"
+							placeholder="Business Name"
+						/>
+					</View>
+					<View className=" mt-1 flex-row items-center bg-white border border-black rounded-xl px-4 py-4 mb-4 h-100">
+						<GooglePlacesAutocomplete
+
+							placeholder="Address"
+							fetchDetails={true}
+							onPress={(data, details = null) => {
+								console.log(data);
+								setAddress(details?.formatted_address!!);
+								setPlaceId(data.place_id);
+							}}
+							query={{
+								key: process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY,
+								language: "en",
+							}}
+						/>
+					</View>
+					<View className=" mt-1 flex-row items-center bg-white border border-black rounded-xl px-4 py-4 mb-4">
+
+						<TextInput
+							onChangeText={setDescription}
+							value={description}
+							placeholder="Description"
+						/>
+					</View>
+					<View className=" mt-1 flex-row items-center bg-white border border-black rounded-xl px-4 py-4 mb-4">
+						<TextInput
+							onChangeText={setEmail}
+							value={email}
+							placeholder="Email"
+							inputMode="email"
+						/>					</View>
+					<View className=" mt-1 flex-row items-center bg-white border border-black rounded-xl px-4 py-4 mb-4">
+
+						<TextInput
+							onChangeText={setPhone}
+							value={phone}
+							placeholder="Phone"
+							inputMode="tel"
+						/>					</View>
+					<View className=" mt-1 flex-row items-center bg-white border border-black rounded-xl px-4 py-4 mb-4">
+
+						<TextInput
+							onChangeText={setWebsite}
+							value={website}
+							placeholder="Website"
+							inputMode="url"
+						/>					</View>
+
 					<Pressable
 						onPress={() => setCategoryMenuOpen((prev) => !prev)}
 						className="border border-gray-300 rounded-md px-3 py-3 mb-2"
@@ -94,7 +112,7 @@ export default function CreateBusiness() {
 					</Pressable>
 
 					{categoryMenuOpen && (
-						<View className="border border-gray-300 rounded-md mb-2">
+						<View className="border border-black-300 rounded-md mb-2">
 							{categoryOptions.map((option) => (
 								<Pressable
 									key={option}
@@ -112,6 +130,8 @@ export default function CreateBusiness() {
 						</View>
 					)}
 					<Pressable
+						className="mt-2 bg-[#E8B24E] rounded-xl py-4 items-center mb-6"
+
 						onPress={async () => {
 							const b = businessName.trim();
 							const d = description.trim();
@@ -140,12 +160,17 @@ export default function CreateBusiness() {
 							});
 
 							refreshBusiness();
-							if (!error) router.replace("/(business)");
+							if (!error)
+								 router.replace("/(business)");
 						}}
 					>
-						<Text>Create Business</Text>
-						<Text>Error text: {error}</Text>
+
+						<Text className="font-semibold text-base">
+							Create Business</Text>
 					</Pressable>
+
+					<Text>Error text: {error}</Text>
+
 				</View>
 			</View>
 		</ScrollView>
