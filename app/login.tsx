@@ -4,12 +4,12 @@ import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import Animated, {
-    Easing,
-    FadeIn,
-    FadeOut,
-    useAnimatedStyle,
-    useSharedValue,
-    withTiming,
+  Easing,
+  FadeIn,
+  FadeOut,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
 } from "react-native-reanimated";
 
 export default function Login() {
@@ -130,10 +130,16 @@ export default function Login() {
           entering={FadeIn.duration(300)}
           exiting={FadeOut.duration(200)}
         >
-          <Text className="text-4xl font-extrabold text-[#2B1E1B] mb-2 text-center">
+          <Text
+            className="text-4xl font-black text-[#2B1E1B] mb-2 text-center"
+            style={{ fontFamily: "Rubik" }}
+          >
             {login ? "Welcome Back!" : "Create Account"}
           </Text>
-          <Text className="text-2xl text-[#3E342F] mb-8 text-center">
+          <Text
+            className="text-2xl text-[#3E342F] mb-8 text-center"
+            style={{ fontFamily: "Rubik" }}
+          >
             {login
               ? "Log in to continue to Radius"
               : signUpStep === 1
@@ -150,7 +156,8 @@ export default function Login() {
               <View className="flex-row items-center bg-[#FFF8F0] border border-black rounded-xl px-4 py-4 mb-4">
                 <Ionicons name="mail-outline" size={20} color="black" />
                 <TextInput
-                  className="ml-3 flex-1 text-base text-black"
+                  style={{ fontFamily: "Rubik" }}
+                  className="ml-3 flex-1 text-base font-semibold text-black"
                   onChangeText={setEmail}
                   value={email}
                   placeholder="Email"
@@ -161,6 +168,7 @@ export default function Login() {
               <View className="flex-row items-center bg-[#FFF8F0] border border-black rounded-xl px-4 py-4 mb-4">
                 <Ionicons name="lock-closed-outline" size={20} color="black" />
                 <TextInput
+                  style={{ fontFamily: "Rubik" }}
                   className="ml-3 flex-1 text-base text-black"
                   onChangeText={setPassword}
                   value={password}
@@ -177,6 +185,7 @@ export default function Login() {
               <View className="flex-row items-center bg-[#FFF8F0] border border-black rounded-xl px-4 py-4 mb-4">
                 <Ionicons name="mail-outline" size={20} color="black" />
                 <TextInput
+                  style={{ fontFamily: "Rubik" }}
                   className="ml-3 flex-1 text-base text-black"
                   onChangeText={setEmail}
                   value={email}
@@ -188,6 +197,7 @@ export default function Login() {
               <View className="flex-row items-center bg-[#FFF8F0] border border-black rounded-xl px-4 py-4 mb-4">
                 <Ionicons name="lock-closed-outline" size={20} color="black" />
                 <TextInput
+                  style={{ fontFamily: "Rubik" }}
                   className="ml-3 flex-1 text-base text-black"
                   onChangeText={setPassword}
                   value={password}
@@ -198,6 +208,7 @@ export default function Login() {
               <View className="flex-row items-center bg-[#FFF8F0] border border-black rounded-xl px-4 py-4 mb-4">
                 <Ionicons name="lock-closed-outline" size={20} color="black" />
                 <TextInput
+                  style={{ fontFamily: "Rubik" }}
                   className="ml-3 flex-1 text-base text-black"
                   onChangeText={setConfirmPassword}
                   value={confirmPassword}
@@ -214,6 +225,7 @@ export default function Login() {
               <View className="flex-row items-center bg-[#FFF8F0] border border-black rounded-xl px-4 py-4 mb-4">
                 <Ionicons name="person-outline" size={20} color="black" />
                 <TextInput
+                  style={{ fontFamily: "Rubik" }}
                   className="ml-3 flex-1 text-base text-black"
                   onChangeText={setFirstName}
                   value={firstName}
@@ -223,6 +235,7 @@ export default function Login() {
               <View className="flex-row items-center bg-[#FFF8F0] border border-black rounded-xl px-4 py-4 mb-4">
                 <Ionicons name="person-outline" size={20} color="black" />
                 <TextInput
+                  style={{ fontFamily: "Rubik" }}
                   className="ml-3 flex-1 text-base text-black"
                   onChangeText={setLastName}
                   value={lastName}
@@ -233,7 +246,10 @@ export default function Login() {
           )}
 
           {error || validationError ? (
-            <Text className="mt-1 mb-3 text-red-500 text-center">
+            <Text
+              className="mt-1 mb-3 text-red-500 text-center"
+              style={{ fontFamily: "Rubik" }}
+            >
               {validationError || error}
             </Text>
           ) : null}
@@ -244,7 +260,10 @@ export default function Login() {
               className="mt-3 py-3 items-center"
               onPress={() => setSignUpStep(1)}
             >
-              <Text className="text-gray-500 font-semibold text-base">
+              <Text
+                className="text-gray-500 font-semibold text-base"
+                style={{ fontFamily: "Rubik" }}
+              >
                 Back
               </Text>
             </Pressable>
@@ -300,14 +319,20 @@ export default function Login() {
                 animatedButtonStyle,
               ]}
             >
-              <Text className="font-semibold text-base">
-                {login ? "Log in" : signUpStep === 1 ? "Next" : "Sign up"}
+              <Text
+                className="font-black text-xl text-base"
+                style={{ fontFamily: "Rubik" }}
+              >
+                {login ? "Log In" : signUpStep === 1 ? "Next" : "Sign up"}
               </Text>
             </Animated.View>
           </Pressable>
 
           {!login && signUpStep === 2 && (
-            <Text className="text-center text-gray-500">
+            <Text
+              className="text-center text-gray-500"
+              style={{ fontFamily: "Rubik" }}
+            >
               After signing up check your email and log in again
             </Text>
           )}

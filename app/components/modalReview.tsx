@@ -78,7 +78,10 @@ export default function ModalReviews() {
             <View className="flex-row justify-center mb-4">
               {[1, 2, 3, 4, 5].map((star) => (
                 <Pressable key={star} onPress={() => setRating(star)}>
-                  <Text className="text-5xl text-[#FFB627]">
+                  <Text
+                    className="text-5xl text-[#FFB627]"
+                    style={{ fontFamily: "Rubik" }}
+                  >
                     {star <= rating ? "★" : "☆"}
                   </Text>
                 </Pressable>
@@ -86,6 +89,7 @@ export default function ModalReviews() {
             </View>
 
             <TextInput
+              style={{ fontFamily: "Rubik" }}
               onChangeText={setReview}
               value={review}
               placeholder="Leave a review..."
@@ -104,7 +108,12 @@ export default function ModalReviews() {
                   setEdit(false);
                 }}
               >
-                <Text className="text-black font-semibold">Update Review</Text>
+                <Text
+                  className="text-black font-semibold"
+                  style={{ fontFamily: "Rubik" }}
+                >
+                  Update Review
+                </Text>
               </Pressable>
             ) : (
               <Pressable
@@ -134,7 +143,10 @@ export default function ModalReviews() {
                   }
                 }}
               >
-                <Text className="text-black text-xl font-semibold justify-center">
+                <Text
+                  className="text-black text-xl font-semibold justify-center"
+                  style={{ fontFamily: "Rubik" }}
+                >
                   Submit Review
                 </Text>
               </Pressable>

@@ -1,6 +1,8 @@
 import { DefaultTheme, ThemeProvider } from "@react-navigation/native";
+import * as Font from "expo-font";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
+import { useEffect, useState } from "react";
 import "react-native-reanimated";
 import "../global.css";
 
@@ -20,6 +22,15 @@ export default function RootLayout() {
   const colorScheme = useColorScheme();
   const Container = Platform.OS === "web" ? View : SafeAreaView;
   const modalSettings = useModalSettingsStore((state) => state.visible);
+  const [fontsLoaded, setFontsLoaded] = useState(false);
+
+  useEffect(() => {
+    Font.loadAsync({
+      Rubik: require("../assets/fonts/Rubik-VariableFont_wght.ttf"),
+    }).then(() => setFontsLoaded(true));
+  }, []);
+
+  if (!fontsLoaded) return null;
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>

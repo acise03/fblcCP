@@ -24,6 +24,7 @@ export default function AnnouncementItem({
         {editing ? (
           <>
             <TextInput
+              style={{ fontFamily: "Rubik" }}
               className="text-md font-medium bg-[#FFF8F0] rounded px-2 py-1"
               value={editText}
               onChangeText={setEditText}
@@ -49,8 +50,16 @@ export default function AnnouncementItem({
           </>
         ) : (
           <>
-            <Text className="text-md font-medium">{announcement.text}</Text>
-            <Text className="text-sm text-gray-500">
+            <Text
+              className="text-md font-medium"
+              style={{ fontFamily: "Rubik" }}
+            >
+              {announcement.text}
+            </Text>
+            <Text
+              className="text-sm text-gray-500"
+              style={{ fontFamily: "Rubik" }}
+            >
               {new Date(announcement.date).toLocaleDateString()}
             </Text>
             <View className="flex flex-row mt-2 space-x-2">

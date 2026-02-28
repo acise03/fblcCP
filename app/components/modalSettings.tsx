@@ -25,7 +25,9 @@ export default function ModalSettings() {
               <Pressable onPress={() => setVisible(false)}>
                 <Feather name="x" size={24} color="gray" />
               </Pressable>
-              <Text className="text-lg">Menu</Text>
+              <Text className="text-lg" style={{ fontFamily: "Rubik" }}>
+                Menu
+              </Text>
               <Image
                 resizeMode="contain"
                 className="rounded-full w-10 h-10 bg-gray-500"

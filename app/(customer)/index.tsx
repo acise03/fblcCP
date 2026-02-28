@@ -208,14 +208,14 @@ export default function CustomerHome() {
         </ScrollView>
       </View>
       <View className="flex-1 mx-8">
-        <View className="mb-4 mt-4 flex flex-row bg-[#FFE4A3] rounded-xl w-full items-center p-2 ps-4">
+        <View className="mb-4 mt-4 flex flex-row bg-[#FFB62799] rounded-xl w-full items-center p-2 ps-4">
           <Feather name="search" size={20} color="black" />
           <TextInput
             ref={inputRef}
             placeholder="Search businesses"
             value={searchQuery}
             onChangeText={setSearchQuery}
-            className="flex-1 ms-2 text-md"
+            className="flex-1 ms-2 text-md rounded-xl"
           />
           <Pressable
             onPress={() => setShowFilters(!showFilters)}
