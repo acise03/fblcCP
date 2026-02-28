@@ -59,10 +59,10 @@ export default function Login() {
 
   return (
     <ScrollView
-      className="h-screen w-screen bg-white"
+      className="h-screen w-screen bg-[#FFF8F0]"
       contentContainerStyle={{ flexGrow: 1, paddingTop: 120 }}
     >
-      <View className="w-full bg-white">
+      <View className="w-full bg-[#FFF8F0]">
         {/* Tab Switcher */}
         <View className="self-center mb-10">
           <View className="flex-row bg-[#DCD5CC] rounded-full p-1 relative">
@@ -143,11 +143,11 @@ export default function Login() {
         </Animated.View>
 
         {/* Form fields */}
-        <View className="mx-8 mt-8 flex flex-col bg-white">
+        <View className="mx-8 mt-8 flex flex-col bg-[#FFF8F0]">
           {/* Login fields */}
           {login && (
             <Animated.View key="login-fields" entering={FadeIn.duration(250)}>
-              <View className="flex-row items-center bg-white border border-black rounded-xl px-4 py-4 mb-4">
+              <View className="flex-row items-center bg-[#FFF8F0] border border-black rounded-xl px-4 py-4 mb-4">
                 <Ionicons name="mail-outline" size={20} color="black" />
                 <TextInput
                   className="ml-3 flex-1 text-base text-black"
@@ -158,7 +158,7 @@ export default function Login() {
                   autoCapitalize="none"
                 />
               </View>
-              <View className="flex-row items-center bg-white border border-black rounded-xl px-4 py-4 mb-4">
+              <View className="flex-row items-center bg-[#FFF8F0] border border-black rounded-xl px-4 py-4 mb-4">
                 <Ionicons name="lock-closed-outline" size={20} color="black" />
                 <TextInput
                   className="ml-3 flex-1 text-base text-black"
@@ -174,7 +174,7 @@ export default function Login() {
           {/* Sign-up step 1: credentials */}
           {!login && signUpStep === 1 && (
             <Animated.View key="signup-step-1" entering={FadeIn.duration(250)}>
-              <View className="flex-row items-center bg-white border border-black rounded-xl px-4 py-4 mb-4">
+              <View className="flex-row items-center bg-[#FFF8F0] border border-black rounded-xl px-4 py-4 mb-4">
                 <Ionicons name="mail-outline" size={20} color="black" />
                 <TextInput
                   className="ml-3 flex-1 text-base text-black"
@@ -185,7 +185,7 @@ export default function Login() {
                   autoCapitalize="none"
                 />
               </View>
-              <View className="flex-row items-center bg-white border border-black rounded-xl px-4 py-4 mb-4">
+              <View className="flex-row items-center bg-[#FFF8F0] border border-black rounded-xl px-4 py-4 mb-4">
                 <Ionicons name="lock-closed-outline" size={20} color="black" />
                 <TextInput
                   className="ml-3 flex-1 text-base text-black"
@@ -195,7 +195,7 @@ export default function Login() {
                   secureTextEntry={true}
                 />
               </View>
-              <View className="flex-row items-center bg-white border border-black rounded-xl px-4 py-4 mb-4">
+              <View className="flex-row items-center bg-[#FFF8F0] border border-black rounded-xl px-4 py-4 mb-4">
                 <Ionicons name="lock-closed-outline" size={20} color="black" />
                 <TextInput
                   className="ml-3 flex-1 text-base text-black"
@@ -211,7 +211,7 @@ export default function Login() {
           {/* Sign-up step 2: name */}
           {!login && signUpStep === 2 && (
             <Animated.View key="signup-step-2" entering={FadeIn.duration(250)}>
-              <View className="flex-row items-center bg-white border border-black rounded-xl px-4 py-4 mb-4">
+              <View className="flex-row items-center bg-[#FFF8F0] border border-black rounded-xl px-4 py-4 mb-4">
                 <Ionicons name="person-outline" size={20} color="black" />
                 <TextInput
                   className="ml-3 flex-1 text-base text-black"
@@ -220,7 +220,7 @@ export default function Login() {
                   placeholder="First Name"
                 />
               </View>
-              <View className="flex-row items-center bg-white border border-black rounded-xl px-4 py-4 mb-4">
+              <View className="flex-row items-center bg-[#FFF8F0] border border-black rounded-xl px-4 py-4 mb-4">
                 <Ionicons name="person-outline" size={20} color="black" />
                 <TextInput
                   className="ml-3 flex-1 text-base text-black"

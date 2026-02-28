@@ -13,28 +13,32 @@ import ModalReviews from "./components/modalReview";
 import ModalSettings from "./components/modalSettings";
 
 export const unstable_settings = {
-	initialRouteName: "login",
+  initialRouteName: "login",
 };
 
 export default function RootLayout() {
-	const colorScheme = useColorScheme();
-	const Container = Platform.OS === "web" ? View : SafeAreaView;
-	const modalSettings = useModalSettingsStore((state) => state.visible);
+  const colorScheme = useColorScheme();
+  const Container = Platform.OS === "web" ? View : SafeAreaView;
+  const modalSettings = useModalSettingsStore((state) => state.visible);
 
-	return (
-		<GestureHandlerRootView style={{ flex: 1 }}>
-			<ThemeProvider value={DefaultTheme}>
-				<Container className="flex-1">
-					<Stack>
-						<Stack.Screen name="(customer)" options={{ headerShown: false }} />
-						<Stack.Screen name="login" options={{ headerShown: false }} />
-						<Stack.Screen name="(business)" options={{ headerShown: false }} />
-					</Stack>
-					<ModalSettings />
-					<ModalReviews />
-					<StatusBar style="auto" />
-				</Container>
-			</ThemeProvider>
-		</GestureHandlerRootView>
-	);
+  return (
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <ThemeProvider value={DefaultTheme}>
+        <Container className="flex-1">
+          <Stack>
+            <Stack.Screen name="(customer)" options={{ headerShown: false }} />
+            <Stack.Screen name="login" options={{ headerShown: false }} />
+            <Stack.Screen name="(business)" options={{ headerShown: false }} />
+          </Stack>
+          <ModalSettings />
+          <ModalReviews />
+          <StatusBar
+            style="dark"
+            backgroundColor="#FFF8F0"
+            translucent={false}
+          />
+        </Container>
+      </ThemeProvider>
+    </GestureHandlerRootView>
+  );
 }
