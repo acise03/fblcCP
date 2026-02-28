@@ -81,6 +81,9 @@ export default function CustomerHome() {
 			setLoading((prev) => prev + 1);
 			businessesApi.getAllPosts().then((posts) => {
 				setPosts(posts);
+				usersApi.getFavorite(userId).then((favs) => {
+					setFavs(favs);
+				});
 			});
 		});
 		return () => {};
@@ -107,7 +110,8 @@ export default function CustomerHome() {
 		}
 		const matchesCategory =
 			selectedCategories.length === 0 ||
-			selectedCategories.includes(business?.category as Category);
+			selectedCategories.includes(business?.category as Category) ||
+			(f && selectedCategories.includes("favourite"));
 		return matchesSearch && matchesCategory;
 	});
 

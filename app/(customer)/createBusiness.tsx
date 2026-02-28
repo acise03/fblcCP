@@ -84,7 +84,7 @@ export default function CreateBusiness() {
 							value={email}
 							placeholder="Email"
 							inputMode="email"
-						/>{" "}
+						/>
 					</View>
 					<View className=" mt-1 flex-row items-center bg-white border border-black rounded-xl px-4 py-4 mb-4">
 						<TextInput
@@ -92,7 +92,7 @@ export default function CreateBusiness() {
 							value={phone}
 							placeholder="Phone"
 							inputMode="tel"
-						/>{" "}
+						/>
 					</View>
 					<View className=" mt-1 flex-row items-center bg-white border border-black rounded-xl px-4 py-4 mb-4">
 						<TextInput
@@ -100,7 +100,7 @@ export default function CreateBusiness() {
 							value={website}
 							placeholder="Website"
 							inputMode="url"
-						/>{" "}
+						/>
 					</View>
 
 					<Pressable

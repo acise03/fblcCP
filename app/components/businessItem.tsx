@@ -8,6 +8,7 @@ import { Image, Pressable, Text, ToastAndroid, View } from "react-native";
 
 type BusinessItemProps = {
 	business: BusinessWithInfo;
+	distance?: number;
 };
 
 const getFormattedAddressFromPlaceId = async (
@@ -46,7 +47,10 @@ const formatCategory = (value?: string | null) => {
 	return value.charAt(0).toUpperCase() + value.slice(1);
 };
 
-export default function BusinessItem({ business }: BusinessItemProps) {
+export default function BusinessItem({
+	business,
+	distance,
+}: BusinessItemProps) {
 	const setVisible = useModalReviewStore((state) => state.setVisible);
 	const setActiveBusiness = useModalReviewStore((state) => state.setBusiness);
 	const userId = useAuthStore((state) => state.user!!.id);
@@ -79,7 +83,7 @@ export default function BusinessItem({ business }: BusinessItemProps) {
 			className="p-4 flex flex-row items-center rounded-2xl bg-[#FFE4A3] w-full"
 			onPress={() => {
 				setActiveBusiness(business.id);
-				router.navigate("/(customer)/businessDetails");
+				router.push("/(customer)/businessDetails");
 			}}
 			android_ripple={{ color: "transparent" }}
 			style={() => ({ opacity: 1 })}
@@ -91,6 +95,11 @@ export default function BusinessItem({ business }: BusinessItemProps) {
 					{business?.business_information?.description?.trim()}
 				</Text>
 				<Text className="text-sm text-gray-500">{address}</Text>
+				{distance !== undefined && (
+					<Text className="text-sm text-gray-500">
+						{distance.toFixed(2)} km away
+					</Text>
+				)}
 				{business?.average_rating != null && (
 					<Text className="text-sm text-gray-500">
 						{business.average_rating} average rating
