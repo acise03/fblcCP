@@ -7,14 +7,14 @@ import * as ImagePicker from "expo-image-picker";
 import { useFocusEffect } from "expo-router";
 import { useEffect, useState } from "react";
 import {
-	FlatList,
-	Image,
-	Pressable,
-	ScrollView,
-	Text,
-	TextInput,
-	ToastAndroid,
-	View,
+    FlatList,
+    Image,
+    Pressable,
+    ScrollView,
+    Text,
+    TextInput,
+    ToastAndroid,
+    View,
 } from "react-native";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 import "../../global.css";
@@ -124,7 +124,7 @@ export default function BusinessAbout() {
 
 	useFocusEffect(() => {
 		setMode("business");
-		return () => { };
+		return () => {};
 	});
 
 	if (dummyImages.length % 2 !== 0) {
@@ -346,8 +346,9 @@ export default function BusinessAbout() {
 										uploadBusinessBanner(
 											ownedBusiness!!.id,
 											result.assets[0].uri,
-										).then((newUri) => {
+										).then(async (newUri) => {
 											updateBusinessInfo(ownedBusiness.id, { banner: newUri });
+											refreshBusiness();
 										});
 									}}
 								>
@@ -387,7 +388,7 @@ export default function BusinessAbout() {
 								field === "address"
 									? (draftValues.address ?? "")
 									: ((ownedBusiness?.business_information?.[field] ??
-										"") as string);
+											"") as string);
 							const isMultiline = field === "description";
 
 							return (

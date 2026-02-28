@@ -1,4 +1,3 @@
-import { BusinessWithInfo } from "@/db/api";
 import { ReviewWithUser } from "@/db/api/reviews";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useModalSettingsStore } from "@/store/useModalSettingsStore";
@@ -12,7 +11,8 @@ import ProfilePicture from "../components/profilePicture";
 
 export default function BusinessHome() {
 	const setMode = useModalSettingsStore((state) => state.setMode);
-	const [ownedBusiness, setOwnedBusiness] = useState<BusinessWithInfo>();
+	// const [ownedBusiness, setOwnedBusiness] = useState<BusinessWithInfo>();
+	const ownedBusiness = useAuthStore((state) => state.ownedBusiness);
 	const refreshBusiness = useAuthStore((state) => state.refreshOwnedBusiness);
 	const fetchReviews = useReviewStore((state) => state.fetchReviewsForBusiness);
 	const fetchedReviews = useReviewStore((state) => state.reviews);
@@ -33,12 +33,14 @@ export default function BusinessHome() {
 	useEffect(() => {
 		let mounted = true;
 		const run = async () => {
-			if (!ownedBusiness) {
-				const oB = await refreshBusiness();
-				if (!mounted) return;
-				setOwnedBusiness(oB ?? undefined);
-				return;
-			}
+			// if (!ownedBusiness) {
+			// 	const oB = await refreshBusiness();
+			// 	if (!mounted) return;
+			// 	setOwnedBusiness(oB ?? undefined);
+			// 	return;
+			// }
+
+			if (!ownedBusiness) return;
 
 			const reviews = await fetchReviews(ownedBusiness.id);
 			if (!mounted) return;
@@ -58,7 +60,14 @@ export default function BusinessHome() {
 					<ProfilePicture />
 				</View>
 				<View className="relative w-full h-48 mt-8">
-					<Image className="bg-gray-500 w-full h-full rounded-3xl" />
+					<Image
+						className="bg-gray-500 w-full h-full rounded-3xl"
+						source={
+							ownedBusiness?.business_information?.banner
+								? { uri: ownedBusiness.business_information.banner }
+								: { uri: "" }
+						}
+					/>
 					<Text className="bottom-11 left-4 text-white font-bold text-2xl">
 						{ownedBusiness?.name}
 					</Text>

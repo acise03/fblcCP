@@ -37,8 +37,9 @@ export default function ActivityItem({
 	console.log(date);
 
 	return (
-		<View className="flex flex-row items-center rounded-2xl bg-[#FFE4A3] w-full px-4 py-2">			<Image className="rounded-full w-12 h-12 bg-gray-500" />
-			<View className="px-4 flex flex-col">
+		<View className="flex flex-row items-center rounded-2xl bg-[#FFE4A3] w-full px-4 py-2">
+			<Image className="rounded-full w-12 h-12 bg-gray-500" />
+			<View className="px-4 flex flex-col pr-12">
 				<Text className="text-xl font-bold">{username}</Text>
 				<Text className="text-md font-medium">{comment}</Text>
 				<Text className="text-md font-medium">{dateLabel}</Text>
