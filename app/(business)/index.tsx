@@ -9,7 +9,6 @@ import { FlatList, Image, Text, View } from "react-native";
 import "../../global.css";
 import ActivityItem from "../components/activityItem";
 import ProfilePicture from "../components/profilePicture";
-import Ionicons from "@expo/vector-icons/Ionicons";
 
 export default function BusinessHome() {
 	const setMode = useModalSettingsStore((state) => state.setMode);
@@ -19,10 +18,16 @@ export default function BusinessHome() {
 	const fetchedReviews = useReviewStore((state) => state.reviews);
 	const [reviews, setReviews] = useState<ReviewWithUser[]>();
 	const userId = useAuthStore((state) => state.user!!.id);
+	const averageBusinessRating =
+		reviews && reviews.length > 0
+			? (
+					reviews.reduce((sum, r) => sum + (r.rating ?? 0), 0) / reviews.length
+				).toFixed(1)
+			: "N/A";
 
 	useFocusEffect(() => {
 		setMode("business");
-		return () => { };
+		return () => {};
 	});
 
 	useEffect(() => {
@@ -44,11 +49,6 @@ export default function BusinessHome() {
 			mounted = false;
 		};
 	}, [ownedBusiness]);
-	const averageBusinessRating = ownedBusiness?.average_rating
-		? ownedBusiness.average_rating.toFixed(1)
-		: "0.0";
-
-	const reviewCount = ownedBusiness?.review_count ?? 0;
 
 	return (
 		<View className="h-full w-full bg-white">
@@ -65,7 +65,6 @@ export default function BusinessHome() {
 				</View>
 
 				<View>
-
 					<Text className="text-zinc-700 font-semibold text-2xl mt-4">
 						Stats
 					</Text>
@@ -75,26 +74,20 @@ export default function BusinessHome() {
 							<Text className="text-black font-bold text-3xl">
 								{averageBusinessRating}
 							</Text>
-							<Text className="text-black text-lg">
-								Star Rating
-							</Text>
+							<Text className="text-black text-lg">Star Rating</Text>
 						</View>
 
 						<View className="bg-[#FFE4A3] rounded-xl px-4 py-2 flex-1">
 							<Text className="text-black font-bold text-3xl">
-								{reviewCount}
+								{reviews?.length}
 							</Text>
-							<Text className="text-black text-lg">
-								Total Reviews
-							</Text>
+							<Text className="text-black text-lg">Total Reviews</Text>
 						</View>
 					</View>
 				</View>
 				<View className="flex flex-col mt-6">
 					<View className="flex flex-row items-center justify-between">
-						<Text className="text-zinc-700 font-semibold text-2xl">
-							Feed
-						</Text>
+						<Text className="text-zinc-700 font-semibold text-2xl">Feed</Text>
 					</View>
 					<FlatList
 						className="mt-2"
@@ -115,7 +108,6 @@ export default function BusinessHome() {
 						ItemSeparatorComponent={() => <View className="h-2" />}
 					/>
 				</View>
-
 			</View>
 		</View>
 	);

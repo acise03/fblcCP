@@ -346,7 +346,9 @@ export default function BusinessAbout() {
 										uploadBusinessBanner(
 											ownedBusiness!!.id,
 											result.assets[0].uri,
-										);
+										).then((newUri) => {
+											updateBusinessInfo(ownedBusiness.id, { banner: newUri });
+										});
 									}}
 								>
 									<Text>Upload Banner</Text>

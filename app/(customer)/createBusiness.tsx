@@ -56,7 +56,6 @@ export default function CreateBusiness() {
 					</View>
 					<View className=" mt-1 flex-row items-center bg-white border border-black rounded-xl px-4 py-4 mb-4 h-100">
 						<GooglePlacesAutocomplete
-
 							placeholder="Address"
 							fetchDetails={true}
 							onPress={(data, details = null) => {
@@ -68,10 +67,11 @@ export default function CreateBusiness() {
 								key: process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY,
 								language: "en",
 							}}
+							keepResultsAfterBlur={true}
+							debounce={300}
 						/>
 					</View>
 					<View className=" mt-1 flex-row items-center bg-white border border-black rounded-xl px-4 py-4 mb-4">
-
 						<TextInput
 							onChangeText={setDescription}
 							value={description}
@@ -84,23 +84,24 @@ export default function CreateBusiness() {
 							value={email}
 							placeholder="Email"
 							inputMode="email"
-						/>					</View>
+						/>{" "}
+					</View>
 					<View className=" mt-1 flex-row items-center bg-white border border-black rounded-xl px-4 py-4 mb-4">
-
 						<TextInput
 							onChangeText={setPhone}
 							value={phone}
 							placeholder="Phone"
 							inputMode="tel"
-						/>					</View>
+						/>{" "}
+					</View>
 					<View className=" mt-1 flex-row items-center bg-white border border-black rounded-xl px-4 py-4 mb-4">
-
 						<TextInput
 							onChangeText={setWebsite}
 							value={website}
 							placeholder="Website"
 							inputMode="url"
-						/>					</View>
+						/>{" "}
+					</View>
 
 					<Pressable
 						onPress={() => setCategoryMenuOpen((prev) => !prev)}
@@ -131,7 +132,6 @@ export default function CreateBusiness() {
 					)}
 					<Pressable
 						className="mt-2 bg-[#E8B24E] rounded-xl py-4 items-center mb-6"
-
 						onPress={async () => {
 							const b = businessName.trim();
 							const d = description.trim();
@@ -149,7 +149,7 @@ export default function CreateBusiness() {
 							console.log("guards passed");
 
 							await createBusiness(b, userId, category).then((business) => {
-								updateBusinessAddress(business.id, address).then((res) => {
+								updateBusinessAddress(business.id, placeId).then((res) => {
 									updateBusinessInfo(business.id, {
 										description: d,
 										email: e,
@@ -160,17 +160,13 @@ export default function CreateBusiness() {
 							});
 
 							refreshBusiness();
-							if (!error)
-								 router.replace("/(business)");
+							if (!error) router.replace("/(business)");
 						}}
 					>
-
-						<Text className="font-semibold text-base">
-							Create Business</Text>
+						<Text className="font-semibold text-base">Create Business</Text>
 					</Pressable>
 
 					<Text>Error text: {error}</Text>
-
 				</View>
 			</View>
 		</ScrollView>

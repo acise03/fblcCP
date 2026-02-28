@@ -3,14 +3,21 @@ import { router, useFocusEffect } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { Image, Pressable } from "react-native";
 
-import { BusinessWithInfo, ReviewWithUser, usersApi } from "@/db/api";
+import {
+    businessesApi,
+    BusinessWithInfo,
+    ReviewWithUser,
+    usersApi,
+} from "@/db/api";
+import { BusinessPost } from "@/db/schema";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useBusinessStore } from "@/store/useBusinessStore";
 import { useModalReviewStore } from "@/store/useModalReviewStore";
 import { useReviewStore } from "@/store/useReviewStore";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { ScrollView, Text, View } from "react-native";
+import { FlatList, ScrollView, Text, View } from "react-native";
 import "../../global.css";
+import AnnouncementItemCustomer from "../components/announcementItemCustomer";
 import ProfilePicture from "../components/profilePicture";
 
 export default function BusinessDetails() {
@@ -24,6 +31,7 @@ export default function BusinessDetails() {
 	const [reviews, setReviews] = useState<ReviewWithUser[] | null>();
 	const dbReviews = useReviewStore((state) => state.reviews);
 	const [usernameById, setUsernameById] = useState<Record<string, string>>({});
+	const [posts, setPosts] = useState<BusinessPost[]>([]);
 	const setVisible = useModalReviewStore((state) => state.setVisible);
 	const setEdit = useModalReviewStore((state) => state.setEdit);
 	const userId = useAuthStore((state) => state.user!!.id);
@@ -43,6 +51,8 @@ export default function BusinessDetails() {
 			const r = await fetchReviews(b.id);
 			console.log(r);
 			setReviews(r);
+			const p = await businessesApi.getPostsByBusiness(b.id);
+			setPosts(p);
 		})();
 		return () => {
 			cancelled = true;
@@ -50,7 +60,10 @@ export default function BusinessDetails() {
 	}, [activeBusiness]);
 
 	useEffect(() => {
-		if (!business || !reviews?.length) return;
+		if (!business || !reviews?.length) {
+			setAISummary("Not enough reviews");
+			return;
+		}
 		const generateAISummary = async () => {
 			const prompt = `You are tasked with creating a brief 3-4 sentence a summary of the business ${business.name} using the following reviews: ${reviews.join("\n")}. Give specific suggestions if relevant. For example, if several reviews say that the apple pie tastes good, recommend it, saying that many people like it. If you believe there are not enough reviews to generate a summary, simply output "Not enough reviews"`;
 
@@ -134,7 +147,7 @@ export default function BusinessDetails() {
 				</View>
 
 				<Image
-					// source={{ uri: testBusiness.getBanner() }}
+					source={{ uri: business.business_information?.banner!! }}
 					className="w-full h-40 rounded-3xl mb-4"
 				/>
 
@@ -160,37 +173,39 @@ export default function BusinessDetails() {
 								<FontAwesome name="star" size={24} color="black" />
 							)}
 						</Pressable>
+						<View className="relative w-full h-48 mt-8">
+							<Image
+								className="bg-gray-500 w-full h-full rounded-3xl"
+								source={
+									business.business_information?.banner
+										? { uri: business.business_information.banner }
+										: { uri: "" }
+								}
+							/>
+						</View>
 						<Text className="text-xl font-semibold text-black ">About</Text>
 
 						<Text className="text-base text-black  w-full">
 							{business.business_information?.description}
 						</Text>
 					</View>
-					<View className="flex flex-col items-start mb-2 px-4 gap-2">
+					<View className="flex flex-col items-start mb-2 px-4 gap-2 w-full">
 						<Text className="text-xl font-semibold text-black ">
 							Announcements
 						</Text>
 
-						{/* {testBusiness.getEvents().map((event) => {
-							return (
-								<View className="w-full bg-gray-100 dark:bg-gray-800 rounded-xl p-3 mb-2">
-									<View className="flex-row justify-between mb-1">
-										<Text className="font-semibold text-black ">
-											{event.getName()}
-										</Text>
-									</View>
-
-									<Text className="text-sm text-gray-700 dark:text-gray-300 mb-1">
-										{event.getDescription()}
-									</Text>
-
-									<Text className="text-xs text-gray-500">
-										{event.getStart().toDateString()} to{" "}
-										{event.getEnd().toDateString()}
-									</Text>
-								</View>
-							);
-						})} */}
+						<FlatList
+							data={posts}
+							renderItem={({ item }) => (
+								<AnnouncementItemCustomer announcement={item} />
+							)}
+							keyExtractor={(item) => item.id}
+							ItemSeparatorComponent={() => <View className="h-2" />}
+							scrollEnabled={true}
+							contentContainerStyle={{ paddingBottom: 8 }}
+							showsVerticalScrollIndicator={false}
+							className="w-full"
+						/>
 					</View>
 					<View className="flex flex-col items-start mb-2 px-4 gap-2">
 						<Text className="text-xl font-semibold text-black ">

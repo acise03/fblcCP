@@ -88,12 +88,14 @@ export default function BusinessItem({ business }: BusinessItemProps) {
 			<View className="px-4 flex flex-col flex-1">
 				<Text className="text-md font-medium">{business?.name}</Text>
 				<Text className="text-sm text-gray-500">
-					{business?.business_information?.description}
+					{business?.business_information?.description?.trim()}
 				</Text>
 				<Text className="text-sm text-gray-500">{address}</Text>
-				<Text className="text-sm text-gray-500">
-					{business?.average_rating} average rating
-				</Text>
+				{business?.average_rating != null && (
+					<Text className="text-sm text-gray-500">
+						{business.average_rating} average rating
+					</Text>
+				)}
 				<Text className="text-sm text-gray-500">
 					{business?.review_count} reviews
 				</Text>

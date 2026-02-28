@@ -1,6 +1,5 @@
-import { usersApi } from "@/db/api";
-import { Announcement } from "@/models/announcement";
-import { Poll } from "@/models/poll";
+import { businessesApi, usersApi } from "@/db/api";
+import { BusinessPost } from "@/db/schema";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useBusinessStore } from "@/store/useBusinessStore";
 import { useModalSettingsStore } from "@/store/useModalSettingsStore";
@@ -56,26 +55,6 @@ const getFormattedAddressFromPlaceId = async (
 	}
 };
 
-const mockAnnouncements = [
-	new Announcement(
-		"Grand Opening! Here is a very long text asdiojfiodfjgiojeriogjioj",
-		new Date(),
-		"martin's grill",
-	),
-	new Announcement("Holiday Hours", new Date(), "martin's grill"),
-	new Poll(
-		"The new chocolate cake was a hit at our North York location! What did you think of it?",
-		new Date(),
-		"Business1",
-		["🍁", "🥀", "💀"],
-	),
-	new Poll("Which day works best for you?", new Date(), "Business1", [
-		"Monday",
-		"Wednesday",
-		"Friday",
-	]),
-];
-
 export default function CustomerHome() {
 	const [searchQuery, setSearchQuery] = useState("");
 	const [selectedCategories, setSelectedCategories] = useState<Category[]>([]);
@@ -89,6 +68,7 @@ export default function CustomerHome() {
 	const businesses = useBusinessStore((state) => state.businesses);
 	const fetchBusinesses = useBusinessStore((state) => state.fetchBusinesses);
 	const setMode = useModalSettingsStore((state) => state.setMode);
+	const [posts, setPosts] = useState<BusinessPost[]>([]);
 	const [refreshing, setRefreshing] = useState(false);
 	const [loading, setLoading] = useState(0);
 	const [addressByBusinessId, setAddressByBusinessId] = useState<
@@ -99,6 +79,9 @@ export default function CustomerHome() {
 		setMode("customer");
 		fetchBusinesses().then(() => {
 			setLoading((prev) => prev + 1);
+			businessesApi.getAllPosts().then((posts) => {
+				setPosts(posts);
+			});
 		});
 		return () => {};
 	});
@@ -111,28 +94,21 @@ export default function CustomerHome() {
 		);
 	};
 
-	const filteredAnnouncements = mockAnnouncements.filter((item) => {
-		if (item instanceof Announcement) {
-			const announcement = item.getAnnouncement();
-			const matchesSearch =
-				announcement.business
-					.toLowerCase()
-					.includes(searchQuery.toLowerCase()) ||
-				announcement.text.toLowerCase().includes(searchQuery.toLowerCase());
-			// const matchesCategory =
-			// 	selectedCategories.length === 0 ||
-			// 	selectedCategories.includes(announcement.category as Category);
-			// return matchesSearch && matchesCategory;
-			return matchesSearch;
-		} else {
-			const announcement = item.getPoll();
-			const matchesSearch =
-				announcement.business
-					.toLowerCase()
-					.includes(searchQuery.toLowerCase()) ||
-				announcement.text.toLowerCase().includes(searchQuery.toLowerCase());
-			return matchesSearch;
+	const filteredAnnouncements = posts.filter((item) => {
+		const business = businesses.find((b) => b.id === item.businessid);
+		const matchesSearch =
+			(business?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ??
+				false) ||
+			item.businessid.toLowerCase().includes(searchQuery.toLowerCase()) ||
+			item.text.toLowerCase().includes(searchQuery.toLowerCase());
+		let f = true;
+		if (selectedCategories.includes("favourite")) {
+			if (!favs?.includes(business!!.id)) f = false;
 		}
+		const matchesCategory =
+			selectedCategories.length === 0 ||
+			selectedCategories.includes(business?.category as Category);
+		return matchesSearch && matchesCategory;
 	});
 
 	useEffect(() => {
@@ -181,202 +157,196 @@ export default function CustomerHome() {
 		});
 
 	return (
-		<ScrollView
-			contentContainerStyle={{ flexGrow: 1 }}
-			scrollEnabled={false}
-			bounces={false}
-			overScrollMode="never"
-			showsVerticalScrollIndicator={false}
-			showsHorizontalScrollIndicator={false}
-			className="h-screen w-screen"
-		>
-			<View className="h-full w-full bg-white">
-				<View className="mx-8 mt-8 flex flex-col bg-white">
-					<View className="flex flex-row items-center justify-between">
-						<Text className="font-bold text-4xl text-black">Home</Text>
-						<ProfilePicture />
-					</View>
-					<View className="mt-4 flex flex-row items-center justify-between">
-						<Text className="font-bold text-2xl text-black">Quick Search</Text>
-					</View>
-					<ScrollView
-						className="mt-5 mb-4 flex flex-row w-full"
-						horizontal={true}
-						showsHorizontalScrollIndicator={false}
-					>
-						<Pressable
-							className={`${selectedCategories.includes("food") ? "bg-[#FFB627]" : "bg-[#FFE4A3]"} rounded-xl w-20 h-20 py-4 px-5 mr-5`}
-							onPress={() => toggleCategory("food")}
-						>
-							<Ionicons name="fast-food-outline" size={35} color="black" />
-						</Pressable>
-						<Pressable
-							className={`${selectedCategories.includes("services") ? "bg-[#FFB627]" : "bg-[#FFE4A3]"} rounded-xl w-20 h-20 py-5 px-5 mr-5`}
-							onPress={() => toggleCategory("services")}
-						>
-							<Ionicons name="hammer-outline" size={35} color="black" />
-						</Pressable>
-						<Pressable
-							className={`${selectedCategories.includes("retail") ? "bg-[#FFB627]" : "bg-[#FFE4A3]"} rounded-xl w-20 h-20 py-4 px-5 mr-5`}
-							onPress={() => toggleCategory("retail")}
-						>
-							<Ionicons name="storefront-outline" size={35} color="black" />
-						</Pressable>
-						<Pressable
-							className={`${selectedCategories.includes("misc") ? "bg-[#FFB627]" : "bg-[#FFE4A3]"}  rounded-xl w-20 h-20 py-5 px-5 mr-5`}
-							onPress={() => toggleCategory("misc")}
-						>
-							<Ionicons name="cog-outline" size={35} color="black" />
-						</Pressable>
-						<Pressable
-							className={`${selectedCategories.includes("favourite") ? "bg-[#FFB627]" : "bg-[#FFE4A3]"}  rounded-xl w-20 h-20 py-5 px-5 mr-5`}
-							onPress={() => toggleCategory("favourite")}
-						>
-							<Ionicons name="star-outline" size={35} color="black" />
-						</Pressable>
-					</ScrollView>
-					<View className="mb-4 mt-4 flex flex-row bg-[#FFE4A3] rounded-xl w-full items-center p-2 ps-4">
-						<Feather name="search" size={20} color="black" />
-						<TextInput
-							ref={inputRef}
-							placeholder="Search businesses"
-							value={searchQuery}
-							onChangeText={setSearchQuery}
-							className="flex-1 ms-2 text-md"
-						/>
-						<Pressable
-							onPress={() => setShowFilters(!showFilters)}
-							className="ml-auto mx-2"
-						>
-							<Feather name="sliders" size={20} color="black" />
-						</Pressable>
-					</View>
-					{showFilters && (
-						<View className="w-full flex flex-col bg-orange-50 p-4 rounded-xl">
-							<Text className="font-semibold">Sort By</Text>
-							<Pressable
-								className="absolute top-4 right-4"
-								onPress={() => setShowFilters(false)}
-							>
-								<Feather name="x" size={18} color="gray" />
-							</Pressable>
-							<ScrollView
-								className="mt-2 flex flex-row w-full"
-								horizontal={true}
-								showsHorizontalScrollIndicator={false}
-							>
-								{activeTab === "announcements" ? (
-									<>
-										<Pressable
-											className={`${sortBy === "recent" ? "bg-slate-500" : "bg-slate-100"} rounded-xl px-4 py-2 mr-2`}
-											onPress={() => setSortBy("recent")}
-										>
-											<Text
-												className={`${sortBy === "recent" ? "text-white" : ""} font-medium`}
-											>
-												Recent
-											</Text>
-										</Pressable>
-										<Pressable
-											className={`${sortBy === "popular" ? "bg-slate-500" : "bg-slate-100"} rounded-xl px-4 py-2 mr-2`}
-											onPress={() => setSortBy("popular")}
-										>
-											<Text
-												className={`${sortBy === "popular" ? "text-white" : ""} font-medium`}
-											>
-												Most Popular
-											</Text>
-										</Pressable>
-									</>
-								) : (
-									<>
-										<Pressable
-											className={`${sortBy === "alphabetical" ? "bg-slate-500" : "bg-slate-100"} rounded-xl px-4 py-2 mr-2`}
-											onPress={() => setSortBy("alphabetical")}
-										>
-											<Text
-												className={`${sortBy === "alphabetical" ? "text-white" : ""} font-medium`}
-											>
-												Alphabetical
-											</Text>
-										</Pressable>
-										<Pressable
-											className={`${sortBy === "popular" ? "bg-slate-500" : "bg-slate-100"} rounded-xl px-4 py-2 mr-2`}
-											onPress={() => setSortBy("popular")}
-										>
-											<Text
-												className={`${sortBy === "popular" ? "text-white" : ""} font-medium`}
-											>
-												Most Popular
-											</Text>
-										</Pressable>
-										<Pressable
-											className={`${sortBy === "ratings" ? "bg-slate-500" : "bg-slate-100"} rounded-xl px-4 py-2 mr-2`}
-											onPress={() => setSortBy("ratings")}
-										>
-											<Text
-												className={`${sortBy === "ratings" ? "text-white" : ""} font-medium`}
-											>
-												Ratings
-											</Text>
-										</Pressable>
-									</>
-								)}
-							</ScrollView>
-						</View>
-					)}
-					<View className="mb-4 mt-2 flex flex-row w-full items-center justify-items-start">
-						<Pressable
-							className={`${activeTab === "announcements" ? "bg-[#FFB627]" : "bg-[#FFE4A3]"} rounded-xl px-4 py-2 mr-2`}
-							onPress={() => {
-								setActiveTab("announcements");
-								setSortBy("recent");
-							}}
-						>
-							<Text className="text-xl font-bold">Announcements</Text>
-						</Pressable>
-						<Pressable
-							className={`${activeTab === "businesses" ? "bg-[#FFB627]" : "bg-[#FFE4A3]"} rounded-xl px-4 py-2 mr-2`}
-							onPress={() => {
-								setActiveTab("businesses");
-								setSortBy("alphabetical");
-							}}
-						>
-							<Text className="text-xl font-bold">Find a Business</Text>
-						</Pressable>
-					</View>
-					{activeTab === "announcements" ? (
-						<FlatList
-							data={filteredAnnouncements}
-							renderItem={({ item }) => <AnnouncementItemCustomer />}
-							keyExtractor={(item) => item.id}
-							ItemSeparatorComponent={() => <View className="h-2" />}
-							scrollEnabled={true}
-							contentContainerStyle={{ paddingBottom: 8 }}
-							showsVerticalScrollIndicator={false}
-						/>
-					) : (
-						<FlatList
-							data={filteredBusinesses}
-							renderItem={({ item }) => <BusinessItem business={item} />}
-							keyExtractor={(item) => item.id}
-							ItemSeparatorComponent={() => <View className="h-2" />}
-							scrollEnabled={true}
-							contentContainerStyle={{ paddingBottom: 8 }}
-							showsVerticalScrollIndicator={false}
-							refreshing={refreshing}
-							onRefresh={async () => {
-								setRefreshing(true);
-								await fetchBusinesses();
-								usersApi.getFavorite(userId).then((favs) => {
-									setFavs(favs);
-									setRefreshing(false);
-								});
-							}}
-						/>
-					)}
+		<View className="h-full w-full bg-white">
+			<View className="mx-8 mt-8 flex flex-col bg-white">
+				<View className="flex flex-row items-center justify-between">
+					<Text className="font-bold text-4xl text-black">Home</Text>
+					<ProfilePicture />
 				</View>
+				<View className="mt-4 flex flex-row items-center justify-between">
+					<Text className="font-bold text-2xl text-black">Quick Search</Text>
+				</View>
+				<ScrollView
+					className="mt-5 mb-4 flex flex-row w-full"
+					horizontal={true}
+					showsHorizontalScrollIndicator={false}
+				>
+					<Pressable
+						className={`${selectedCategories.includes("food") ? "bg-[#FFB627]" : "bg-[#FFE4A3]"} rounded-xl w-20 h-20 py-4 px-5 mr-5`}
+						onPress={() => toggleCategory("food")}
+					>
+						<Ionicons name="fast-food-outline" size={35} color="black" />
+					</Pressable>
+					<Pressable
+						className={`${selectedCategories.includes("services") ? "bg-[#FFB627]" : "bg-[#FFE4A3]"} rounded-xl w-20 h-20 py-5 px-5 mr-5`}
+						onPress={() => toggleCategory("services")}
+					>
+						<Ionicons name="hammer-outline" size={35} color="black" />
+					</Pressable>
+					<Pressable
+						className={`${selectedCategories.includes("retail") ? "bg-[#FFB627]" : "bg-[#FFE4A3]"} rounded-xl w-20 h-20 py-4 px-5 mr-5`}
+						onPress={() => toggleCategory("retail")}
+					>
+						<Ionicons name="storefront-outline" size={35} color="black" />
+					</Pressable>
+					<Pressable
+						className={`${selectedCategories.includes("misc") ? "bg-[#FFB627]" : "bg-[#FFE4A3]"}  rounded-xl w-20 h-20 py-5 px-5 mr-5`}
+						onPress={() => toggleCategory("misc")}
+					>
+						<Ionicons name="cog-outline" size={35} color="black" />
+					</Pressable>
+					<Pressable
+						className={`${selectedCategories.includes("favourite") ? "bg-[#FFB627]" : "bg-[#FFE4A3]"}  rounded-xl w-20 h-20 py-5 px-5 mr-5`}
+						onPress={() => toggleCategory("favourite")}
+					>
+						<Ionicons name="star-outline" size={35} color="black" />
+					</Pressable>
+				</ScrollView>
 			</View>
-		</ScrollView>
+			<View className="flex-1 mx-8">
+				<View className="mb-4 mt-4 flex flex-row bg-[#FFE4A3] rounded-xl w-full items-center p-2 ps-4">
+					<Feather name="search" size={20} color="black" />
+					<TextInput
+						ref={inputRef}
+						placeholder="Search businesses"
+						value={searchQuery}
+						onChangeText={setSearchQuery}
+						className="flex-1 ms-2 text-md"
+					/>
+					<Pressable
+						onPress={() => setShowFilters(!showFilters)}
+						className="ml-auto mx-2"
+					>
+						<Feather name="sliders" size={20} color="black" />
+					</Pressable>
+				</View>
+				{showFilters && (
+					<View className="w-full flex flex-col bg-orange-50 p-4 rounded-xl">
+						<Text className="font-semibold">Sort By</Text>
+						<Pressable
+							className="absolute top-4 right-4"
+							onPress={() => setShowFilters(false)}
+						>
+							<Feather name="x" size={18} color="gray" />
+						</Pressable>
+						<ScrollView
+							className="mt-2 flex flex-row w-full"
+							horizontal={true}
+							showsHorizontalScrollIndicator={false}
+						>
+							{activeTab === "announcements" ? (
+								<>
+									<Pressable
+										className={`${sortBy === "recent" ? "bg-slate-500" : "bg-slate-100"} rounded-xl px-4 py-2 mr-2`}
+										onPress={() => setSortBy("recent")}
+									>
+										<Text
+											className={`${sortBy === "recent" ? "text-white" : ""} font-medium`}
+										>
+											Recent
+										</Text>
+									</Pressable>
+									<Pressable
+										className={`${sortBy === "popular" ? "bg-slate-500" : "bg-slate-100"} rounded-xl px-4 py-2 mr-2`}
+										onPress={() => setSortBy("popular")}
+									>
+										<Text
+											className={`${sortBy === "popular" ? "text-white" : ""} font-medium`}
+										>
+											Most Popular
+										</Text>
+									</Pressable>
+								</>
+							) : (
+								<>
+									<Pressable
+										className={`${sortBy === "alphabetical" ? "bg-slate-500" : "bg-slate-100"} rounded-xl px-4 py-2 mr-2`}
+										onPress={() => setSortBy("alphabetical")}
+									>
+										<Text
+											className={`${sortBy === "alphabetical" ? "text-white" : ""} font-medium`}
+										>
+											Alphabetical
+										</Text>
+									</Pressable>
+									<Pressable
+										className={`${sortBy === "popular" ? "bg-slate-500" : "bg-slate-100"} rounded-xl px-4 py-2 mr-2`}
+										onPress={() => setSortBy("popular")}
+									>
+										<Text
+											className={`${sortBy === "popular" ? "text-white" : ""} font-medium`}
+										>
+											Most Popular
+										</Text>
+									</Pressable>
+									<Pressable
+										className={`${sortBy === "ratings" ? "bg-slate-500" : "bg-slate-100"} rounded-xl px-4 py-2 mr-2`}
+										onPress={() => setSortBy("ratings")}
+									>
+										<Text
+											className={`${sortBy === "ratings" ? "text-white" : ""} font-medium`}
+										>
+											Ratings
+										</Text>
+									</Pressable>
+								</>
+							)}
+						</ScrollView>
+					</View>
+				)}
+				<View className="mb-4 mt-2 flex flex-row w-full items-center justify-items-start">
+					<Pressable
+						className={`${activeTab === "announcements" ? "bg-[#FFB627]" : "bg-[#FFE4A3]"} rounded-xl px-4 py-2 mr-2`}
+						onPress={() => {
+							setActiveTab("announcements");
+							setSortBy("recent");
+						}}
+					>
+						<Text className="text-xl font-bold">Announcements</Text>
+					</Pressable>
+					<Pressable
+						className={`${activeTab === "businesses" ? "bg-[#FFB627]" : "bg-[#FFE4A3]"} rounded-xl px-4 py-2 mr-2`}
+						onPress={() => {
+							setActiveTab("businesses");
+							setSortBy("alphabetical");
+						}}
+					>
+						<Text className="text-xl font-bold">Find a Business</Text>
+					</Pressable>
+				</View>
+				{activeTab === "announcements" ? (
+					<FlatList
+						data={filteredAnnouncements}
+						renderItem={({ item }) => (
+							<AnnouncementItemCustomer announcement={item} />
+						)}
+						keyExtractor={(item) => item.id}
+						ItemSeparatorComponent={() => <View className="h-2" />}
+						scrollEnabled={true}
+						contentContainerStyle={{ paddingBottom: 8 }}
+						showsVerticalScrollIndicator={false}
+					/>
+				) : (
+					<FlatList
+						data={filteredBusinesses}
+						renderItem={({ item }) => <BusinessItem business={item} />}
+						keyExtractor={(item) => item.id}
+						ItemSeparatorComponent={() => <View className="h-2" />}
+						scrollEnabled={true}
+						contentContainerStyle={{ paddingBottom: 8 }}
+						showsVerticalScrollIndicator={false}
+						refreshing={refreshing}
+						onRefresh={async () => {
+							setRefreshing(true);
+							await fetchBusinesses();
+							usersApi.getFavorite(userId).then((favs) => {
+								setFavs(favs);
+								setRefreshing(false);
+							});
+						}}
+					/>
+				)}
+			</View>
+		</View>
 	);
 }
