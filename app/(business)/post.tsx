@@ -26,7 +26,7 @@ export default function Post() {
 
 	useFocusEffect(() => {
 		setModalMode("business");
-		return () => {};
+		return () => { };
 	});
 
 	return (
@@ -37,7 +37,7 @@ export default function Post() {
 			</View>
 
 			<View className="flex-1 mt-2">
-				<Pressable className="flex-row items-center justify-between border border-black rounded-lg px-3 py-2 mb-3">
+				<Pressable className="flex-row items-center justify-between border border-black rounded-lg px-3 py-2 mb-5">
 					<View className="flex-row items-center">
 						<Feather name="volume-2" size={25} color="black" />
 						<Text className="text-black text-xl"> Announcement</Text>
@@ -63,20 +63,17 @@ export default function Post() {
 				{/* Date toggle */}
 				<View className="mb-2 flex-row">
 					<Pressable
-						className={`flex-1 py-2 rounded-lg mr-2 ${dateEnabled ? "bg-[#FFB703]" : "bg-gray-200"}`}
+						className={`flex-1 h-12 mt-4 mr-4 rounded-lg flex items-center justify-center ${dateEnabled ? "bg-[#FFB703]" : "bg-gray-200"}`}
 						onPress={() => setDateEnabled(true)}
 					>
-						<Text className="text-center text-black font-semibold">
-							Include Date
-						</Text>
+						<Text className="text-black text-lg  ">Include Date</Text>
 					</Pressable>
+
 					<Pressable
-						className={`flex-1 py-2 rounded-lg ${!dateEnabled ? "bg-[#FFB703]" : "bg-gray-200"}`}
+						className={`flex-1 h-12 mt-4 rounded-lg flex items-center justify-center ${!dateEnabled ? "bg-[#FFB703]" : "bg-gray-200"}`}
 						onPress={() => setDateEnabled(false)}
 					>
-						<Text className="text-center text-black font-semibold">
-							No Date
-						</Text>
+						<Text className="text-black  text-lg  ">No Date</Text>
 					</Pressable>
 				</View>
 

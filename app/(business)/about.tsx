@@ -343,12 +343,11 @@ export default function BusinessAbout() {
 											ToastAndroid.show("No image chosen", ToastAndroid.SHORT);
 											return;
 										}
-										uploadBusinessBanner(
-											ownedBusiness!!.id,
-											result.assets[0].uri,
-										).then((newUri) => {
-											updateBusinessInfo(ownedBusiness.id, { banner: newUri });
-										});
+										uploadBusinessBanner(ownedBusiness!!.id, result.assets[0].uri)
+											.then((newUri) => {
+												updateBusinessInfo(ownedBusiness.id, { banner: newUri });
+											})
+
 									}}
 								>
 									<Text>Upload Banner</Text>
@@ -538,33 +537,31 @@ export default function BusinessAbout() {
 					</View>
 
 					<View className="flex flex-col">
-						<View className="flex flex-row items-center justify-between">
-							<Text className=" text-zinc-700 font-semibold text-xl">
-								Working Hours
-							</Text>
-						</View>
-						<View className="flex flex-col">
-							<Text className=" text-zinc-700 text-xl text-md">
-								Saturday Closed
-							</Text>
-							<Text className=" text-zinc-700 text-xl text-md">
-								Sunday Closed
-							</Text>
-							<Text className=" text-zinc-700 text-xl text-md">
-								Monday Closed
-							</Text>
-							<Text className=" text-zinc-700 text-xl text-md">
-								Tuesday Closed
-							</Text>
-							<Text className=" text-zinc-700 text-xl text-md">
-								Wednesday Closed
-							</Text>
-							<Text className=" text-zinc-700 text-xl text-md">
-								Thursday Closed
-							</Text>
-							<Text className=" text-zinc-700 text-xl text-md">
-								Friday Closed
-							</Text>
+						<Text className="text-zinc-700 font-semibold text-xl mb-2">
+							Working Hours
+						</Text>
+
+						<View className="border border-zinc-300 rounded-xl overflow-hidden">
+							{[
+								{ day: "Saturday", hours: "Closed" },
+								{ day: "Sunday", hours: "Closed" },
+								{ day: "Monday", hours: "Closed" },
+								{ day: "Tuesday", hours: "Closed" },
+								{ day: "Wednesday", hours: "Closed" },
+								{ day: "Thursday", hours: "Closed" },
+								{ day: "Friday", hours: "Closed" },
+							].map((item, index) => (
+								<View
+									key={item.day}
+									className={`flex flex-row justify-between px-4 py-3 ${index !== 6 ? "border-b border-zinc-200" : ""
+										}`}
+								>
+									<Text className="text-zinc-700 text-base font-medium">
+										{item.day}
+									</Text>
+									<Text className="text-zinc-500 text-base">{item.hours}</Text>
+								</View>
+							))}
 						</View>
 					</View>
 				</View>
