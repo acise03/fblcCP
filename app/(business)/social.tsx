@@ -47,7 +47,7 @@ export default function BusinessSocial() {
 							Events
 						</Text>
 						<Pressable onPress={() => router.push("/post")}>
-							<Ionicons name="add-circle-sharp" size={30} color="#FFE4A3" />
+							<Ionicons name="add-circle-sharp" size={30} color="orange" />
 						</Pressable>
 					</View>
 					<FlatList
@@ -72,7 +72,9 @@ export default function BusinessSocial() {
 						keyExtractor={(item) => item.id}
 						ItemSeparatorComponent={() => <View className="h-2" />}
 						scrollEnabled={true}
-						contentContainerStyle={{ paddingBottom: 8 }}
+						contentContainerStyle={{ paddingBottom: 8,
+							    paddingHorizontal: 0 
+						}}
 						showsVerticalScrollIndicator={false}
 					/>
 				</View>

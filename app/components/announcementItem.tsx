@@ -19,8 +19,8 @@ export default function AnnouncementItem({
 	const [editText, setEditText] = useState(announcement.text);
 
 	return (
-		<View className="p-4 flex flex-row items-center rounded-2xl bg-[#FFE4A3] w-full">
-			<View className="px-4 flex flex-col flex-1">
+		<View className="py-4 px-4 flex flex-row items-center rounded-2xl bg-[#FFE4A3] w-full">
+			<View className="flex flex-col flex-1">
 				{editing ? (
 					<>
 						<TextInput
@@ -55,7 +55,7 @@ export default function AnnouncementItem({
 						</Text>
 						<View className="flex flex-row mt-2 space-x-2">
 							<Text
-								className="px-2 py-1 bg-blue-500 text-white rounded"
+								className="px-2 py-1 bg-white text-black rounded mr-3"
 								onPress={() => setEditing(true)}
 							>
 								Edit

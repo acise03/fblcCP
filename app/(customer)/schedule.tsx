@@ -126,30 +126,32 @@ export default function Schedule() {
 						{
 							<View>
 								<View className="mt-4 flex flex-row items-center justify-between mb-2 mt-5">
-									<Text className="font-bold text-2xl text-black">
+									<Text className="font-bold text-3xl text-black">
 										Events on {selectedDate}
 									</Text>
 								</View>
 
 								{selectedDayEvents.length === 0 ? (
-									<Text className="text-lg">No events.</Text>
+									<View className="bg-[#FFE4A3] flex flex-col items-start      border-black rounded-xl px-4 py-4 mt-3">
+										<Text className="text-xl  ">No events.</Text>
+
+									</View>
 								) : (
 									selectedDayEvents.map((event, index) => (
-										<Text
-											key={index}
-											onPress={() => setSelectedEvent(event)}
-											className="text-lg"
-										>
-											- {event.getName()}: {event.getDescription()}
-										</Text>
+										<View className=" bg-[#FFE4A3] flex flex-col items-start       rounded-xl px-4 py-4 mt-3">
+											<Text className="text-xl font-bold">{event.getName()}</Text>
+											<Text className="text-lg">
+												{event.getDescription()}
+											</Text>
+										</View>
 									))
 								)}
 							</View>
 						}
 
 						{selectedEvent && (
-							<View>
-								<Text className="text-lg">{selectedEvent.getName()}</Text>
+							<View className="flex flex-col items-start bg-white border border-black rounded-xl px-4 py-4 mb-4 mt-5">
+								<Text className="text-xl font-bold">{selectedEvent.getName()}</Text>
 								<Text className="text-lg">
 									{selectedEvent.getDescription()}
 								</Text>
