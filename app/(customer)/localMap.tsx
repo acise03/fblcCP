@@ -4,20 +4,20 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import * as Location from "expo-location";
 import React, { useEffect, useMemo, useState } from "react";
 import {
-    Dimensions,
-    FlatList,
-    Pressable,
-    Text,
-    TextInput,
-    ToastAndroid,
-    View,
+	Dimensions,
+	FlatList,
+	Pressable,
+	Text,
+	TextInput,
+	ToastAndroid,
+	View,
 } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import MapView, { Marker } from "react-native-maps";
 import Animated, {
-    useAnimatedStyle,
-    useSharedValue,
-    withSpring,
+	useAnimatedStyle,
+	useSharedValue,
+	withSpring,
 } from "react-native-reanimated";
 import BusinessItem from "../components/businessItem";
 import ProfilePicture from "../components/profilePicture";
@@ -81,9 +81,9 @@ function getDistance(lat1: number, lon1: number, lat2: number, lon2: number) {
 	const a =
 		Math.sin(dLat / 2) * Math.sin(dLat / 2) +
 		Math.cos(toRad(lat1)) *
-			Math.cos(toRad(lat2)) *
-			Math.sin(dLon / 2) *
-			Math.sin(dLon / 2);
+		Math.cos(toRad(lat2)) *
+		Math.sin(dLon / 2) *
+		Math.sin(dLon / 2);
 	const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 	return R * c;
 }
@@ -306,9 +306,10 @@ export default function LocalMap() {
 			<View
 				style={{
 					position: "absolute",
-					top: 70,
+					top: 80,
 					left: 18,
 					right: 18,
+					height: 50,
 					backgroundColor: "#FFE4A3",
 					borderRadius: 12,
 					flexDirection: "row",
@@ -334,10 +335,10 @@ export default function LocalMap() {
 				style={{
 					position: "absolute",
 					top: 120,
-					left: 18,
-					right: 18,
+					left: 25,
+					right: 25,
 					flexDirection: "row",
-					marginTop: 16,
+					marginTop: 25,
 				}}
 			>
 				<Pressable
@@ -350,7 +351,7 @@ export default function LocalMap() {
 						height: 60,
 						justifyContent: "center",
 						alignItems: "center",
-						marginRight: 10,
+						marginRight: 15,
 					}}
 					onPress={() => toggleCategory("food")}
 				>
@@ -366,7 +367,7 @@ export default function LocalMap() {
 						height: 60,
 						justifyContent: "center",
 						alignItems: "center",
-						marginRight: 10,
+						marginRight: 15,
 					}}
 					onPress={() => toggleCategory("services")}
 				>
@@ -382,7 +383,7 @@ export default function LocalMap() {
 						height: 60,
 						justifyContent: "center",
 						alignItems: "center",
-						marginRight: 10,
+						marginRight: 15,
 					}}
 					onPress={() => toggleCategory("retail")}
 				>
@@ -398,7 +399,7 @@ export default function LocalMap() {
 						height: 60,
 						justifyContent: "center",
 						alignItems: "center",
-						marginRight: 10,
+						marginRight: 15,
 					}}
 					onPress={() => toggleCategory("misc")}
 				>

@@ -4,10 +4,10 @@ import React, { useEffect, useState } from "react";
 import { Image, Pressable } from "react-native";
 
 import {
-    businessesApi,
-    BusinessWithInfo,
-    ReviewWithUser,
-    usersApi,
+	businessesApi,
+	BusinessWithInfo,
+	ReviewWithUser,
+	usersApi,
 } from "@/db/api";
 import { BusinessPost } from "@/db/schema";
 import { useAuthStore } from "@/store/useAuthStore";
@@ -130,7 +130,7 @@ export default function BusinessDetails() {
 
 	useFocusEffect(() => {
 		setMode("customer");
-		return () => {};
+		return () => { };
 	});
 
 	if (!activeBusiness) return null;
@@ -146,51 +146,45 @@ export default function BusinessDetails() {
 					<ProfilePicture />
 				</View>
 
-				<Image
-					source={{ uri: business.business_information?.banner!! }}
-					className="w-full h-40 rounded-3xl mb-4"
-				/>
 
-				<ScrollView className="flex-1 w-full px-4">
+
+				<ScrollView className="flex-1 w-full">
+					<Image
+						source={{ uri: business.business_information?.banner!! }}
+						className="w-full h-40 rounded-3xl mb-4"
+					/>
 					<View className="flex flex-col items-start mb-2 px-4 gap-2">
-						<Pressable
-							onPress={async () => {
-								console.log("clicked");
-								if (!favs || !favs.includes(business.id)) {
-									await usersApi.addFavorite(userId, business.id);
-								} else {
-									await usersApi.removeFavorite(userId, business.id);
-								}
-								usersApi.getFavorite(userId).then((favs) => {
-									console.log(favs);
-									setFavs(favs);
-								});
-							}}
-						>
-							{!favs || !favs.includes(business.id) ? (
-								<FontAwesome name="star-o" size={24} color="black" />
-							) : (
-								<FontAwesome name="star" size={24} color="black" />
-							)}
-						</Pressable>
-						<View className="relative w-full h-48 mt-8">
-							<Image
-								className="bg-gray-500 w-full h-full rounded-3xl"
-								source={
-									business.business_information?.banner
-										? { uri: business.business_information.banner }
-										: { uri: "" }
-								}
-							/>
-						</View>
-						<Text className="text-xl font-semibold text-black ">About</Text>
+						<View className="flex-row items-center justify-between w-full mb-2">
+							<Text className="text-2xl font-semibold text-black">
+								About
+							</Text>
 
+							<Pressable
+								onPress={async () => {
+									if (!favs || !favs.includes(business.id)) {
+										await usersApi.addFavorite(userId, business.id);
+									} else {
+										await usersApi.removeFavorite(userId, business.id);
+									}
+
+									const updated = await usersApi.getFavorite(userId);
+									setFavs(updated);
+								}}
+								className="p-1"
+							>
+								{!favs || !favs.includes(business.id) ? (
+									<FontAwesome name="star-o" size={22} color="black" />
+								) : (
+									<FontAwesome name="star" size={22} color="#FFB627" />
+								)}
+							</Pressable>
+						</View>
 						<Text className="text-base text-black  w-full">
 							{business.business_information?.description}
 						</Text>
 					</View>
 					<View className="flex flex-col items-start mb-2 px-4 gap-2 w-full">
-						<Text className="text-xl font-semibold text-black ">
+						<Text className="text-2xl font-semibold text-black ">
 							Announcements
 						</Text>
 
@@ -208,7 +202,7 @@ export default function BusinessDetails() {
 						/>
 					</View>
 					<View className="flex flex-col items-start mb-2 px-4 gap-2">
-						<Text className="text-xl font-semibold text-black ">
+						<Text className="text-2xl font-semibold text-black ">
 							AI Summary of Reviews:
 						</Text>
 						<Text className="italic text-base text-black  w-full">
@@ -217,7 +211,7 @@ export default function BusinessDetails() {
 					</View>
 
 					<View className="flex flex-col items-start mb-2 px-4 gap-2">
-						<Text className="text-xl font-semibold text-black ">Reviews</Text>
+						<Text className="text-2xl font-semibold text-black ">Reviews</Text>
 						<View className="w-full">
 							{reviews != null &&
 								reviews.length > 0 &&
@@ -234,7 +228,7 @@ export default function BusinessDetails() {
 											: d.toLocaleDateString();
 
 										return (
-											<View className="w-full bg-gray-100 rounded-xl p-3 mb-2">
+											<View className="w-full bg-gray-100 rounded-xl p-3 mb-4">
 												<View className="flex-row justify-between mb-1">
 													<Text className="font-semibold text-black ">
 														{usernameById[review.reviewerid!!]}
@@ -277,10 +271,14 @@ export default function BusinessDetails() {
 										);
 									})}
 						</View>
-					</View>
-					<Pressable onPress={() => setVisible(true)}>
-						<Text>Leave a review</Text>
-					</Pressable>
+						<Pressable
+							onPress={() => setVisible(true)}
+							className="w-full bg-[#FFB627] rounded-xl py-3 items-center justify-center mt-1 active:opacity-50"
+						>
+							<Text className="text-black font-semibold text-base">
+								Leave a review
+							</Text>
+						</Pressable>					</View>
 				</ScrollView>
 			</View>
 		</View>

@@ -3,12 +3,12 @@ import { useModalReviewStore } from "@/store/useModalReviewStore";
 import { useReviewStore } from "@/store/useReviewStore";
 import { useEffect, useState } from "react";
 import {
-    Modal,
-    Pressable,
-    Text,
-    TextInput,
-    ToastAndroid,
-    View,
+	Modal,
+	Pressable,
+	Text,
+	TextInput,
+	ToastAndroid,
+	View,
 } from "react-native";
 
 export default function ModalReviews() {
@@ -64,92 +64,87 @@ export default function ModalReviews() {
 	return (
 		<Modal transparent visible={modalVisible} animationType="slide">
 			<Pressable
-				className="h-full w-full"
+				className="flex-1"
 				onPress={() => {
 					setVisible(false);
 					setEdit(false);
 				}}
 			>
-				<View className="flex justify-center items-center h-full">
+				<View className="flex-1 justify-end bg-black/40">
+
 					<View
-						className="flex w-2/3 h-[22.5rem] shadow-md bg-white rounded-2xl p-4 items-center"
+						className="w-full bg-white rounded-t-3xl p-6 h-[38%]"
 						onStartShouldSetResponder={() => true}
 					>
-						<View style={{ flexDirection: "row", marginBottom: 8 }}>
+
+
+						<View className="flex-row justify-center mb-4">
 							{[1, 2, 3, 4, 5].map((star) => (
 								<Pressable key={star} onPress={() => setRating(star)}>
-									<Text>{star <= rating ? "★" : "☆"}</Text>
+									<Text className="text-5xl text-[#FFB627]">
+										{star <= rating ? "★" : "☆"}
+									</Text>
 								</Pressable>
 							))}
 						</View>
-						{editing ? (
-							<>
-								<TextInput
-									onChangeText={setReview}
-									value={review}
-									placeholder="Edit your review"
-								/>
-								<Pressable
-									onPress={async () => {
-										console.log("editing");
-										setEdit(false);
-										const userReviewNew = await fetchPrev(
-											userId,
-											activeBusiness,
-										);
 
-										await editReview(userReviewNew!!.id, {
+						<TextInput
+							onChangeText={setReview}
+							value={review}
+							placeholder="Leave a review..."
+							className="border border-gray-300 text-xl rounded-xl p-3 h-80 text-base text-black"
+							multiline
+						/>
+
+						{editing ? (
+							<Pressable
+								className="mt-4 bg-[#FFB627] rounded-xl py-3 items-center"
+								onPress={async () => {
+									const prev = await fetchPrev(userId, activeBusiness);
+									await editReview(prev!!.id, { rating, review });
+									fetchReviews(activeBusiness);
+									setVisible(false);
+									setEdit(false);
+								}}
+							>
+								<Text className="text-black font-semibold">Update Review</Text>
+							</Pressable>
+						) : (
+							<Pressable
+								className="mt-4 bg-[#FFB627] rounded-xl h-16 items-center justify-center"
+								onPress={async () => {
+									// This check could be redundant as it checks on DB end
+									const userReviewNew = await fetchPrev(
+										userId,
+										activeBusiness,
+									);
+
+									if (userReviewNew === null) {
+										if (rating === 0) {
+											ToastAndroid.show("Set a rating", ToastAndroid.SHORT);
+											return;
+										}
+										await createReview({
+											businessid: activeBusiness,
+											reviewerid: userId,
 											rating: rating,
 											review: review,
 										});
+										ToastAndroid.show("Review created", ToastAndroid.SHORT);
 										fetchReviews(activeBusiness);
 										setVisible(false);
-									}}
-								>
-									<Text>Edit Review</Text>
-								</Pressable>
-							</>
-						) : (
-							<>
-								<TextInput
-									onChangeText={setReview}
-									value={review}
-									placeholder="Leave a review"
-								/>
-								<Pressable
-									onPress={async () => {
-										// This check could be redundant as it checks on DB end
-										const userReviewNew = await fetchPrev(
-											userId,
-											activeBusiness,
+									} else {
+										setError(
+											"You already have a review on this business, edit it instead.",
 										);
+									}
+								}}
+							>
 
-										if (userReviewNew === null) {
-											if (rating === 0) {
-												ToastAndroid.show("Set a rating", ToastAndroid.SHORT);
-												return;
-											}
-											await createReview({
-												businessid: activeBusiness,
-												reviewerid: userId,
-												rating: rating,
-												review: review,
-											});
-											ToastAndroid.show("Review created", ToastAndroid.SHORT);
-											fetchReviews(activeBusiness);
-											setVisible(false);
-										} else {
-											setError(
-												"You already have a review on this business, edit it instead.",
-											);
-										}
-									}}
-								>
-									<Text>Submit Review</Text>
-								</Pressable>
-							</>
+								<Text className="text-black text-xl font-semibold justify-center">Submit Review</Text>
+							</Pressable>
 						)}
-						<Text>{error}</Text>
+
 					</View>
 				</View>
 			</Pressable>
