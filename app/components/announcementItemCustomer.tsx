@@ -8,83 +8,99 @@ import { Image, Pressable, Text, View } from "react-native";
 import ExpandableText from "./expandableText";
 
 type AnnouncementItemCustomerProps = {
-  announcement: BusinessPost;
+	announcement: BusinessPost;
 };
 
 const postTypeLabels: Record<string, string> = {
-  announcement: "📢 Announcement",
-  sale: "🏷️ Sale",
-  coupon: "🎟️ Coupon",
+	announcement: "📢 Announcement",
+	sale: "🏷️ Sale",
+	coupon: "🎟️ Coupon",
 };
 
 export default function AnnouncementItemCustomer({
-  announcement,
+	announcement,
 }: AnnouncementItemCustomerProps) {
-  const [businessName, setBusinessName] = useState("");
-  const [profilePicture, setProfilePicture] = useState<string | null>(null);
-  const setActive = useModalReviewStore((state) => state.setBusiness);
+	const [businessName, setBusinessName] = useState("");
+	const [profilePicture, setProfilePicture] = useState<string | null>(null);
+	const setActive = useModalReviewStore((state) => state.setBusiness);
 
-  useEffect(() => {
-    businessesApi.getById(announcement.businessid).then((business) => {
-      setBusinessName(business?.name ?? "");
-      setProfilePicture(
-        business?.business_information?.profile_picture ?? null,
-      );
-    });
-  }, [announcement.businessid]);
+	useEffect(() => {
+		businessesApi.getById(announcement.businessid).then((business) => {
+			setBusinessName(business?.name ?? "");
+			setProfilePicture(
+				business?.business_information?.profile_picture ?? null,
+			);
+		});
+	}, [announcement.businessid]);
 
-  return (
-    <Pressable
-      className="p-4 flex flex-row items-center rounded-2xl bg-[#FFB62799] w-full"
-      onPress={() => {
-        router.push("/(customer)/businessDetails");
-        setActive(announcement.businessid);
-      }}
-    >
-      {/* Static darker gray circle aligned with businessName */}
-      <View className="flex flex-col flex-1">
-        <View style={{ flexDirection: "row", alignItems: "center" }}>
-          {profilePicture ? (
-            <Image
-              source={{ uri: profilePicture }}
-              style={{
-                width: 24,
-                height: 24,
-                borderRadius: 12,
-                backgroundColor: "#d1d5db",
-                marginRight: 8,
-              }}
-            />
-          ) : (
-            <View
-              style={{
-                width: 24,
-                height: 24,
-                borderRadius: 12,
-                backgroundColor: "#FFF8F0",
-                alignItems: "center",
-                justifyContent: "center",
-                marginRight: 8,
-              }}
-            >
-              <Ionicons name="briefcase-outline" size={14} color="black" />
-            </View>
-          )}
-          <Text className="text-lg font-bold" style={{ fontFamily: "Rubik" }}>
-            {businessName}
-          </Text>
-        </View>
-        <ExpandableText
-          className="text-base font-normal mt-2"
-          style={{ fontFamily: "Rubik" }}
-          numberOfLines={4}
-        >
-          {announcement.text}
-        </ExpandableText>
-        {/* <Text className="text-sm text-gray-500">
+	return (
+		<Pressable
+			className="p-4 flex flex-row items-center rounded-2xl bg-[#FFB62799] w-full"
+			onPress={() => {
+				router.push("/(customer)/businessDetails");
+				setActive(announcement.businessid);
+			}}
+		>
+			{/* Static darker gray circle aligned with businessName */}
+			<View className="flex flex-col flex-1">
+				<View style={{ flexDirection: "row", alignItems: "center" }}>
+					{profilePicture ? (
+						<Image
+							source={{ uri: profilePicture }}
+							style={{
+								width: 24,
+								height: 24,
+								borderRadius: 12,
+								backgroundColor: "#d1d5db",
+								marginRight: 8,
+							}}
+						/>
+					) : (
+						<View
+							style={{
+								width: 24,
+								height: 24,
+								borderRadius: 12,
+								backgroundColor: "#FFF8F0",
+								alignItems: "center",
+								justifyContent: "center",
+								marginRight: 8,
+							}}
+						>
+							<Ionicons name="briefcase-outline" size={14} color="black" />
+						</View>
+					)}
+					<Text className="text-lg font-bold" style={{ fontFamily: "Rubik" }}>
+						{businessName}
+					</Text>
+				</View>
+				{announcement.highlight && announcement.type === "sale" && (
+					<Text
+						className="text-base font-bold mt-2"
+						style={{ fontFamily: "Rubik" }}
+					>
+						SALE: {announcement.highlight}%
+					</Text>
+				)}
+				{announcement.highlight && announcement.type === "coupon" && (
+					<Text
+						className="text-base font-bold mt-2"
+						style={{ fontFamily: "Rubik" }}
+					>
+						PROMO CODE: {announcement.highlight}
+					</Text>
+				)}
+				<ExpandableText
+					className={`text-base font-normal ${announcement.highlight && (announcement.type === "sale" || announcement.type === "coupon") ? "mt-1" : "mt-2"}`}
+					style={{ fontFamily: "Rubik" }}
+					numberOfLines={4}
+				>
+					{announcement.text}
+				</ExpandableText>
+				{/* <Text className="text-sm text-gray-500">
           {new Date(announcement.date).toLocaleDateString()}
         </Text> */}
-      </View>
-    </Pressable>
-  );
+			</View>
+		</Pressable>
+	);
 }

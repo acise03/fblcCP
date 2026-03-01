@@ -12,7 +12,7 @@ import {
     Text,
     TextInput,
     ToastAndroid,
-    View
+    View,
 } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import MapView, { Marker } from "react-native-maps";
@@ -140,7 +140,7 @@ export default function LocalMap() {
 		right: 0,
 		bottom: 0,
 		height: sheetHeight,
-		backgroundColor: "#fff",
+		backgroundColor: "#FFF8F0",
 		borderTopLeftRadius: 24,
 		borderTopRightRadius: 24,
 		shadowColor: "#000",
