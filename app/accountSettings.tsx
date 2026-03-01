@@ -44,7 +44,6 @@ export default function AccountSettings() {
       setUploading(false);
     }
   };
-
   return (
     <ScrollView
       className="h-screen w-screen"
@@ -84,31 +83,69 @@ export default function AccountSettings() {
               </Text>
             </Pressable>
           </View>
+          <View className="flex-row items-center bg-[#FFF8F0] border border-black rounded-xl px-4 py-4 mb-4">
+            <Ionicons name="lock-closed-outline" size={20} color="black" />
 
-          <TextInput
-            onChangeText={setPassword}
-            value={password}
-            placeholder="New Password"
-            secureTextEntry={true}
-          />
-          <TextInput
-            onChangeText={setConfirmPassword}
-            value={confirmPassword}
-            placeholder="Confirm New Password"
-            secureTextEntry={true}
-          />
-          {/* TODO need to add updatePassword function in auth.ts */}
-          <Pressable onPress={() => {}}>
-            <Text>Set</Text>
-          </Pressable>
-          <Pressable
-            onPress={() => {
-              signOut();
-              router.replace("/login");
+            <TextInput
+              onChangeText={setPassword}
+              value={password}
+              placeholder="New Password"
+              secureTextEntry={true} className="ml-3 flex-1 text-base text-black"
+
+            />
+          </View>
+          <View className="flex-row items-center bg-[#FFF8F0] border border-black rounded-xl px-4 py-4 mb-4">
+            <Ionicons name="lock-closed-outline" size={20} color="black" />
+
+            <TextInput
+              onChangeText={setConfirmPassword}
+              value={confirmPassword}
+              placeholder="Confirm New Password"
+              secureTextEntry={true} className="ml-3 flex-1 text-base text-black"
+
+            />
+
+          </View>
+          <View
+            style={{
+              backgroundColor: "#E8B24E",
+              borderRadius: 8,
             }}
           >
-            <Text>Sign out</Text>
-          </Pressable>
+            <Pressable
+              onPress={() => { }}
+              style={{
+                height: 40,
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Text style={{ textAlign: "center", fontWeight: "600" }}>
+                Set
+              </Text>
+            </Pressable>
+          </View>
+          <View
+            style={{
+              backgroundColor: "#B08968",
+              borderRadius: 8,
+              marginTop: 12,
+            }}
+          >
+            <Pressable
+              onPress={() => { }}
+              style={{
+                height: 40,
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Text style={{ textAlign: "center", fontWeight: "600" }}>
+                Sign Out
+              </Text>
+            </Pressable>
+          </View>
+
         </View>
       </View>
     </ScrollView>

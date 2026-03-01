@@ -1,6 +1,7 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Image, Text, View } from "react-native";
 import "../../global.css";
+import ExpandableText from "./expandableText";
 
 type ActivityItemProps = {
   rating: number;
@@ -35,9 +36,13 @@ export default function ActivityItem({
         <Text className="text-xl font-bold" style={{ fontFamily: "Rubik" }}>
           {username}
         </Text>
-        <Text className="text-base font-medium" style={{ fontFamily: "Rubik" }}>
+        <ExpandableText
+          className="text-base font-medium"
+          style={{ fontFamily: "Rubik" }}
+          numberOfLines={4}
+        >
           {reviewText}
-        </Text>
+        </ExpandableText>
       </View>
     </View>
   );

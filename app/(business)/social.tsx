@@ -6,7 +6,7 @@ import Feather from "@expo/vector-icons/Feather";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useFocusEffect, useRouter } from "expo-router";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
     Dimensions,
     FlatList,
@@ -46,46 +46,32 @@ export default function BusinessSocial() {
 	const setPosts = useBusinessStore((state) => state.setPosts);
 	const setModalMode = useModalSettingsStore((state) => state.setMode);
 	const router = useRouter();
-	const [showSheet, setShowSheet] = useState(false);
 	const screenHeight = Dimensions.get("window").height;
 	const sheetHeight = Math.round(screenHeight * 0.725);
 	const collapsedY = sheetHeight * 0.935;
-	const translateY = useSharedValue(sheetHeight);
+	const translateY = useSharedValue(collapsedY);
 	const [message, setMessage] = useState("");
-	const [dateEnabled, setDateEnabled] = useState(false);
-	const [mode, setMode] = useState<"single" | "range">("single");
-	const [singleDate, setSingleDate] = useState<Date | null>(null);
+	const [dateConfigOpen, setDateConfigOpen] = useState(false);
 	const [startDate, setStartDate] = useState<Date | null>(null);
 	const [endDate, setEndDate] = useState<Date | null>(null);
 	const ownedBusiness = useAuthStore((state) => state.ownedBusiness);
 	const [postType, setPostType] = useState<PostType>("announcement");
 	const [postTypeMenuOpen, setPostTypeMenuOpen] = useState(false);
-	const [editingId, setEditingId] = useState<string | null>();
 	const [highlight, setHighlight] = useState("");
-	const [showPicker, setShowPicker] = useState<
-		null | "single" | "start" | "end"
-	>(null);
+	const [showPicker, setShowPicker] = useState<null | "start" | "end">(null);
+	const [showSheet, setShowSheet] = useState(false);
+	const [editingId, setEditingId] = useState<string | null>();
 	useFocusEffect(() => {
 		setModalMode("business");
 		return () => {};
 	});
 
-	useEffect(() => {
-		if (editingId != null) {
-			if (editingId == "hide") {
-				translateY.value = withSpring(collapsedY);
-				setShowSheet(false);
-				return;
-			}
-			setShowSheet(true);
-			translateY.value = withSpring(0);
-			businessesApi.getPostById(editingId).then((post) => {
-				setMessage(post.text);
-				setPostType(post.type);
-				setHighlight(post.highlight ?? "");
-			});
-		}
-	}, [editingId]);
+	const resetDateConfig = useCallback(() => {
+		setDateConfigOpen(false);
+		setStartDate(null);
+		setEndDate(null);
+		setShowPicker(null);
+	}, []);
 
 	const panGesture = Gesture.Pan()
 		.runOnJS(true)
@@ -99,8 +85,9 @@ export default function BusinessSocial() {
 				translateY.value = withSpring(0);
 			} else {
 				translateY.value = withSpring(collapsedY);
+				resetDateConfig();
+				Keyboard.dismiss();
 			}
-			Keyboard.dismiss();
 		});
 
 	const animatedSheetStyle = useAnimatedStyle(() => ({
@@ -132,6 +119,26 @@ export default function BusinessSocial() {
 		fetchPosts();
 	}, [ownedBusiness?.id]);
 
+	useEffect(() => {
+		if (editingId != null) {
+			if (editingId == "hide") {
+				translateY.value = withSpring(collapsedY);
+				setShowSheet(false);
+				return;
+			}
+			setShowSheet(true);
+			translateY.value = withSpring(0);
+			businessesApi.getPostById(editingId).then((post) => {
+				setMessage(post.text);
+				setHighlight(post.highlight ?? "");
+				setPostType(post.type);
+				setEndDate(post.end_date);
+				setStartDate(new Date(post.start_date!!));
+				setEndDate(new Date(post.end_date!!));
+			});
+		}
+	}, [editingId]);
+
 	return (
 		<View className="h-full w-full bg-[#FFF8F0]">
 			<View className="mx-8 mt-8 flex flex-1 flex-col bg-[#FFF8F0]">
@@ -159,7 +166,7 @@ export default function BusinessSocial() {
 						</Pressable>
 					</View>
 					<FlatList
-						className={`mt-2 ${showSheet ? "mb-12" : ""}`}
+						className="mt-2 mb-12"
 						data={posts}
 						renderItem={({ item }) => {
 							return (
@@ -235,6 +242,10 @@ export default function BusinessSocial() {
 														setPostType(option);
 														setHighlight("");
 														setPostTypeMenuOpen(false);
+														setDateConfigOpen(false);
+														setStartDate(null);
+														setEndDate(null);
+														setShowPicker(null);
 													}}
 													className={`px-3 py-3 border-b border-gray-200 flex-row items-center ${
 														postType === option ? "bg-[#FFE4A3]" : ""
@@ -311,130 +322,105 @@ export default function BusinessSocial() {
 								className="flex-1 text-black text-base border border-black rounded-lg p-3"
 							/>
 
-							<View className="mb-2 flex-row">
-								<Pressable
-									className={`flex-1 h-12 mt-4 mr-4 rounded-lg flex items-center justify-center ${dateEnabled ? "bg-[#FFB703]" : "bg-gray-200"}`}
-									onPress={() => setDateEnabled(true)}
-								>
-									<Text className="text-black text-lg  ">Include Date</Text>
-								</Pressable>
+							{(postType === "sale" || postType === "coupon") &&
+								!dateConfigOpen && (
+									<Pressable
+										className="mt-4 py-3 rounded-xl items-center border border-black"
+										onPress={() => setDateConfigOpen(true)}
+									>
+										<Text className="text-black text-lg">Configure Date</Text>
+									</Pressable>
+								)}
 
-								<Pressable
-									className={`flex-1 h-12 mt-4 rounded-lg flex items-center justify-center ${!dateEnabled ? "bg-[#FFB703]" : "bg-gray-200"}`}
-									onPress={() => setDateEnabled(false)}
-								>
-									<Text className="text-black  text-lg  ">No Date</Text>
-								</Pressable>
-							</View>
-
-							{dateEnabled && (
-								<View className="mb-4">
-									<View className="flex-row mb-2">
-										<Pressable
-											className={`flex-1 py-2 rounded-lg mr-2 ${mode === "single" ? "bg-[#FFB703]" : "bg-gray-200"}`}
-											onPress={() => setMode("single")}
-										>
-											<Text className="text-center text-black font-semibold">
-												Single Day
-											</Text>
-										</Pressable>
-										<Pressable
-											className={`flex-1 py-2 rounded-lg ${mode === "range" ? "bg-[#FFB703]" : "bg-gray-200"}`}
-											onPress={() => setMode("range")}
-										>
-											<Text className="text-center text-black font-semibold">
-												Day Range
-											</Text>
-										</Pressable>
-									</View>
-
-									{mode === "single" ? (
-										<Pressable
-											className="px-3 py-2 rounded-lg border border-black bg-[#FFF8F0]"
-											onPress={() => setShowPicker("single")}
-										>
-											<Text className="text-black">
-												{singleDate
-													? singleDate.toDateString()
-													: "Choose a date"}
-											</Text>
-										</Pressable>
-									) : (
+							{(postType === "sale" || postType === "coupon") &&
+								dateConfigOpen && (
+									<View className="mt-4">
 										<View className="flex-row gap-2">
 											<Pressable
-												className="flex-1 px-3 py-2 rounded-lg border border-black bg-[#FFF8F0]"
+												className="flex-1 px-3 py-3 rounded-xl items-center border border-black bg-[#FFF8F0]"
 												onPress={() => setShowPicker("start")}
 											>
-												<Text className="text-black">
-													{startDate ? startDate.toDateString() : "Start date"}
+												<Text className="text-black text-lg">
+													{startDate
+														? startDate.toLocaleDateString()
+														: "Start date"}
 												</Text>
 											</Pressable>
 											<Pressable
-												className="flex-1 px-3 py-2 rounded-lg border border-black bg-[#FFF8F0]"
+												className="flex-1 px-3 py-3 rounded-xl items-center border border-black bg-[#FFF8F0]"
 												onPress={() => setShowPicker("end")}
 											>
-												<Text className="text-black">
-													{endDate ? endDate.toDateString() : "End date"}
+												<Text className="text-black text-lg">
+													{endDate ? endDate.toLocaleDateString() : "End date"}
 												</Text>
 											</Pressable>
 										</View>
-									)}
 
-									{showPicker && (
-										<DateTimePicker
-											value={
-												showPicker === "single"
-													? (singleDate ?? new Date())
-													: showPicker === "start"
+										{showPicker && (
+											<DateTimePicker
+												value={
+													showPicker === "start"
 														? (startDate ?? new Date())
 														: (endDate ?? new Date())
-											}
-											mode="date"
-											display="default"
-											minimumDate={
-												showPicker === "end" && startDate
-													? startDate
-													: undefined
-											}
-											maximumDate={
-												showPicker === "start" && endDate ? endDate : undefined
-											}
-											onChange={(_, selectedDate) => {
-												setShowPicker(null);
-												if (!selectedDate) return;
-												if (showPicker === "single")
-													setSingleDate(selectedDate);
-												if (showPicker === "start") setStartDate(selectedDate);
-												if (showPicker === "end") setEndDate(selectedDate);
-											}}
-										/>
-									)}
-								</View>
-							)}
+												}
+												mode="date"
+												display="default"
+												minimumDate={
+													showPicker === "end" && startDate
+														? startDate
+														: undefined
+												}
+												maximumDate={
+													showPicker === "start" && endDate
+														? endDate
+														: undefined
+												}
+												onChange={(_, selectedDate) => {
+													setShowPicker(null);
+													if (!selectedDate) return;
+													if (showPicker === "start")
+														setStartDate(selectedDate);
+													if (showPicker === "end") setEndDate(selectedDate);
+												}}
+											/>
+										)}
+									</View>
+								)}
 
 							<Pressable
 								className="mt-4 bg-[#FFB703] py-3 rounded-xl items-center"
 								onPress={async () => {
-									if (!message.trim()) {
+									// Validation guard
+									const isSaleOrCoupon =
+										postType === "sale" || postType === "coupon";
+									if (
+										!message.trim() ||
+										(isSaleOrCoupon &&
+											(!highlight.trim() || !startDate || !endDate))
+									) {
 										ToastAndroid.show(
-											"Post text cannot be empty",
+											"You need to fill in all fields",
 											ToastAndroid.SHORT,
 										);
-										translateY.value = withSpring(collapsedY);
-										setShowSheet(false);
+										setEditingId("hide");
 										return;
 									}
-									if (editingId != null) {
+									if (editingId != null && editingId != "hide") {
 										await businessesApi.editPost(editingId, {
 											type: postType,
 											highlight:
 												postType === "coupon"
 													? highlight
 													: postType === "sale"
-														? `${highlight}%`
+														? `${highlight}`
 														: undefined,
 											text: message,
+											start_date: startDate
+												? (startDate.toISOString() as any)
+												: null,
+											end_date: endDate ? (endDate.toISOString() as any) : null,
 										});
+										ToastAndroid.show("Post edited", ToastAndroid.SHORT);
 									} else {
 										await businessesApi.upsertPost({
 											businessId: ownedBusiness!!.id,
@@ -443,22 +429,23 @@ export default function BusinessSocial() {
 												postType === "coupon"
 													? highlight
 													: postType === "sale"
-														? `${highlight}%`
+														? `${highlight}`
 														: undefined,
 											text: message,
 											date: new Date().toISOString(),
+											start_date: startDate ? startDate.toISOString() : null,
+											end_date: endDate ? endDate.toISOString() : null,
 										});
+										ToastAndroid.show("Post created", ToastAndroid.SHORT);
 									}
-
-									setEditingId(null);
 
 									businessesApi
 										.getPostsByBusiness(ownedBusiness!!.id)
 										.then((posts) => {
 											setPosts(posts);
-											ToastAndroid.show("Post created", ToastAndroid.SHORT);
-											translateY.value = withSpring(collapsedY);
+											setEditingId("hide");
 											setShowSheet(false);
+											translateY.value = withSpring(collapsedY);
 										});
 								}}
 							>

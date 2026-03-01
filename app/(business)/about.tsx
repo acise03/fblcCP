@@ -5,20 +5,18 @@ import Entypo from "@expo/vector-icons/Entypo";
 import Feather from "@expo/vector-icons/Feather";
 import * as ImagePicker from "expo-image-picker";
 import { useFocusEffect } from "expo-router";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
-  FlatList,
-  Image,
-  Pressable,
-  ScrollView,
-  Text,
-  TextInput,
-  ToastAndroid,
-  View,
+    Image,
+    Pressable,
+    ScrollView,
+    Text,
+    TextInput,
+    ToastAndroid,
+    View,
 } from "react-native";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 import "../../global.css";
-import ImageUploadItem from "../components/imageUploadItem";
 import ProfilePicture from "../components/profilePicture";
 
 const DAY_NAMES = [
@@ -44,12 +42,6 @@ const DEFAULT_HOURS: HoursEntry[] = DAY_NAMES.map((_, i) => ({
   close_time: "17:00",
   is_closed: 1,
 }));
-
-let dummyImages = [
-  { id: "1", uri: "https://reactnative.dev/img/tiny_logo.png" },
-  { id: "2", uri: "https://reactnative.dev/img/tiny_logo.png" },
-  { id: "add", uri: "hi" },
-];
 
 type EditableInfoField =
   | "description"
@@ -158,10 +150,6 @@ export default function BusinessAbout() {
     setMode("business");
     return () => {};
   });
-
-  if (dummyImages.length % 2 !== 0) {
-    dummyImages = [...dummyImages, { id: "empty", uri: "" }];
-  }
 
   const [editingField, setEditingField] = useState<EditableInfoField | null>(
     null,
@@ -771,23 +759,7 @@ export default function BusinessAbout() {
             )}
           </View>
         </View>
-        <View className="flex flex-col mt-6">
-          <Text className=" text-zinc-700 font-semibold text-xl">
-            Upload Pictures
-          </Text>
-          <FlatList
-            className="my-2"
-            data={dummyImages}
-            keyExtractor={(item) => item.id}
-            numColumns={2}
-            renderItem={({ item }) => (
-              <ImageUploadItem id={item.id} uri={item.uri} />
-            )}
-            scrollEnabled={false}
-            columnWrapperStyle={{ gap: 12 }}
-            contentContainerStyle={{ gap: 12 }}
-          />
-        </View>
+        <View className="h-8" />
       </View>
     </ScrollView>
   );

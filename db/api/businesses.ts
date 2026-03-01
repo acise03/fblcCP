@@ -229,6 +229,8 @@ export const businessesApi = {
 		highlight?: string;
 		text: string;
 		date: string;
+		start_date?: string | null;
+		end_date?: string | null;
 	}): Promise<void> {
 		const { error } = await supabase.from("business_posts").upsert({
 			businessid: post.businessId,
@@ -236,6 +238,8 @@ export const businessesApi = {
 			highlight: post.highlight ?? null,
 			text: post.text,
 			date: post.date,
+			start_date: post.start_date ?? null,
+			end_date: post.end_date ?? null,
 		});
 
 		if (error) throw error;
@@ -271,17 +275,6 @@ export const businessesApi = {
 			.select("*")
 			.eq("businessid", businessId)
 			.order("date", { ascending: false });
-
-		if (error) throw error;
-		return data;
-	},
-
-	async getPostById(postId: string): Promise<BusinessPost> {
-		const { data, error } = await supabase
-			.from("business_posts")
-			.select("*")
-			.eq("id", postId.trim())
-			.single();
 
 		if (error) throw error;
 		return data;
@@ -329,6 +322,17 @@ export const businessesApi = {
 			.from("business_posts")
 			.select("*")
 			.order("date", { ascending: false });
+
+		if (error) throw error;
+		return data;
+	},
+
+	async getPostById(postId: string): Promise<BusinessPost> {
+		const { data, error } = await supabase
+			.from("business_posts")
+			.select("*")
+			.eq("id", postId)
+			.single();
 
 		if (error) throw error;
 		return data;

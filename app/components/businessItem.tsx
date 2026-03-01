@@ -5,6 +5,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import { Image, Pressable, Text, View } from "react-native";
+import ExpandableText from "./expandableText";
 
 type BusinessItemProps = {
 	business: BusinessWithInfo;
@@ -102,21 +103,14 @@ export default function BusinessItem({
 						{business.average_rating.toFixed(1)} / 5 Rating
 					</Text>
 				)}
-				{distance !== undefined && (
-					<Text
-						className="text-sm font-medium text-black mb-1"
-						style={{ fontFamily: "Rubik" }}
-					>
-						{distance.toFixed(2)} km away
-					</Text>
-				)}
 				{business?.business_information?.description ? (
-					<Text
+					<ExpandableText
 						className="text-base text-black font-semibold leading-6"
 						style={{ fontFamily: "Rubik" }}
+						numberOfLines={4}
 					>
 						{business.business_information.description.trim()}
-					</Text>
+					</ExpandableText>
 				) : null}
 			</View>
 		</Pressable>

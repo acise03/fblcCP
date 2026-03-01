@@ -5,6 +5,7 @@ import { useBusinessStore } from "@/store/useBusinessStore";
 import { Dispatch, SetStateAction } from "react";
 import { Text, View } from "react-native";
 import "../../global.css";
+import ExpandableText from "./expandableText";
 
 type AnnouncementItemProps = {
 	announcement: BusinessPost;
@@ -35,9 +36,13 @@ export default function AnnouncementItem({
 				>
 					{typeLabel}
 				</Text>
-				<Text className="text-md font-medium" style={{ fontFamily: "Rubik" }}>
+				<ExpandableText
+					className="text-md font-medium"
+					style={{ fontFamily: "Rubik" }}
+					numberOfLines={4}
+				>
 					{announcement.text}
-				</Text>
+				</ExpandableText>
 				<Text className="text-sm text-gray-500" style={{ fontFamily: "Rubik" }}>
 					{new Date(announcement.date).toLocaleDateString()}
 				</Text>

@@ -1,13 +1,13 @@
 import {
-  integer,
-  pgEnum,
-  pgSchema,
-  pgTable,
-  primaryKey,
-  text,
-  timestamp,
-  uuid,
-  varchar,
+    integer,
+    pgEnum,
+    pgSchema,
+    pgTable,
+    primaryKey,
+    text,
+    timestamp,
+    uuid,
+    varchar,
 } from "drizzle-orm/pg-core";
 
 // Reference Supabase's auth schema
@@ -90,6 +90,8 @@ export const BusinessPosts = pgTable("business_posts", {
   highlight: varchar("highlight", { length: 255 }),
   text: text("text").notNull(),
   date: timestamp("date").defaultNow().notNull(),
+  start_date: timestamp("start_date"),
+  end_date: timestamp("end_date"),
 });
 
 export const FavoriteBusinesses = pgTable(

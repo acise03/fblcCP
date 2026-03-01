@@ -1,88 +1,79 @@
 import { Business } from "@/models/business";
 import { Event } from "@/models/event";
 import { Review } from "@/models/review";
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import ProfilePicture from "../components/profilePicture";
 
 import { ScrollView, Text, View } from "react-native";
 import { Calendar, DateData } from "react-native-calendars";
+import { BusinessPost } from "@/db/schema";
+import { businessesApi } from "@/db/api";
 
-const testBusiness = new Business(
-  "McDonalds",
-  "Fast Food",
-  "McDonald's is the world's leading global foodservice retailer with over 40,000 locations in more than 100 countries, serving burgers, fries, chicken, and breakfast items.",
-  "https://creativereview.imgix.net/uploads/2020/03/mcds-banner.jpg",
-  43.815,
-  -79.418,
-); // fix this later to make it not test
-
-const testreview1 = new Review(
-  4,
-  "Food was served hot and the service was quick despite the staff shortage",
-  new Date(),
-  "Johnny",
-);
-
-const testreview2 = new Review(
-  3,
-  "I was waiting in the hour drivethru for about 10 minutes which wasn't the worst thing.  I ordered a fillet of fish combo with a strawberry milkshake.  What seemed like an eternity later I got to the window and was told they didn't have strawberry...  So I I said what do you have? They said chocolate and vanilla...  Fair enough I chose Villa although they could have told me that earlier.  I received my food and checked to ensure it was correct and realized my fries were about half full...  Probably a mistake but left a sour taste since I had waited so long for the food and they didn't even have e everything I ordered.  I took a picture and showed my friends and it wasnt an exaggeration by any means as they all reacted as I did.  Please see picture posted.  I rate this experience a 1 star and think they can at least apologize for the wait when someone comes to the window...  Especially went you can't fulfill the order.  Thanks",
-  new Date(),
-  "Tommy",
-);
-
-const testreview3 = new Review(
-  1,
-  "They make the drive through customer wait for way too long, 20+mins",
-  new Date(),
-  "Bobby",
-);
-
-testBusiness.addReview(testreview1);
-testBusiness.addReview(testreview2);
-testBusiness.addReview(testreview3);
-
-const testevent1 = new Event(
-  "Family Day Sale",
-  "Purchase our Happy Meal and Big Mac Combo for just $15.99",
-  new Date(),
-  new Date(),
-);
-
-const testevent2 = new Event(
-  "Sunday Morning Sale",
-  "All menu items 5% off.",
-  new Date(),
-  new Date(),
-);
-testBusiness.addEvent(testevent1);
-testBusiness.addEvent(testevent2);
-
-const events = testBusiness.getEvents();
-
-const formatDate = (date: Date): string => {
-  return date.toISOString().split("T")[0];
+const formatDate = (date: Date) => {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
 };
 
+const getDatesInRange = (start: Date, end: Date) => {
+  const dates: string[] = [];
+  const current = new Date(start);
+
+  while (current <= end) {
+    dates.push(formatDate(current));
+    current.setDate(current.getDate() + 1);
+  }
+
+  return dates;
+};
+const eventColors: Record<string, string> = {
+  coupon: "#a970ba",
+  sale: "#379959",
+};
 export default function Schedule() {
   const [selectedDate, setSelectedDate] = useState<string>("");
-  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
-  const selectedDayEvents = events.filter(
-    (event) => formatDate(event.getStart()) === selectedDate,
-  );
+  const [posts, setPosts] = useState<BusinessPost[]>([]);
+
+  useEffect(() => {
+    (async () => {
+      const allPosts = await businessesApi.getAllPosts();
+      const eventPosts = allPosts.filter((p) => p.start_date);
+      console.log(allPosts);
+      setPosts(eventPosts);
+    })();
+  }, []);
+
+  const selectedDayEvents = posts.filter((post) => {
+    if (!selectedDate) return false;
+
+    const start = new Date(post.start_date!);
+    const end = post.end_date ? new Date(post.end_date) : start;
+    const selected = new Date(selectedDate + "T00:00:00");
+    const startDay = new Date(formatDate(start) + "T00:00:00");
+    const endDay = new Date(formatDate(end) + "T00:00:00");
+
+    return selected >= startDay && selected <= endDay;
+  });
 
   const markedDates = useMemo(() => {
     const marks: any = {};
 
-    events.forEach((event, index) => {
-      const dateKey = formatDate(event.getStart());
+    posts.forEach((post, index) => {
+      const start = new Date(post.start_date!);
+      const end = post.end_date ? new Date(post.end_date) : start;
 
-      if (!marks[dateKey]) {
-        marks[dateKey] = { dots: [] };
-      }
+      const range = getDatesInRange(start, end);
 
-      marks[dateKey].dots.push({
-        key: `event-${index}`,
-        color: "#555555",
+      range.forEach((dateKey) => {
+        if (!marks[dateKey]) {
+          marks[dateKey] = { dots: [] };
+        }
+
+        marks[dateKey].dots.push({
+          key: `post-${index}`,
+          color: eventColors[post.type],
+        });
       });
     });
 
@@ -95,7 +86,7 @@ export default function Schedule() {
     }
 
     return marks;
-  }, [selectedDate]);
+  }, [posts, selectedDate]);
 
   return (
     <ScrollView
@@ -119,7 +110,6 @@ export default function Schedule() {
               markedDates={markedDates}
               onDayPress={(day: DateData) => {
                 setSelectedDate(day.dateString);
-                setSelectedEvent(null);
               }}
               style={{ backgroundColor: "#FFF8F0" }}
               theme={{
@@ -127,41 +117,32 @@ export default function Schedule() {
               }}
             />
 
-            {
-              <View>
-                <View className="mt-4 flex flex-row items-center justify-between mb-2 mt-5">
-                  <Text className="font-bold text-3xl text-black">
-                    Events on {selectedDate}
-                  </Text>
+
+            <View>
+              <View className="mt-4 flex flex-row items-center justify-between mb-2 mt-5">
+                <Text className="font-bold text-3xl text-black">
+                  Events on {selectedDate}
+                </Text>
+              </View>
+
+              {selectedDayEvents.length === 0 ? (
+                <View className="bg-[#FFE4A3] rounded-xl px-4 py-4 mt-3">
+                  <Text className="text-xl">No events.</Text>
                 </View>
-
-                {selectedDayEvents.length === 0 ? (
-                  <View className="bg-[#FFE4A3] flex flex-col items-start      border-black rounded-xl px-4 py-4 mt-3">
-                    <Text className="text-xl  ">No events.</Text>
+              ) : (
+                selectedDayEvents.map((post) => (
+                  <View
+                    key={post.id}
+                    className="bg-[#FFE4A3] rounded-xl px-4 py-4 mt-3"
+                  >
+                    <Text className="text-xl font-bold">
+                      {post.highlight}
+                    </Text>
+                    <Text className="text-lg">{post.text}</Text>
                   </View>
-                ) : (
-                  selectedDayEvents.map((event, index) => (
-                    <View className=" bg-[#FFE4A3] flex flex-col items-start       rounded-xl px-4 py-4 mt-3">
-                      <Text className="text-xl font-bold">
-                        {event.getName()}
-                      </Text>
-                      <Text className="text-lg">{event.getDescription()}</Text>
-                    </View>
-                  ))
-                )}
-              </View>
-            }
-
-            {selectedEvent && (
-              <View className="flex flex-col items-start bg-[#FFF8F0] border border-black rounded-xl px-4 py-4 mb-4 mt-5">
-                <Text className="text-xl font-bold">
-                  {selectedEvent.getName()}
-                </Text>
-                <Text className="text-lg">
-                  {selectedEvent.getDescription()}
-                </Text>
-              </View>
-            )}
+                ))
+              )}
+            </View>
           </ScrollView>
         </View>
       </View>

@@ -5,6 +5,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import { Image, Pressable, Text, View } from "react-native";
+import ExpandableText from "./expandableText";
 
 type AnnouncementItemCustomerProps = {
   announcement: BusinessPost;
@@ -73,12 +74,13 @@ export default function AnnouncementItemCustomer({
             {businessName}
           </Text>
         </View>
-        <Text
+        <ExpandableText
           className="text-base font-normal mt-2"
           style={{ fontFamily: "Rubik" }}
+          numberOfLines={4}
         >
           {announcement.text}
-        </Text>
+        </ExpandableText>
         {/* <Text className="text-sm text-gray-500">
           {new Date(announcement.date).toLocaleDateString()}
         </Text> */}
