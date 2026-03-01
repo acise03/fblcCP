@@ -135,6 +135,9 @@ export default function BusinessAbout() {
   const uploadBusinessBanner = useBusinessStore(
     (state) => state.uploadBusinessBanner,
   );
+  const uploadBusinessProfilePicture = useBusinessStore(
+    (state) => state.uploadBusinessProfilePicture,
+  );
   const updateBusinessAddress = useBusinessStore(
     (state) => state.updateBusinessAddress,
   );
@@ -402,6 +405,37 @@ export default function BusinessAbout() {
                   }}
                 >
                   <Text>Upload Banner</Text>
+                </Pressable>
+                <Pressable
+                  onPress={async () => {
+                    setDropdownVisible(false);
+                    const result = await ImagePicker.launchImageLibraryAsync({
+                      mediaTypes: ["images"],
+                      allowsEditing: true,
+                      aspect: [1, 1],
+                    });
+
+                    if (
+                      result.canceled ||
+                      !result.assets?.length ||
+                      !ownedBusiness
+                    ) {
+                      ToastAndroid.show("No image chosen", ToastAndroid.SHORT);
+                      return;
+                    }
+                    uploadBusinessProfilePicture(
+                      ownedBusiness.id,
+                      result.assets[0].uri,
+                    ).then(async () => {
+                      refreshBusiness();
+                      ToastAndroid.show(
+                        "Profile picture updated",
+                        ToastAndroid.SHORT,
+                      );
+                    });
+                  }}
+                >
+                  <Text>Upload Profile Picture</Text>
                 </Pressable>
                 <Pressable
                   onPress={() => {

@@ -56,7 +56,7 @@ export default function BusinessHome() {
     <View className="h-full w-full bg-[#FFF8F0]">
       <View className="mx-8 mt-8 flex flex-col bg-[#FFF8F0]">
         <View className="flex flex-row items-center justify-between">
-          <Text className="font-bold text-2xl text-black ">Dashboard</Text>
+          <Text className="font-bold text-4xl text-black ">Dashboard</Text>
           <ProfilePicture />
         </View>
         <View className="relative w-full h-48 mt-8">
@@ -74,7 +74,7 @@ export default function BusinessHome() {
         </View>
 
         <View>
-          <Text className="text-zinc-700 font-semibold text-2xl mt-4">
+          <Text className="text-zinc-700 font-semibold text-3xl mt-4">
             Stats
           </Text>
 
@@ -96,20 +96,21 @@ export default function BusinessHome() {
         </View>
         <View className="flex flex-col mt-6">
           <View className="flex flex-row items-center justify-between">
-            <Text className="text-zinc-700 font-semibold text-2xl">Feed</Text>
+            <Text className="text-zinc-700 font-semibold text-3xl">Feed</Text>
           </View>
           <FlatList
             className="mt-2"
             data={reviews}
             renderItem={({ item }) => {
-              console.log(item);
+              const name = item.users
+                ? `${item.users.firstname ?? ""} ${item.users.lastname ?? ""}`.trim()
+                : "Unknown";
               return (
                 <ActivityItem
-                  id={item.id}
                   rating={item.rating!!}
                   comment={item.review ?? ""}
-                  customer={item.reviewerid!!}
-                  date={item.date}
+                  username={name}
+                  profilePicture={item.users?.profile_picture}
                 />
               );
             }}

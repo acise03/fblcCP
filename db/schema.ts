@@ -23,6 +23,7 @@ export const Users = pgTable("users", {
   email: varchar("email", { length: 255 }),
   firstname: varchar("firstname", { length: 255 }),
   lastname: varchar("lastname", { length: 255 }),
+  profile_picture: varchar("profile_picture", { length: 255 }),
 });
 
 export const Addresses = pgTable("addresses", {
@@ -52,6 +53,7 @@ export const BusinessInformation = pgTable("business_information", {
   phone: varchar("phone", { length: 255 }),
   website: varchar("website", { length: 255 }),
   banner: varchar("banner", { length: 255 }),
+  profile_picture: varchar("profile_picture", { length: 255 }),
 });
 
 export const BusinessAddresses = pgTable("business_addresses", {

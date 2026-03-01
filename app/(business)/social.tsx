@@ -124,7 +124,7 @@ export default function BusinessSocial() {
 						</Text>
 					</View>
 					<FlatList
-						className="mt-2"
+						className="mt-2 mb-12"
 						data={posts}
 						renderItem={({ item }) => {
 							return <AnnouncementItem announcement={item} />;
