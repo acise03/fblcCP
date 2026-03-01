@@ -1,7 +1,9 @@
 import { useAuthStore } from "@/store/useAuthStore";
 import { useBusinessStore } from "@/store/useBusinessStore";
+import { useModalReviewStore } from "@/store/useModalReviewStore";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import * as Location from "expo-location";
+import { router } from "expo-router";
 import React, { useEffect, useMemo, useState } from "react";
 import {
     Dimensions,
@@ -90,10 +92,12 @@ function getDistance(lat1: number, lon1: number, lat2: number, lon2: number) {
 
 export default function LocalMap() {
 	const [showBottomSheet, setShowBottomSheet] = useState(false);
+	const [armedBusinessId, setArmedBusinessId] = useState<string | null>(null);
 	const screenHeight = Dimensions.get("window").height;
 	const sheetHeight = Math.round(screenHeight * 0.55);
 	const collapsedY = sheetHeight * 0.6;
 	const translateY = useSharedValue(collapsedY);
+	const setModalBusiness = useModalReviewStore((state) => state.setBusiness);
 	const [userLocation, setUserLocation] = useState<{
 		latitude: number;
 		longitude: number;
@@ -315,6 +319,7 @@ export default function LocalMap() {
 				showsUserLocation={true}
 				region={region}
 				onRegionChangeComplete={setRegion}
+				onPress={() => setArmedBusinessId(null)}
 				customMapStyle={[
 					{
 						featureType: "poi",
@@ -333,6 +338,16 @@ export default function LocalMap() {
 									coordinate={coords}
 									title={business.name}
 									description={formatCategory(business.category)}
+									onPress={() => {
+										if (armedBusinessId !== business.id) {
+											setArmedBusinessId(business.id);
+											return;
+										}
+
+										setArmedBusinessId(null);
+										setModalBusiness(business.id);
+										router.push("/(customer)/businessDetails");
+									}}
 								>
 									<View
 										style={{
