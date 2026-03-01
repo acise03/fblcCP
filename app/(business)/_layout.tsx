@@ -1,3 +1,10 @@
+/**
+ * Business Tab Layout
+ *
+ * Defines the bottom-tab navigator for business-owner mode.
+ * Tabs: Home (dashboard), Social (post management), About (business config).
+ * Redirects unauthenticated users back to the login screen.
+ */
 import { Redirect, Tabs } from "expo-router";
 import React from "react";
 
@@ -11,6 +18,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function TabLayout() {
 	const colorScheme = useColorScheme();
+	/** Auth guard – redirect to login if no active session */
 	const isAuth = useAuthStore((state) => state.session !== null);
 	if (!isAuth) return <Redirect href="/login" />;
 	const insets = useSafeAreaInsets();

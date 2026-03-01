@@ -1,3 +1,13 @@
+/**
+ * Business Dashboard (Home Tab)
+ *
+ * Displays an overview of the business owner’s profile:
+ * - Banner image and business name
+ * - Stats cards (average star rating, total reviews)
+ * - Review feed rendered via FlatList
+ *
+ * Fetches reviews when the owned-business changes.
+ */
 import { ReviewWithUser } from "@/db/api/reviews";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useModalSettingsStore } from "@/store/useModalSettingsStore";
@@ -10,14 +20,16 @@ import ActivityItem from "../components/activityItem";
 import ProfilePicture from "../components/profilePicture";
 
 export default function BusinessHome() {
+  // ---- Store selectors ----
   const setMode = useModalSettingsStore((state) => state.setMode);
-  // const [ownedBusiness, setOwnedBusiness] = useState<BusinessWithInfo>();
   const ownedBusiness = useAuthStore((state) => state.ownedBusiness);
   const refreshBusiness = useAuthStore((state) => state.refreshOwnedBusiness);
   const fetchReviews = useReviewStore((state) => state.fetchReviewsForBusiness);
   const fetchedReviews = useReviewStore((state) => state.reviews);
   const [reviews, setReviews] = useState<ReviewWithUser[]>();
   const userId = useAuthStore((state) => state.user!!.id);
+
+  /** Compute average rating across all reviews, or "N/A" if empty */
   const averageBusinessRating =
     reviews && reviews.length > 0
       ? (

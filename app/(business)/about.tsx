@@ -1,3 +1,17 @@
+/**
+ * Business About / Configuration (About Tab)
+ *
+ * Provides a comprehensive editing interface for the business owner’s
+ * public profile:
+ * - Business name (inline edit)
+ * - Banner and profile image uploads via ImagePicker
+ * - Editable info fields: description, address, phone, email, website
+ * - Google Places autocomplete for address entry
+ * - Category selector (Food, Retail, Services, Misc)
+ * - Working hours editor with per-day open/close times and closed toggle
+ *
+ * All changes are persisted to Supabase via the business store.
+ */
 import { useAuthStore } from "@/store/useAuthStore";
 import { useBusinessStore } from "@/store/useBusinessStore";
 import { useModalSettingsStore } from "@/store/useModalSettingsStore";
@@ -19,6 +33,7 @@ import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplet
 import "../../global.css";
 import ProfilePicture from "../components/profilePicture";
 
+/** Ordered day names starting from Sunday (index 0) */
 const DAY_NAMES = [
 	"Sunday",
 	"Monday",
@@ -29,13 +44,16 @@ const DAY_NAMES = [
 	"Saturday",
 ];
 
+/** Shape of a single day’s business hours record */
 type HoursEntry = {
 	day: number;
 	open_time: string;
 	close_time: string;
+	/** 1 = closed, 0 = open */
 	is_closed: number;
 };
 
+/** Default hours: every day 09:00–17:00, marked closed */
 const DEFAULT_HOURS: HoursEntry[] = DAY_NAMES.map((_, i) => ({
 	day: i,
 	open_time: "09:00",
@@ -43,6 +61,7 @@ const DEFAULT_HOURS: HoursEntry[] = DAY_NAMES.map((_, i) => ({
 	is_closed: 1,
 }));
 
+/** Editable business-info field keys */
 type EditableInfoField =
 	| "description"
 	| "address"
@@ -50,6 +69,7 @@ type EditableInfoField =
 	| "email"
 	| "website";
 
+/** Display labels for each editable field */
 const fieldLabels: Record<EditableInfoField, string> = {
 	description: "About Us",
 	address: "Address",
@@ -58,6 +78,7 @@ const fieldLabels: Record<EditableInfoField, string> = {
 	website: "Website",
 };
 
+/** Placeholder text for each editable field */
 const fieldPlaceholders: Record<EditableInfoField, string> = {
 	description: "Business description",
 	address: "Business address",
@@ -66,8 +87,10 @@ const fieldPlaceholders: Record<EditableInfoField, string> = {
 	website: "Website URL",
 };
 
+/** Allowed business categories */
 type Category = "food" | "retail" | "services" | "misc";
 
+/** Safely cast an unknown value to a Category, defaulting to "misc" */
 const toCategory = (value: unknown): Category => {
 	if (
 		value === "food" ||
@@ -80,6 +103,10 @@ const toCategory = (value: unknown): Category => {
 	return "misc";
 };
 
+/**
+ * Fetches a human-readable address string from a Google Place ID
+ * using the Google Places API (New).
+ */
 const getFormattedAddressFromPlaceId = async (
 	placeId: string,
 ): Promise<string | null> => {

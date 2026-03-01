@@ -1,3 +1,16 @@
+/**
+ * Business Social / Post Management (Social Tab)
+ *
+ * Allows business owners to create, edit, and view posts (announcements,
+ * sales, coupons). Features a gesture-driven bottom sheet for the
+ * post editor with:
+ * - Post type selector dropdown (Announcement / Sale / Coupon)
+ * - Highlight field (promo code for coupons, percentage for sales)
+ * - Date range picker for sales and coupons
+ * - Description text input
+ *
+ * Posts are persisted via the businesses API and refreshed on submit.
+ */
 import { businessesApi } from "@/db/api";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useBusinessStore } from "@/store/useBusinessStore";
@@ -27,14 +40,17 @@ import "../../global.css";
 import AnnouncementItem from "../components/announcementItem";
 import ProfilePicture from "../components/profilePicture";
 
+/** Allowed post categories */
 type PostType = "announcement" | "sale" | "coupon";
 
+/** Human-readable labels for each post type */
 const postTypeLabels: Record<PostType, string> = {
   announcement: "Announcement",
   sale: "Sale",
   coupon: "Coupon",
 };
 
+/** Feather icon name for each post type */
 const postTypeIcons: Record<PostType, "volume-2" | "tag" | "gift"> = {
   announcement: "volume-2",
   sale: "tag",
@@ -42,6 +58,7 @@ const postTypeIcons: Record<PostType, "volume-2" | "tag" | "gift"> = {
 };
 
 export default function BusinessSocial() {
+  // ---- Store selectors ----
   const posts = useBusinessStore((state) => state.posts);
   const setPosts = useBusinessStore((state) => state.setPosts);
   const setModalMode = useModalSettingsStore((state) => state.setMode);
