@@ -9,11 +9,10 @@ import {
     Dimensions,
     FlatList,
     Keyboard,
-    Pressable,
     Text,
     TextInput,
     ToastAndroid,
-    View,
+    View
 } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import MapView, { Marker } from "react-native-maps";
@@ -220,19 +219,21 @@ export default function LocalMap() {
 		const matchesSearch =
 			searchQuery.length === 0 ||
 			business.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-			business
-				.business_information!!.description!!.toLowerCase()
+			business.business_information?.description
+				?.toLowerCase()
 				.includes(searchQuery.toLowerCase()) ||
-			addr.includes(searchQuery.toLowerCase());
-		let f = true;
-		if (selectedCategories.includes("favourite")) {
-			if (!favs?.includes(business!!.id)) f = false;
-		}
-		const matchesCategory =
-			selectedCategories.length === 0 ||
-			selectedCategories.includes(business?.category as Category) ||
-			(f && selectedCategories.includes("favourite"));
-		return matchesSearch && matchesCategory;
+			addr.includes(searchQuery.toLowerCase()) ||
+			(business.category &&
+				business.category.toLowerCase().includes(searchQuery.toLowerCase()));
+		// let f = true;
+		// if (selectedCategories.includes("favourite")) {
+		// 	if (!favs?.includes(business!!.id)) f = false;
+		// }
+		// const matchesCategory =
+		// 	selectedCategories.length === 0 ||
+		// 	selectedCategories.includes(business?.category as Category) ||
+		// 	(f && selectedCategories.includes("favourite"));
+		return matchesSearch;
 	});
 
 	const sortedBusinesses = useMemo(() => {
@@ -456,7 +457,7 @@ export default function LocalMap() {
 					onSubmitEditing={handleSearchSubmit}
 				/>
 			</View>
-			<View
+			{/* <View
 				style={{
 					position: "absolute",
 					top: 120,
@@ -546,7 +547,7 @@ export default function LocalMap() {
 				>
 					<Ionicons name="star-outline" size={32} color="black" />
 				</Pressable>
-			</View>
+			</View> */}
 
 			<Animated.View style={animatedSheetStyle}>
 				<GestureDetector gesture={panGesture}>
