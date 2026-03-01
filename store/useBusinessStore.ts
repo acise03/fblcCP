@@ -147,7 +147,8 @@ export const useBusinessStore = create<BusinessStore>((set, get) => ({
         phone: info.phone ?? existingInfo?.phone ?? null,
         website: info.website ?? existingInfo?.website ?? null,
         banner: info.banner ?? existingInfo?.banner ?? null,
-        profile_picture: info.profile_picture ?? existingInfo?.profile_picture ?? null,
+        profile_picture:
+          info.profile_picture ?? existingInfo?.profile_picture ?? null,
       });
 
       // Refresh the selected business if it matches
