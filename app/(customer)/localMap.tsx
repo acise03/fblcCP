@@ -258,13 +258,57 @@ export default function LocalMap() {
 		longitudeDelta: 0.05,
 	});
 
+	const clusteredBusinesses = useMemo(() => {
+		const CLUSTER_RADIUS_KM = region.latitudeDelta < 0.4 ? 1 : 5;
+		const clusters: Array<{
+			latitude: number;
+			longitude: number;
+			count: number;
+		}> = [];
+
+		sortedBusinesses.forEach((business) => {
+			const coords = coordinatesByBusinessId[business.id];
+			if (!coords) return;
+
+			const existingCluster = clusters.find((cluster) => {
+				const distance = getDistance(
+					coords.latitude,
+					coords.longitude,
+					cluster.latitude,
+					cluster.longitude,
+				);
+				return distance <= CLUSTER_RADIUS_KM;
+			});
+
+			if (!existingCluster) {
+				clusters.push({
+					latitude: coords.latitude,
+					longitude: coords.longitude,
+					count: 1,
+				});
+				return;
+			}
+
+			const nextCount = existingCluster.count + 1;
+			existingCluster.latitude =
+				(existingCluster.latitude * existingCluster.count + coords.latitude) /
+				nextCount;
+			existingCluster.longitude =
+				(existingCluster.longitude * existingCluster.count + coords.longitude) /
+				nextCount;
+			existingCluster.count = nextCount;
+		});
+
+		return clusters;
+	}, [sortedBusinesses, coordinatesByBusinessId, region.latitudeDelta]);
+
 	return (
 		<View style={{ flex: 1 }}>
 			<MapView
 				style={{ flex: 1 }}
 				initialRegion={{
 					latitude: userLocation !== null ? userLocation.latitude : 43.6406,
-					longitude: userLocation !== null ? userLocation.latitude : -79.3757,
+					longitude: userLocation !== null ? userLocation.longitude : -79.3757,
 					latitudeDelta: 0.05,
 					longitudeDelta: 0.05,
 				}}
@@ -279,60 +323,61 @@ export default function LocalMap() {
 					},
 				]}
 			>
-				{userLocation == null || region.latitudeDelta < 0.25 ? (
-					sortedBusinesses.map((business, index) => {
-						const coords = coordinatesByBusinessId[business.id];
-						if (!coords) return null;
-						return (
+				{userLocation == null || region.latitudeDelta < 0.25
+					? sortedBusinesses.map((business) => {
+							const coords = coordinatesByBusinessId[business.id];
+							if (!coords) return null;
+							return (
+								<Marker
+									key={business.id}
+									coordinate={coords}
+									title={business.name}
+									description={formatCategory(business.category)}
+								>
+									<View
+										style={{
+											width: 24,
+											height: 24,
+											backgroundColor: "#FFB627",
+											borderRadius: 12,
+											borderWidth: 2,
+											borderColor: "#fff",
+										}}
+									/>
+								</Marker>
+							);
+						})
+					: clusteredBusinesses.map((cluster, index) => (
 							<Marker
-								key={index}
-								coordinate={coords}
-								title={business.name}
-								description={formatCategory(business.category)}
+								key={`${cluster.latitude.toFixed(5)}-${cluster.longitude.toFixed(5)}-${cluster.count}-${index}`}
+								coordinate={{
+									latitude: cluster.latitude,
+									longitude: cluster.longitude,
+								}}
+								title={`${cluster.count} businesses`}
+								description="Zoom in to see details"
 							>
 								<View
 									style={{
-										width: 24,
-										height: 24,
+										width: 32,
+										height: 32,
 										backgroundColor: "#FFB627",
-										borderRadius: 12,
+										borderRadius: 20,
 										borderWidth: 2,
 										borderColor: "#fff",
+										alignItems: "center",
+										justifyContent: "center",
+										overflow: "visible",
 									}}
-								/>
+								>
+									<Text
+										style={{ color: "white", fontWeight: "bold", fontSize: 16 }}
+									>
+										{cluster.count}
+									</Text>
+								</View>
 							</Marker>
-						);
-					})
-				) : (
-					<Marker
-						coordinate={{
-							latitude: region.latitude,
-							longitude: region.longitude,
-						}}
-						title={`${sortedBusinesses.length} businesses`}
-						description="Zoom in to see details"
-					>
-						<View
-							style={{
-								width: 32,
-								height: 32,
-								backgroundColor: "#FFB627",
-								borderRadius: 20,
-								borderWidth: 2,
-								borderColor: "#fff",
-								alignItems: "center",
-								justifyContent: "center",
-								overflow: "visible",
-							}}
-						>
-							<Text
-								style={{ color: "white", fontWeight: "bold", fontSize: 16 }}
-							>
-								{sortedBusinesses.length}
-							</Text>
-						</View>
-					</Marker>
-				)}
+						))}
 			</MapView>
 			<Text
 				style={{
