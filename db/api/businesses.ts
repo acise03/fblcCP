@@ -1,11 +1,11 @@
 import { supabase } from "@/lib/supabase";
 import { File } from "expo-file-system";
 import type {
-  Business,
-  BusinessAddress,
-  BusinessHoursRow,
-  BusinessInfo,
-  BusinessPost,
+    Business,
+    BusinessAddress,
+    BusinessHoursRow,
+    BusinessInfo,
+    BusinessPost,
 } from "../schema";
 
 export type BusinessWithInfo = Business & {
@@ -229,6 +229,8 @@ export const businessesApi = {
     highlight?: string;
     text: string;
     date: string;
+    start_date?: string | null;
+    end_date?: string | null;
   }): Promise<void> {
     const { error } = await supabase.from("business_posts").upsert({
       businessid: post.businessId,
@@ -236,6 +238,8 @@ export const businessesApi = {
       highlight: post.highlight ?? null,
       text: post.text,
       date: post.date,
+      start_date: post.start_date ?? null,
+      end_date: post.end_date ?? null,
     });
 
     if (error) throw error;
