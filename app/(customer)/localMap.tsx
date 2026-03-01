@@ -75,7 +75,7 @@ const getCoordinatesFromPlaceId = async (placeId: string) => {
 
 function getDistance(lat1: number, lon1: number, lat2: number, lon2: number) {
 	const toRad = (value: number) => (value * Math.PI) / 180;
-	const R = 6371; // km
+	const R = 6371;
 	const dLat = toRad(lat2 - lat1);
 	const dLon = toRad(lon2 - lon1);
 	const a =
@@ -85,7 +85,7 @@ function getDistance(lat1: number, lon1: number, lat2: number, lon2: number) {
 			Math.sin(dLon / 2) *
 			Math.sin(dLon / 2);
 	const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-	return R * c;
+	return R * c; // km
 }
 
 export default function LocalMap() {
@@ -251,30 +251,88 @@ export default function LocalMap() {
 			return distA - distB;
 		});
 	}, [filteredBusinesses, userLocation, coordinatesByBusinessId]);
+	const [region, setRegion] = useState({
+		latitude: userLocation !== null ? userLocation.latitude : 43.6406,
+		longitude: userLocation !== null ? userLocation.longitude : -79.3757,
+		latitudeDelta: 0.05,
+		longitudeDelta: 0.05,
+	});
 
 	return (
 		<View style={{ flex: 1 }}>
 			<MapView
 				style={{ flex: 1 }}
 				initialRegion={{
-					latitude: 43.811,
-					longitude: -79.413,
+					latitude: userLocation !== null ? userLocation.latitude : 43.6406,
+					longitude: userLocation !== null ? userLocation.latitude : -79.3757,
 					latitudeDelta: 0.05,
 					longitudeDelta: 0.05,
 				}}
+				showsUserLocation={true}
+				region={region}
+				onRegionChangeComplete={setRegion}
+				customMapStyle={[
+					{
+						featureType: "poi",
+						elementType: "labels",
+						stylers: [{ visibility: "off" }],
+					},
+				]}
 			>
-				{sortedBusinesses.map((business, index) => {
-					const coords = coordinatesByBusinessId[business.id];
-					if (!coords) return null;
-					return (
-						<Marker
-							key={index}
-							coordinate={coords}
-							title={business.name}
-							description={formatCategory(business.category)}
-						/>
-					);
-				})}
+				{userLocation == null || region.latitudeDelta < 0.25 ? (
+					sortedBusinesses.map((business, index) => {
+						const coords = coordinatesByBusinessId[business.id];
+						if (!coords) return null;
+						return (
+							<Marker
+								key={index}
+								coordinate={coords}
+								title={business.name}
+								description={formatCategory(business.category)}
+							>
+								<View
+									style={{
+										width: 24,
+										height: 24,
+										backgroundColor: "#FFB627",
+										borderRadius: 12,
+										borderWidth: 2,
+										borderColor: "#fff",
+									}}
+								/>
+							</Marker>
+						);
+					})
+				) : (
+					<Marker
+						coordinate={{
+							latitude: region.latitude,
+							longitude: region.longitude,
+						}}
+						title={`${sortedBusinesses.length} businesses`}
+						description="Zoom in to see details"
+					>
+						<View
+							style={{
+								width: 32,
+								height: 32,
+								backgroundColor: "#FFB627",
+								borderRadius: 20,
+								borderWidth: 2,
+								borderColor: "#fff",
+								alignItems: "center",
+								justifyContent: "center",
+								overflow: "visible",
+							}}
+						>
+							<Text
+								style={{ color: "white", fontWeight: "bold", fontSize: 16 }}
+							>
+								{sortedBusinesses.length}
+							</Text>
+						</View>
+					</Marker>
+				)}
 			</MapView>
 			<Text
 				style={{
@@ -334,6 +392,7 @@ export default function LocalMap() {
 					right: 25,
 					flexDirection: "row",
 					marginTop: 25,
+					justifyContent: "center",
 				}}
 			>
 				<Pressable
