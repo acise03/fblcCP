@@ -3,6 +3,7 @@ import { File } from "expo-file-system";
 import type {
     Business,
     BusinessAddress,
+    BusinessHoursRow,
     BusinessInfo,
     BusinessPost,
 } from "../schema";
@@ -10,6 +11,7 @@ import type {
 export type BusinessWithInfo = Business & {
 	business_information: BusinessInfo | null;
 	business_addresses: BusinessAddress | null;
+	business_hours?: BusinessHoursRow[];
 	average_rating?: number;
 	review_count?: number;
 };
@@ -55,6 +57,7 @@ export const businessesApi = {
         *,
         business_information (*),
         business_addresses (*),
+        business_hours (*),
         reviews (rating)
       `,
 			)
@@ -82,6 +85,7 @@ export const businessesApi = {
         *,
         business_information (*),
         business_addresses (*),
+        business_hours (*),
         reviews (rating)
       `,
 			)
@@ -111,7 +115,8 @@ export const businessesApi = {
 				`
         *,
         business_information (*),
-        business_addresses (*)
+        business_addresses (*),
+        business_hours (*)
       `,
 			)
 			.eq("ownerid", ownerId)
@@ -239,6 +244,38 @@ export const businessesApi = {
 			.select("*")
 			.eq("businessid", businessId)
 			.order("date", { ascending: false });
+
+		if (error) throw error;
+		return data;
+	},
+
+	async upsertHours(
+		businessId: string,
+		hours: { day: number; open_time: string | null; close_time: string | null; is_closed: number }[],
+	): Promise<BusinessHoursRow[]> {
+		const rows = hours.map((h) => ({
+			id: businessId,
+			day: h.day,
+			open_time: h.open_time,
+			close_time: h.close_time,
+			is_closed: h.is_closed,
+		}));
+
+		const { data, error } = await supabase
+			.from("business_hours")
+			.upsert(rows, { onConflict: "id,day" })
+			.select();
+
+		if (error) throw error;
+		return data;
+	},
+
+	async getHours(businessId: string): Promise<BusinessHoursRow[]> {
+		const { data, error } = await supabase
+			.from("business_hours")
+			.select("*")
+			.eq("id", businessId)
+			.order("day");
 
 		if (error) throw error;
 		return data;

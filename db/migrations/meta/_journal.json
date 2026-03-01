@@ -15,6 +15,13 @@
       "when": 1772118643069,
       "tag": "0001_lonely_quicksilver",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1772328394109,
+      "tag": "0002_oval_enchantress",
+      "breakpoints": true
     }
   ]
 }

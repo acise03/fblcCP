@@ -5,7 +5,7 @@ import Entypo from "@expo/vector-icons/Entypo";
 import Feather from "@expo/vector-icons/Feather";
 import * as ImagePicker from "expo-image-picker";
 import { useFocusEffect } from "expo-router";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
 	FlatList,
 	Image,
@@ -20,6 +20,30 @@ import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplet
 import "../../global.css";
 import ImageUploadItem from "../components/imageUploadItem";
 import ProfilePicture from "../components/profilePicture";
+
+const DAY_NAMES = [
+  "Sunday",
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+];
+
+type HoursEntry = {
+  day: number;
+  open_time: string;
+  close_time: string;
+  is_closed: number;
+};
+
+const DEFAULT_HOURS: HoursEntry[] = DAY_NAMES.map((_, i) => ({
+  day: i,
+  open_time: "09:00",
+  close_time: "17:00",
+  is_closed: 1,
+}));
 
 let dummyImages = [
   { id: "1", uri: "https://reactnative.dev/img/tiny_logo.png" },
@@ -114,6 +138,9 @@ export default function BusinessAbout() {
   const updateBusinessAddress = useBusinessStore(
     (state) => state.updateBusinessAddress,
   );
+  const updateBusinessHours = useBusinessStore(
+    (state) => state.updateBusinessHours,
+  );
   const updateBusinessInfo = useBusinessStore(
     (state) => state.updateBusinessInfo,
   );
@@ -121,6 +148,8 @@ export default function BusinessAbout() {
   const [newName, setNewName] = useState("");
   const refreshBusiness = useAuthStore((state) => state.refreshOwnedBusiness);
   const [savedAddress, setSavedAddress] = useState("");
+  const [hours, setHours] = useState<HoursEntry[]>(DEFAULT_HOURS);
+  const [editingHours, setEditingHours] = useState(false);
 
   useFocusEffect(() => {
     setMode("business");
@@ -169,6 +198,28 @@ export default function BusinessAbout() {
     };
 
     void hydrate();
+  }, [ownedBusiness]);
+
+  useEffect(() => {
+    if (
+      ownedBusiness?.business_hours &&
+      ownedBusiness.business_hours.length > 0
+    ) {
+      const merged = DAY_NAMES.map((_, i) => {
+        const existing = ownedBusiness.business_hours?.find(
+          (h) => h.day === i,
+        );
+        return existing
+          ? {
+              day: existing.day,
+              open_time: existing.open_time ?? "09:00",
+              close_time: existing.close_time ?? "17:00",
+              is_closed: existing.is_closed,
+            }
+          : DEFAULT_HOURS[i];
+      });
+      setHours(merged);
+    }
   }, [ownedBusiness]);
 
   const validateField = (
@@ -539,33 +590,151 @@ export default function BusinessAbout() {
           </View>
 
           <View className="flex flex-col">
-            <Text className="text-zinc-700 font-semibold text-xl mb-2">
-              Working Hours
-            </Text>
+            <View className="flex flex-row items-center justify-between">
+              <Text className="text-zinc-700 font-semibold text-xl mb-2">
+                Working Hours
+              </Text>
+              <Pressable onPress={() => setEditingHours((prev) => !prev)}>
+                <Feather name="edit-3" size={22} color="black" />
+              </Pressable>
+            </View>
 
             <View className="border border-zinc-300 rounded-xl overflow-hidden">
-              {[
-                { day: "Saturday", hours: "Closed" },
-                { day: "Sunday", hours: "Closed" },
-                { day: "Monday", hours: "Closed" },
-                { day: "Tuesday", hours: "Closed" },
-                { day: "Wednesday", hours: "Closed" },
-                { day: "Thursday", hours: "Closed" },
-                { day: "Friday", hours: "Closed" },
-              ].map((item, index) => (
-                <View
-                  key={item.day}
-                  className={`flex flex-row justify-between px-4 py-3 ${
-                    index !== 6 ? "border-b border-zinc-200" : ""
-                  }`}
-                >
-                  <Text className="text-zinc-700 text-base font-medium">
-                    {item.day}
-                  </Text>
-                  <Text className="text-zinc-500 text-base">{item.hours}</Text>
-                </View>
-              ))}
+              {hours
+                .sort((a, b) => {
+                  const order = [6, 0, 1, 2, 3, 4, 5];
+                  return order.indexOf(a.day) - order.indexOf(b.day);
+                })
+                .map((item, index) => (
+                  <View
+                    key={item.day}
+                    className={`flex flex-row justify-between items-center px-4 py-3 ${
+                      index !== 6 ? "border-b border-zinc-200" : ""
+                    }`}
+                  >
+                    <Text className="text-zinc-700 text-base font-medium">
+                      {DAY_NAMES[item.day]}
+                    </Text>
+
+                    {editingHours ? (
+                      <View className="flex-row items-center">
+                        <Pressable
+                          onPress={() => {
+                            setHours((prev) =>
+                              prev.map((h) =>
+                                h.day === item.day
+                                  ? { ...h, is_closed: h.is_closed === 1 ? 0 : 1 }
+                                  : h,
+                              ),
+                            );
+                          }}
+                          className={`px-2 py-1 rounded mr-2 ${
+                            item.is_closed === 1 ? "bg-red-200" : "bg-green-200"
+                          }`}
+                        >
+                          <Text className="text-xs">
+                            {item.is_closed === 1 ? "Closed" : "Open"}
+                          </Text>
+                        </Pressable>
+
+                        {item.is_closed === 0 && (
+                          <View className="flex-row items-center">
+                            <TextInput
+                              value={item.open_time}
+                              onChangeText={(text) =>
+                                setHours((prev) =>
+                                  prev.map((h) =>
+                                    h.day === item.day
+                                      ? { ...h, open_time: text }
+                                      : h,
+                                  ),
+                                )
+                              }
+                              className="border border-gray-300 rounded px-2 py-1 w-16 text-center text-sm"
+                              placeholder="09:00"
+                            />
+                            <Text className="mx-1">-</Text>
+                            <TextInput
+                              value={item.close_time}
+                              onChangeText={(text) =>
+                                setHours((prev) =>
+                                  prev.map((h) =>
+                                    h.day === item.day
+                                      ? { ...h, close_time: text }
+                                      : h,
+                                  ),
+                                )
+                              }
+                              className="border border-gray-300 rounded px-2 py-1 w-16 text-center text-sm"
+                              placeholder="17:00"
+                            />
+                          </View>
+                        )}
+                      </View>
+                    ) : (
+                      <Text className="text-zinc-500 text-base">
+                        {item.is_closed === 1
+                          ? "Closed"
+                          : `${item.open_time} - ${item.close_time}`}
+                      </Text>
+                    )}
+                  </View>
+                ))}
             </View>
+
+            {editingHours && (
+              <View className="flex-row mt-2 mb-4">
+                <Pressable
+                  className="bg-[#FFB627] rounded-xl px-4 py-2 mr-2"
+                  onPress={async () => {
+                    if (!ownedBusiness) return;
+                    try {
+                      await updateBusinessHours(ownedBusiness.id, hours);
+                      setEditingHours(false);
+                      ToastAndroid.show("Hours saved", ToastAndroid.SHORT);
+                      refreshBusiness();
+                    } catch {
+                      ToastAndroid.show(
+                        "Failed to save hours",
+                        ToastAndroid.SHORT,
+                      );
+                    }
+                  }}
+                >
+                  <Text className="font-semibold">Save</Text>
+                </Pressable>
+                <Pressable
+                  className="bg-gray-200 rounded-xl px-4 py-2"
+                  onPress={() => {
+                    if (
+                      ownedBusiness?.business_hours &&
+                      ownedBusiness.business_hours.length > 0
+                    ) {
+                      const merged = DAY_NAMES.map((_, i) => {
+                        const existing =
+                          ownedBusiness.business_hours?.find(
+                            (h) => h.day === i,
+                          );
+                        return existing
+                          ? {
+                              day: existing.day,
+                              open_time: existing.open_time ?? "09:00",
+                              close_time: existing.close_time ?? "17:00",
+                              is_closed: existing.is_closed,
+                            }
+                          : DEFAULT_HOURS[i];
+                      });
+                      setHours(merged);
+                    } else {
+                      setHours([...DEFAULT_HOURS]);
+                    }
+                    setEditingHours(false);
+                  }}
+                >
+                  <Text>Cancel</Text>
+                </Pressable>
+              </View>
+            )}
           </View>
         </View>
         <View className="flex flex-col mt-6">

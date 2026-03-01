@@ -32,6 +32,10 @@ type BusinessStore = {
 		},
 	) => Promise<void>;
 	updateBusinessAddress: (businessId: string, address: string) => Promise<void>;
+	updateBusinessHours: (
+		businessId: string,
+		hours: { day: number; open_time: string | null; close_time: string | null; is_closed: number }[],
+	) => Promise<void>;
 	uploadBusinessBanner: (
 		businessId: string,
 		fileUri: string,
@@ -175,6 +179,20 @@ export const useBusinessStore = create<BusinessStore>((set, get) => ({
 			} else {
 				set({ loading: false });
 			}
+		} catch (error) {
+			set({ error: (error as Error).message, loading: false });
+			throw error;
+		}
+	},
+
+	updateBusinessHours: async (businessId, hours) => {
+		try {
+			set({ loading: true, error: null });
+			await businessesApi.upsertHours(businessId, hours);
+
+			// Refresh business data
+			const businesses = await businessesApi.getAll();
+			set({ businesses, loading: false });
 		} catch (error) {
 			set({ error: (error as Error).message, loading: false });
 			throw error;

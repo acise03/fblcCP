@@ -61,6 +61,22 @@ export const BusinessAddresses = pgTable("business_addresses", {
 	address: varchar("address", { length: 255 }),
 });
 
+export const BusinessHours = pgTable(
+	"business_hours",
+	{
+		id: uuid("id")
+			.notNull()
+			.references(() => Businesses.id, { onDelete: "cascade" }),
+		day: integer("day").notNull(), // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+		open_time: varchar("open_time", { length: 10 }), // e.g. "09:00"
+		close_time: varchar("close_time", { length: 10 }), // e.g. "17:00"
+		is_closed: integer("is_closed").notNull().default(1), // 1 = closed, 0 = open
+	},
+	(table) => ({
+		pk: primaryKey({ columns: [table.id, table.day] }),
+	}),
+);
+
 export const PostType = pgEnum("post_type", ["announcement", "coupon", "sale"]);
 
 export const BusinessPosts = pgTable("business_posts", {
@@ -126,3 +142,6 @@ export type NewBusinessAddress = typeof BusinessAddresses.$inferInsert;
 
 export type Review = typeof Reviews.$inferSelect;
 export type NewReview = typeof Reviews.$inferInsert;
+
+export type BusinessHoursRow = typeof BusinessHours.$inferSelect;
+export type NewBusinessHoursRow = typeof BusinessHours.$inferInsert;

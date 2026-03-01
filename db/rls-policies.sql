@@ -35,6 +35,7 @@ ALTER TABLE addresses ENABLE ROW LEVEL SECURITY;
 ALTER TABLE businesses ENABLE ROW LEVEL SECURITY;
 ALTER TABLE business_information ENABLE ROW LEVEL SECURITY;
 ALTER TABLE business_addresses ENABLE ROW LEVEL SECURITY;
+ALTER TABLE business_hours ENABLE ROW LEVEL SECURITY;
 ALTER TABLE reviews ENABLE ROW LEVEL SECURITY;
 ALTER TABLE business_posts ENABLE ROW LEVEL SECURITY;
 ALTER TABLE favorite_businesses ENABLE ROW LEVEL SECURITY;
@@ -194,6 +195,31 @@ CREATE POLICY "reviews_update" ON reviews
 -- Users can delete their own reviews
 CREATE POLICY "reviews_delete" ON reviews
   FOR DELETE USING (auth.uid() = reviewerid);
+
+
+-- ============ BUSINESS_HOURS TABLE POLICIES ============
+
+-- Anyone can read business hours
+CREATE POLICY "business_hours_select" ON business_hours
+  FOR SELECT USING (true);
+
+-- Owner can insert hours
+CREATE POLICY "business_hours_insert" ON business_hours
+  FOR INSERT WITH CHECK (
+    id IN (SELECT id FROM businesses WHERE ownerid = auth.uid())
+  );
+
+-- Owner can update hours
+CREATE POLICY "business_hours_update" ON business_hours
+  FOR UPDATE USING (
+    id IN (SELECT id FROM businesses WHERE ownerid = auth.uid())
+  );
+
+-- Owner can delete hours
+CREATE POLICY "business_hours_delete" ON business_hours
+  FOR DELETE USING (
+    id IN (SELECT id FROM businesses WHERE ownerid = auth.uid())
+  );
 
 
 -- ============ OPTIONAL: UNIQUE CONSTRAINT ============

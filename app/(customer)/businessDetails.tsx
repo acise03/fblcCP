@@ -20,6 +20,16 @@ import "../../global.css";
 import AnnouncementItemCustomer from "../components/announcementItemCustomer";
 import ProfilePicture from "../components/profilePicture";
 
+const DAY_NAMES = [
+  "Sunday",
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+];
+
 export default function BusinessDetails() {
   const setMode = useModalSettingsStore((state) => state.setMode);
   const fetchBusiness = useBusinessStore((state) => state.fetchBusinessById);
@@ -197,6 +207,37 @@ export default function BusinessDetails() {
               className="w-full"
             />
           </View>
+          {business?.business_hours && business.business_hours.length > 0 && (
+            <View className="flex flex-col items-start mb-2 px-4 gap-2">
+              <Text className="text-2xl font-semibold text-black">
+                Working Hours
+              </Text>
+              <View className="w-full border border-zinc-300 rounded-xl overflow-hidden">
+                {[6, 0, 1, 2, 3, 4, 5].map((dayIndex, i) => {
+                  const entry = business.business_hours?.find(
+                    (h) => h.day === dayIndex,
+                  );
+                  return (
+                    <View
+                      key={dayIndex}
+                      className={`flex flex-row justify-between px-4 py-3 ${
+                        i !== 6 ? "border-b border-zinc-200" : ""
+                      }`}
+                    >
+                      <Text className="text-zinc-700 text-base font-medium">
+                        {DAY_NAMES[dayIndex]}
+                      </Text>
+                      <Text className="text-zinc-500 text-base">
+                        {!entry || entry.is_closed === 1
+                          ? "Closed"
+                          : `${entry.open_time} - ${entry.close_time}`}
+                      </Text>
+                    </View>
+                  );
+                })}
+              </View>
+            </View>
+          )}
           <View className="flex flex-col items-start mb-2 px-4 gap-2">
             <Text className="text-2xl font-semibold text-black ">
               AI Summary of Reviews:
