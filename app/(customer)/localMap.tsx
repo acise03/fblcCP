@@ -95,7 +95,7 @@ export default function LocalMap() {
 	const [armedBusinessId, setArmedBusinessId] = useState<string | null>(null);
 	const screenHeight = Dimensions.get("window").height;
 	const sheetHeight = Math.round(screenHeight * 0.55);
-	const collapsedY = sheetHeight * 0.6;
+	const collapsedY = sheetHeight * 0.94;
 	const translateY = useSharedValue(collapsedY);
 	const setModalBusiness = useModalReviewStore((state) => state.setBusiness);
 	const [userLocation, setUserLocation] = useState<{
