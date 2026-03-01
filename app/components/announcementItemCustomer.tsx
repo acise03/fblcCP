@@ -26,7 +26,9 @@ export default function AnnouncementItemCustomer({
   useEffect(() => {
     businessesApi.getById(announcement.businessid).then((business) => {
       setBusinessName(business?.name ?? "");
-      setProfilePicture(business?.business_information?.profile_picture ?? null);
+      setProfilePicture(
+        business?.business_information?.profile_picture ?? null,
+      );
     });
   }, [announcement.businessid]);
 

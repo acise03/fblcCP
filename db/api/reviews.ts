@@ -1,8 +1,8 @@
 import { supabase } from "@/lib/supabase";
-import type { Review, NewReview, User } from "../schema";
+import type { Review, User } from "../schema";
 
 export type ReviewWithUser = Review & {
-  users: Pick<User, "firstname" | "lastname"> | null;
+  users: Pick<User, "firstname" | "lastname" | "profile_picture"> | null;
 };
 
 export const reviewsApi = {
@@ -12,7 +12,7 @@ export const reviewsApi = {
       .select(
         `
         *,
-        users (firstname, lastname)
+        users (firstname, lastname, profile_picture)
       `,
       )
       .eq("businessid", businessId)

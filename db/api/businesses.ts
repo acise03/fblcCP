@@ -49,7 +49,10 @@ export const businessesApi = {
     return data.publicUrl;
   },
 
-  async uploadProfilePicture(businessId: string, fileUri: string): Promise<string> {
+  async uploadProfilePicture(
+    businessId: string,
+    fileUri: string,
+  ): Promise<string> {
     const cleanUri = fileUri.split("?")[0];
     const extension = (cleanUri.split(".").pop() || "jpg").toLowerCase();
     const filePath = `${businessId}/profile-${Date.now()}.${extension}`;
