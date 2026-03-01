@@ -1,21 +1,26 @@
 import { ReviewWithUser } from "@/db/api";
+import { Feather } from "@expo/vector-icons";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { Image, Text, View } from "react-native";
+import { Image, Pressable, Text, View } from "react-native";
 import ExpandableText from "./expandableText";
 
 type ReviewItemCustomerProps = {
   review: ReviewWithUser;
   username: string;
+  onEdit?: () => void;
+  onDelete?: () => void;
 };
 
 export default function ReviewItemCustomer({
   review,
   username,
+  onEdit,
+  onDelete,
 }: ReviewItemCustomerProps) {
   const profilePicture = review.users?.profile_picture ?? null;
 
   return (
-    <View className="p-4 flex flex-row items-center rounded-2xl bg-[#FFB62799] w-full">
+    <View className="p-4 flex flex-row items-start rounded-2xl bg-[#FFB62799] w-full">
       <View className="flex flex-col flex-1">
         <View style={{ flexDirection: "row", alignItems: "center" }}>
           {profilePicture ? (
@@ -56,6 +61,20 @@ export default function ReviewItemCustomer({
           {`${review.rating}/5; ${review.review ?? ""}`}
         </ExpandableText>
       </View>
+      {(onEdit || onDelete) && (
+        <View className="flex-row items-center gap-4 ml-3">
+          {onEdit && (
+            <Pressable onPress={onEdit} hitSlop={8}>
+              <Feather name="edit-2" size={18} color="#000" />
+            </Pressable>
+          )}
+          {onDelete && (
+            <Pressable onPress={onDelete} hitSlop={8}>
+              <Feather name="trash-2" size={18} color="#ef4444" />
+            </Pressable>
+          )}
+        </View>
+      )}
     </View>
   );
 }

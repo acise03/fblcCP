@@ -86,38 +86,27 @@ export default function AllReviews() {
           <Text className="font-bold text-3xl text-black">Reviews</Text>
         </View>
 
-        <ScrollView className="flex-1 w-full" showsVerticalScrollIndicator={false}>
+        <ScrollView
+          className="flex-1 w-full"
+          showsVerticalScrollIndicator={false}
+        >
           {sortedReviews.length > 0 ? (
             sortedReviews.map((review) => (
               <View key={review.id} className="mb-3 w-full">
                 <ReviewItemCustomer
                   review={review}
                   username={usernameById[review.reviewerid!!] ?? ""}
+                  {...(review.reviewerid == userId && {
+                    onEdit: () => {
+                      setVisible(true);
+                      setEdit(true);
+                    },
+                    onDelete: () => {
+                      deleteReview(review.id);
+                      fetchReviews(activeBusiness!).then(setReviews);
+                    },
+                  })}
                 />
-                {review.reviewerid == userId && (
-                  <View className="flex-row gap-4 mt-2">
-                    <Pressable
-                      onPress={() => {
-                        setVisible(true);
-                        setEdit(true);
-                      }}
-                    >
-                      <Text className="text-sm text-[#FFB627] font-medium">
-                        Edit
-                      </Text>
-                    </Pressable>
-                    <Pressable
-                      onPress={() => {
-                        deleteReview(review.id);
-                        fetchReviews(activeBusiness!).then(setReviews);
-                      }}
-                    >
-                      <Text className="text-sm text-red-500 font-medium">
-                        Delete
-                      </Text>
-                    </Pressable>
-                  </View>
-                )}
               </View>
             ))
           ) : (

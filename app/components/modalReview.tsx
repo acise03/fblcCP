@@ -72,7 +72,7 @@ export default function ModalReviews() {
       >
         <View className="flex-1 justify-end bg-black/40">
           <View
-            className="w-full bg-[#FFF8F0] rounded-t-3xl p-6 h-[38%]"
+            className="w-full bg-[#FFF8F0] rounded-t-3xl p-6 h-[55%]"
             onStartShouldSetResponder={() => true}
           >
             <View className="flex-row justify-center mb-4">
@@ -93,8 +93,9 @@ export default function ModalReviews() {
               onChangeText={setReview}
               value={review}
               placeholder="Leave a review..."
-              className="border border-gray-300 text-xl rounded-xl p-3 h-80 text-base text-black"
+              className="border border-gray-300 text-xl rounded-xl p-3 flex-1 text-base text-black"
               multiline
+              textAlignVertical="top"
             />
 
             {editing ? (
@@ -144,8 +145,8 @@ export default function ModalReviews() {
                 }}
               >
                 <Text
-                  className="text-black text-xl font-semibold justify-center"
-                  style={{ fontFamily: "Rubik" }}
+                  className="text-black text-xl font-bold justify-center"
+                  style={{ fontFamily: "Rubik", fontWeight: "700" }}
                 >
                   Submit Review
                 </Text>
