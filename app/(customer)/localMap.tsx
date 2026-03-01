@@ -4,20 +4,20 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import * as Location from "expo-location";
 import React, { useEffect, useMemo, useState } from "react";
 import {
-	Dimensions,
-	FlatList,
-	Pressable,
-	Text,
-	TextInput,
-	ToastAndroid,
-	View,
+    Dimensions,
+    FlatList,
+    Pressable,
+    Text,
+    TextInput,
+    ToastAndroid,
+    View,
 } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import MapView, { Marker } from "react-native-maps";
 import Animated, {
-	useAnimatedStyle,
-	useSharedValue,
-	withSpring,
+    useAnimatedStyle,
+    useSharedValue,
+    withSpring,
 } from "react-native-reanimated";
 import BusinessItem from "../components/businessItem";
 import ProfilePicture from "../components/profilePicture";
@@ -81,18 +81,16 @@ function getDistance(lat1: number, lon1: number, lat2: number, lon2: number) {
 	const a =
 		Math.sin(dLat / 2) * Math.sin(dLat / 2) +
 		Math.cos(toRad(lat1)) *
-		Math.cos(toRad(lat2)) *
-		Math.sin(dLon / 2) *
-		Math.sin(dLon / 2);
+			Math.cos(toRad(lat2)) *
+			Math.sin(dLon / 2) *
+			Math.sin(dLon / 2);
 	const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 	return R * c;
 }
 
 export default function LocalMap() {
-	// Bottom sheet state
 	const [showBottomSheet, setShowBottomSheet] = useState(false);
-	// Set sheet height to 75% of screen
-	const screenHeight = Dimensions.get("window").height; // You can use Dimensions.get('window').height for dynamic
+	const screenHeight = Dimensions.get("window").height;
 	const sheetHeight = Math.round(screenHeight * 0.55);
 	const collapsedY = sheetHeight * 0.6;
 	const translateY = useSharedValue(collapsedY);
@@ -101,14 +99,11 @@ export default function LocalMap() {
 		longitude: number;
 	} | null>(null);
 
-	// Show sheet when search is submitted
 	const handleSearchSubmit = () => {
 		setShowBottomSheet(true);
-		// Show near bottom (collapsed)
 		translateY.value = withSpring(collapsedY);
 	};
 
-	// New gesture handler using Gesture API
 	const panGesture = Gesture.Pan()
 		.onUpdate((event) => {
 			let newY = translateY.value + event.translationY;
@@ -421,7 +416,6 @@ export default function LocalMap() {
 					<Ionicons name="star-outline" size={32} color="black" />
 				</Pressable>
 			</View>
-			{/* Draggable Bottom Sheet - moved outside search/filter bar */}
 			{showBottomSheet && (
 				<GestureDetector gesture={panGesture}>
 					<Animated.View style={animatedSheetStyle}>
