@@ -33,9 +33,9 @@ export default function RootLayout() {
   if (!fontsLoaded) return null;
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
+    <GestureHandlerRootView style={{ flex: 1, backgroundColor: "#FFF8F0" }}>
       <ThemeProvider value={DefaultTheme}>
-        <Container className="flex-1">
+        <Container style={{ flex: 1, backgroundColor: "#FFF8F0" }}>
           <Stack>
             <Stack.Screen name="(customer)" options={{ headerShown: false }} />
             <Stack.Screen name="login" options={{ headerShown: false }} />
@@ -46,7 +46,7 @@ export default function RootLayout() {
           <StatusBar
             style="dark"
             backgroundColor="#FFF8F0"
-            translucent={false}
+            translucent={true}
           />
         </Container>
       </ThemeProvider>
