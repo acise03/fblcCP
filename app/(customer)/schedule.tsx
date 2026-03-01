@@ -39,11 +39,20 @@ export default function Schedule() {
     (async () => {
       const allPosts = await businessesApi.getAllPosts();
       const eventPosts = allPosts.filter((p) => p.start_date);
-      console.log(allPosts);
+
+      const businessIds = [...new Set(eventPosts.map(p => p.businessid))];
+
+      const businessData = await Promise.all(
+        businessIds.map(async (id) => {
+          const b = await businessesApi.getById(id);
+          return [id, b?.name ?? "Unknown Business"] as const;
+        })
+      );
+
+      setBusinesses(Object.fromEntries(businessData));
       setPosts(eventPosts);
     })();
-  }, []);
-
+  }, []); const [businesses, setBusinesses] = useState<Record<string, string>>({});
   const selectedDayEvents = posts.filter((post) => {
     if (!selectedDate) return false;
 
@@ -135,9 +144,10 @@ export default function Schedule() {
                     key={post.id}
                     className="bg-[#FFE4A3] rounded-xl px-4 py-4 mt-3"
                   >
-                    <Text className="text-xl font-bold">
-                      {post.highlight}
+                    <Text className="text-2xl font-bold text-gray-700 mb-1">
+                      {businesses[post.businessid]}
                     </Text>
+                    <Text className="text-xl font-semi-bold">{post.highlight}</Text>
                     <Text className="text-lg">{post.text}</Text>
                   </View>
                 ))
