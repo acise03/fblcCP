@@ -8,6 +8,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import {
     Dimensions,
     FlatList,
+    Keyboard,
     Pressable,
     Text,
     TextInput,
@@ -91,7 +92,6 @@ function getDistance(lat1: number, lon1: number, lat2: number, lon2: number) {
 }
 
 export default function LocalMap() {
-	const [showBottomSheet, setShowBottomSheet] = useState(false);
 	const [armedBusinessId, setArmedBusinessId] = useState<string | null>(null);
 	const screenHeight = Dimensions.get("window").height;
 	const sheetHeight = Math.round(screenHeight * 0.55);
@@ -104,11 +104,11 @@ export default function LocalMap() {
 	} | null>(null);
 
 	const handleSearchSubmit = () => {
-		setShowBottomSheet(true);
 		translateY.value = withSpring(collapsedY);
 	};
 
 	const panGesture = Gesture.Pan()
+		.runOnJS(true)
 		.onUpdate((event) => {
 			let newY = translateY.value + event.translationY;
 			newY = Math.max(0, Math.min(newY, collapsedY));
@@ -120,6 +120,7 @@ export default function LocalMap() {
 			} else {
 				translateY.value = withSpring(collapsedY);
 			}
+			Keyboard.dismiss();
 		});
 
 	useEffect(() => {
@@ -148,7 +149,7 @@ export default function LocalMap() {
 		shadowOpacity: 0.2,
 		shadowRadius: 8,
 		elevation: 8,
-		padding: 16,
+		paddingHorizontal: 16,
 		transform: [{ translateY: translateY.value }],
 	}));
 	const [searchQuery, setSearchQuery] = useState("");
@@ -317,6 +318,7 @@ export default function LocalMap() {
 					longitudeDelta: 0.05,
 				}}
 				showsUserLocation={true}
+				showsMyLocationButton={false}
 				region={region}
 				onRegionChangeComplete={setRegion}
 				onPress={() => setArmedBusinessId(null)}
@@ -337,7 +339,17 @@ export default function LocalMap() {
 									key={business.id}
 									coordinate={coords}
 									title={business.name}
-									description={formatCategory(business.category)}
+									description={
+										formatCategory(business.category) +
+										" " +
+										getDistance(
+											coords.latitude,
+											coords.longitude,
+											userLocation?.latitude ?? 43.6406,
+											userLocation?.longitude ?? -79.3757,
+										).toFixed(2) +
+										" km away"
+									}
 									onPress={() => {
 										if (armedBusinessId !== business.id) {
 											setArmedBusinessId(business.id);
@@ -535,43 +547,51 @@ export default function LocalMap() {
 					<Ionicons name="star-outline" size={32} color="black" />
 				</Pressable>
 			</View>
-			{showBottomSheet && (
+
+			<Animated.View style={animatedSheetStyle}>
 				<GestureDetector gesture={panGesture}>
-					<Animated.View style={animatedSheetStyle}>
+					<View
+						style={{
+							alignItems: "center",
+							justifyContent: "center",
+							width: "auto",
+							paddingBottom: 12,
+							paddingTop: 12,
+						}}
+					>
 						<View
 							style={{
 								width: 48,
 								height: 6,
 								backgroundColor: "#ccc",
 								borderRadius: 3,
-								alignSelf: "center",
-								marginBottom: 12,
 							}}
 						/>
-						<FlatList
-							data={sortedBusinesses}
-							renderItem={({ item }) => {
-								const coords = coordinatesByBusinessId[item.id];
-								let distance;
-								if (coords && userLocation) {
-									distance = getDistance(
-										userLocation.latitude,
-										userLocation.longitude,
-										coords.latitude,
-										coords.longitude,
-									);
-								}
-								return <BusinessItem business={item} distance={distance} />;
-							}}
-							keyExtractor={(item) => item.id}
-							ItemSeparatorComponent={() => <View className="h-2" />}
-							scrollEnabled={true}
-							contentContainerStyle={{ paddingBottom: 8 }}
-							showsVerticalScrollIndicator={false}
-						/>
-					</Animated.View>
+					</View>
 				</GestureDetector>
-			)}
+
+				<FlatList
+					data={sortedBusinesses}
+					renderItem={({ item }) => {
+						const coords = coordinatesByBusinessId[item.id];
+						let distance;
+						if (coords && userLocation) {
+							distance = getDistance(
+								userLocation.latitude,
+								userLocation.longitude,
+								coords.latitude,
+								coords.longitude,
+							);
+						}
+						return <BusinessItem business={item} distance={distance} />;
+					}}
+					keyExtractor={(item) => item.id}
+					ItemSeparatorComponent={() => <View className="h-2" />}
+					scrollEnabled={true}
+					contentContainerStyle={{ paddingBottom: 8 }}
+					showsVerticalScrollIndicator={false}
+				/>
+			</Animated.View>
 		</View>
 	);
 }
