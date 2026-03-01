@@ -74,7 +74,7 @@ export default function BusinessHome() {
         </View>
 
         <View>
-          <Text className="text-zinc-700 font-semibold text-3xl mt-4">
+          <Text className="text-zinc-700 font-semibold text-2xl mt-4">
             Stats
           </Text>
 
@@ -96,7 +96,7 @@ export default function BusinessHome() {
         </View>
         <View className="flex flex-col mt-6">
           <View className="flex flex-row items-center justify-between">
-            <Text className="text-zinc-700 font-semibold text-3xl">Feed</Text>
+            <Text className="text-zinc-700 font-semibold text-2xl">Feed</Text>
           </View>
           <FlatList
             className="mt-2"
