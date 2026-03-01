@@ -10,6 +10,12 @@ type AnnouncementItemProps = {
   announcement: BusinessPost;
 };
 
+const postTypeLabels: Record<string, string> = {
+  announcement: "📢 Announcement",
+  sale: "🏷️ Sale",
+  coupon: "🎟️ Coupon",
+};
+
 export default function AnnouncementItem({
   announcement,
 }: AnnouncementItemProps) {
@@ -18,9 +24,17 @@ export default function AnnouncementItem({
   const [editing, setEditing] = useState(false);
   const [editText, setEditText] = useState(announcement.text);
 
+  const typeLabel = postTypeLabels[announcement.type] ?? "📢 Announcement";
+
   return (
     <View className="py-4 px-4 flex flex-row items-center rounded-2xl bg-[#FFE4A3] w-full">
       <View className="flex flex-col flex-1">
+        <Text
+          className="text-xs font-semibold text-gray-600 mb-1"
+          style={{ fontFamily: "Rubik" }}
+        >
+          {typeLabel}
+        </Text>
         {editing ? (
           <>
             <TextInput

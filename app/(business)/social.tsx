@@ -5,7 +5,7 @@ import { useModalSettingsStore } from "@/store/useModalSettingsStore";
 import Feather from "@expo/vector-icons/Feather";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useFocusEffect, useRouter } from "expo-router";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
     Dimensions,
     FlatList,
@@ -25,6 +25,20 @@ import "../../global.css";
 import AnnouncementItem from "../components/announcementItem";
 import ProfilePicture from "../components/profilePicture";
 
+type PostType = "announcement" | "sale" | "coupon";
+
+const postTypeLabels: Record<PostType, string> = {
+	announcement: "Announcement",
+	sale: "Sale",
+	coupon: "Coupon",
+};
+
+const postTypeIcons: Record<PostType, "volume-2" | "tag" | "gift"> = {
+	announcement: "volume-2",
+	sale: "tag",
+	coupon: "gift",
+};
+
 export default function BusinessSocial() {
 	const posts = useBusinessStore((state) => state.posts);
 	const setPosts = useBusinessStore((state) => state.setPosts);
@@ -41,6 +55,9 @@ export default function BusinessSocial() {
 	const [startDate, setStartDate] = useState<Date | null>(null);
 	const [endDate, setEndDate] = useState<Date | null>(null);
 	const ownedBusiness = useAuthStore((state) => state.ownedBusiness);
+	const [postType, setPostType] = useState<PostType>("announcement");
+	const [postTypeMenuOpen, setPostTypeMenuOpen] = useState(false);
+	const [highlight, setHighlight] = useState("");
 	const [showPicker, setShowPicker] = useState<
 		null | "single" | "start" | "end"
 	>(null);
@@ -110,11 +127,7 @@ export default function BusinessSocial() {
 						className="mt-2"
 						data={posts}
 						renderItem={({ item }) => {
-							if (item.type == "announcement") {
-								return <AnnouncementItem announcement={item} />;
-							} else {
-								return <></>;
-							}
+							return <AnnouncementItem announcement={item} />;
 						}}
 						keyExtractor={(item) => item.id}
 						ItemSeparatorComponent={() => <View className="h-2" />}
@@ -136,22 +149,95 @@ export default function BusinessSocial() {
 							marginBottom: 12,
 						}}
 					/>
-					<View className="flex-1 mt-2">
-						<Pressable className="flex-row items-center justify-between border border-black rounded-lg px-3 py-2 mb-5">
-							<View className="flex-row items-center">
-								<Feather name="volume-2" size={25} color="black" />
-								<Text className="text-black text-xl"> Announcement</Text>
+					<View className="flex-1 mt-2" style={{ zIndex: 1 }}>
+						{/* Post Type Dropdown */}
+						<View style={{ zIndex: 20 }}>
+							<Pressable
+								className="flex-row items-center justify-between border border-black rounded-lg px-3 py-2 mb-5"
+								onPress={() => setPostTypeMenuOpen((prev) => !prev)}
+							>
+								<View className="flex-row items-center">
+									<Feather name={postTypeIcons[postType]} size={25} color="black" />
+									<Text className="text-black text-xl"> {postTypeLabels[postType]}</Text>
+								</View>
+								<Feather
+									name="chevron-down"
+									className="pt-1"
+									size={18}
+									color="black"
+								/>
+							</Pressable>
+
+							{postTypeMenuOpen && (
+								<View
+									className="border border-gray-300 rounded-md bg-white"
+									style={{ position: "absolute", top: 48, left: 0, right: 0, zIndex: 30, elevation: 10 }}
+								>
+									{(["announcement", "sale", "coupon"] as PostType[]).map(
+										(option) => (
+											<Pressable
+												key={option}
+												onPress={() => {
+													setPostType(option);
+													setHighlight("");
+													setPostTypeMenuOpen(false);
+												}}
+												className={`px-3 py-3 border-b border-gray-200 flex-row items-center ${
+													postType === option ? "bg-[#FFE4A3]" : ""
+												}`}
+											>
+												<Feather
+													name={postTypeIcons[option]}
+													size={18}
+													color="black"
+													style={{ marginRight: 8 }}
+												/>
+												<Text className="text-black text-lg">
+													{postTypeLabels[option]}
+												</Text>
+											</Pressable>
+										),
+									)}
+								</View>
+							)}
+						</View>
+
+						{/* Highlight field for Coupon / Sale */}
+						{postType === "coupon" && (
+							<View className="border border-black rounded-lg items-center justify-center px-4 py-6 mb-4">
+								<TextInput
+									placeholder="CODE"
+									value={highlight}
+									onChangeText={(text) => setHighlight(text.toUpperCase().slice(0, 8))}
+									maxLength={8}
+									autoCapitalize="characters"
+									className="text-black text-3xl font-bold text-center w-full"
+									placeholderTextColor="#ccc"
+								/>
+								<Text className="text-gray-400 text-sm mt-1">Max 8 characters</Text>
 							</View>
-							<Feather
-								name="chevron-down"
-								className="pt-1"
-								size={18}
-								color="black"
-							/>
-						</Pressable>
+						)}
+
+						{postType === "sale" && (
+							<View className="border border-black rounded-lg items-center justify-center px-4 py-6 mb-4">
+								<View className="flex-row items-baseline" style={{ gap: -4 }}>
+									<TextInput
+										placeholder="00"
+										value={highlight}
+										onChangeText={(text) => setHighlight(text.replace(/[^0-9]/g, "").slice(0, 3))}
+										maxLength={3}
+										keyboardType="numeric"
+										className="text-black text-3xl font-bold text-center"
+										placeholderTextColor="#ccc"
+										style={{ minWidth: 60, paddingRight: 0 }}
+									/>
+									<Text className="text-black text-3xl font-bold" style={{ marginLeft: -8 }}>%</Text>
+								</View>
+							</View>
+						)}
 
 						<TextInput
-							placeholder="Message"
+							placeholder="Description..."
 							value={message}
 							onChangeText={setMessage}
 							multiline={true}
@@ -261,7 +347,8 @@ export default function BusinessSocial() {
 							onPress={async () => {
 								await businessesApi.upsertPost({
 									businessId: ownedBusiness!!.id,
-									type: "announcement",
+									type: postType,
+									highlight: postType === "coupon" ? highlight : postType === "sale" ? `${highlight}%` : undefined,
 									text: message,
 									date: new Date().toISOString(),
 								});

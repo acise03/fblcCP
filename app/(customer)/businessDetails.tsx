@@ -4,10 +4,10 @@ import React, { useEffect, useState } from "react";
 import { Image, Pressable } from "react-native";
 
 import {
-    businessesApi,
-    BusinessWithInfo,
-    ReviewWithUser,
-    usersApi,
+  businessesApi,
+  BusinessWithInfo,
+  ReviewWithUser,
+  usersApi,
 } from "@/db/api";
 import { BusinessPost } from "@/db/schema";
 import { useAuthStore } from "@/store/useAuthStore";

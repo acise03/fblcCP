@@ -7,14 +7,14 @@ import * as ImagePicker from "expo-image-picker";
 import { useFocusEffect } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import {
-	FlatList,
-	Image,
-	Pressable,
-	ScrollView,
-	Text,
-	TextInput,
-	ToastAndroid,
-	View,
+  FlatList,
+  Image,
+  Pressable,
+  ScrollView,
+  Text,
+  TextInput,
+  ToastAndroid,
+  View,
 } from "react-native";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 import "../../global.css";
@@ -206,9 +206,7 @@ export default function BusinessAbout() {
       ownedBusiness.business_hours.length > 0
     ) {
       const merged = DAY_NAMES.map((_, i) => {
-        const existing = ownedBusiness.business_hours?.find(
-          (h) => h.day === i,
-        );
+        const existing = ownedBusiness.business_hours?.find((h) => h.day === i);
         return existing
           ? {
               day: existing.day,
@@ -623,7 +621,10 @@ export default function BusinessAbout() {
                             setHours((prev) =>
                               prev.map((h) =>
                                 h.day === item.day
-                                  ? { ...h, is_closed: h.is_closed === 1 ? 0 : 1 }
+                                  ? {
+                                      ...h,
+                                      is_closed: h.is_closed === 1 ? 0 : 1,
+                                    }
                                   : h,
                               ),
                             );
@@ -711,10 +712,9 @@ export default function BusinessAbout() {
                       ownedBusiness.business_hours.length > 0
                     ) {
                       const merged = DAY_NAMES.map((_, i) => {
-                        const existing =
-                          ownedBusiness.business_hours?.find(
-                            (h) => h.day === i,
-                          );
+                        const existing = ownedBusiness.business_hours?.find(
+                          (h) => h.day === i,
+                        );
                         return existing
                           ? {
                               day: existing.day,

@@ -9,6 +9,12 @@ type AnnouncementItemCustomerProps = {
   announcement: BusinessPost;
 };
 
+const postTypeLabels: Record<string, string> = {
+  announcement: "📢 Announcement",
+  sale: "🏷️ Sale",
+  coupon: "🎟️ Coupon",
+};
+
 export default function AnnouncementItemCustomer({
   announcement,
 }: AnnouncementItemCustomerProps) {
@@ -46,7 +52,13 @@ export default function AnnouncementItemCustomer({
           </Text>
         </View>
         <Text
-          className="text-base font-normal mt-3"
+          className="text-xs font-semibold text-gray-600 mt-1"
+          style={{ fontFamily: "Rubik" }}
+        >
+          {postTypeLabels[announcement.type] ?? "📢 Announcement"}
+        </Text>
+        <Text
+          className="text-base font-normal mt-2"
           style={{ fontFamily: "Rubik" }}
         >
           {announcement.text}
