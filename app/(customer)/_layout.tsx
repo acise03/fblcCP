@@ -55,6 +55,8 @@ export default function TabLayout() {
       />
       <Tabs.Screen name="businessDetails" options={{ href: null }} />
       <Tabs.Screen name="createBusiness" options={{ href: null }} />
+      <Tabs.Screen name="allAnnouncements" options={{ href: null }} />
+      <Tabs.Screen name="allReviews" options={{ href: null }} />
     </Tabs>
   );
 }
