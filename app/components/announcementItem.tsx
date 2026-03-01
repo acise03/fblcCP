@@ -5,6 +5,7 @@ import { useBusinessStore } from "@/store/useBusinessStore";
 import { useState } from "react";
 import { Text, TextInput, View } from "react-native";
 import "../../global.css";
+import ExpandableText from "./expandableText";
 
 type AnnouncementItemProps = {
   announcement: BusinessPost;
@@ -64,12 +65,13 @@ export default function AnnouncementItem({
           </>
         ) : (
           <>
-            <Text
+            <ExpandableText
               className="text-md font-medium"
               style={{ fontFamily: "Rubik" }}
+              numberOfLines={4}
             >
               {announcement.text}
-            </Text>
+            </ExpandableText>
             <Text
               className="text-sm text-gray-500"
               style={{ fontFamily: "Rubik" }}
