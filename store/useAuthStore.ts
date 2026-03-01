@@ -30,6 +30,7 @@ type AuthStore = {
 	signIn: (email: string, password: string) => Promise<void>;
 	signOut: () => Promise<void>;
 	updateProfile: (updates: Partial<Omit<User, "id">>) => Promise<void>;
+	uploadProfilePicture: (fileUri: string) => Promise<string>;
 	refreshOwnedBusiness: () => Promise<BusinessWithInfo | null>;
 	setError: (error: string | null) => void;
 };
@@ -148,6 +149,24 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
 			set({ loading: true, error: null });
 			const updatedProfile = await usersApi.update(user.id, updates);
 			set({ profile: updatedProfile, loading: false });
+		} catch (error) {
+			set({ error: (error as Error).message, loading: false });
+			throw error;
+		}
+	},
+
+	uploadProfilePicture: async (fileUri: string) => {
+		const { user, profile } = get();
+		if (!user || !profile) throw new Error("Not authenticated");
+
+		try {
+			set({ loading: true, error: null });
+			const url = await usersApi.uploadProfilePicture(user.id, fileUri);
+			set({
+				profile: { ...profile, profile_picture: url },
+				loading: false,
+			});
+			return url;
 		} catch (error) {
 			set({ error: (error as Error).message, loading: false });
 			throw error;

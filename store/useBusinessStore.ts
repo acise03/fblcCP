@@ -29,6 +29,7 @@ type BusinessStore = {
       phone?: string;
       website?: string;
       banner?: string;
+      profile_picture?: string;
     },
   ) => Promise<void>;
   updateBusinessAddress: (businessId: string, address: string) => Promise<void>;
@@ -42,6 +43,10 @@ type BusinessStore = {
     }[],
   ) => Promise<void>;
   uploadBusinessBanner: (
+    businessId: string,
+    fileUri: string,
+  ) => Promise<string>;
+  uploadBusinessProfilePicture: (
     businessId: string,
     fileUri: string,
   ) => Promise<string>;
@@ -142,6 +147,7 @@ export const useBusinessStore = create<BusinessStore>((set, get) => ({
         phone: info.phone ?? existingInfo?.phone ?? null,
         website: info.website ?? existingInfo?.website ?? null,
         banner: info.banner ?? existingInfo?.banner ?? null,
+        profile_picture: info.profile_picture ?? existingInfo?.profile_picture ?? null,
       });
 
       // Refresh the selected business if it matches
@@ -165,6 +171,19 @@ export const useBusinessStore = create<BusinessStore>((set, get) => ({
       await get().updateBusinessInfo(businessId, { banner: bannerUrl });
       set({ loading: false });
       return bannerUrl;
+    } catch (error) {
+      set({ error: (error as Error).message, loading: false });
+      throw error;
+    }
+  },
+
+  uploadBusinessProfilePicture: async (businessId: string, fileUri: string) => {
+    try {
+      set({ loading: true, error: null });
+      const url = await businessesApi.uploadProfilePicture(businessId, fileUri);
+      await get().updateBusinessInfo(businessId, { profile_picture: url });
+      set({ loading: false });
+      return url;
     } catch (error) {
       set({ error: (error as Error).message, loading: false });
       throw error;

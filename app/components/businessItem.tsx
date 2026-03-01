@@ -88,7 +88,14 @@ export default function BusinessItem({
       android_ripple={{ color: "transparent" }}
       style={() => ({ opacity: 1 })}
     >
-      <Image className="rounded-full w-14 h-14 bg-gray-500" />
+      {business?.business_information?.profile_picture ? (
+        <Image
+          className="rounded-full w-14 h-14"
+          source={{ uri: business.business_information.profile_picture }}
+        />
+      ) : (
+        <Image className="rounded-full w-14 h-14 bg-gray-500" />
+      )}
       <View className="px-4 flex flex-col flex-1">
         <Text className="text-md font-medium" style={{ fontFamily: "Rubik" }}>
           {business?.name}

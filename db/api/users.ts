@@ -1,4 +1,5 @@
 import { supabase } from "@/lib/supabase";
+import { File } from "expo-file-system";
 import type { User } from "../schema";
 
 export const usersApi = {
@@ -26,6 +27,38 @@ export const usersApi = {
 
 		if (error) throw error;
 		return data;
+	},
+
+	async uploadProfilePicture(userId: string, fileUri: string): Promise<string> {
+		const cleanUri = fileUri.split("?")[0];
+		const extension = (cleanUri.split(".").pop() || "jpg").toLowerCase();
+		const filePath = `${userId}/profile-${Date.now()}.${extension}`;
+
+		const file = new File(fileUri);
+		const fileBytes = await file.arrayBuffer();
+
+		const { error: uploadError } = await supabase.storage
+			.from("profile-pictures")
+			.upload(filePath, fileBytes, {
+				upsert: true,
+				contentType: `image/${extension}`,
+			});
+
+		if (uploadError) throw uploadError;
+
+		const { data } = supabase.storage
+			.from("profile-pictures")
+			.getPublicUrl(filePath);
+
+		// Update the user record with the new profile picture URL
+		const { error: updateError } = await supabase
+			.from("users")
+			.update({ profile_picture: data.publicUrl })
+			.eq("id", userId);
+
+		if (updateError) throw updateError;
+
+		return data.publicUrl;
 	},
 
 	async getAddress(userId: string): Promise<string | null> {
